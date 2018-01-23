@@ -1,0 +1,24 @@
+$mainColor: rgba(255, 203, 5, 1);
+$mainAccent: rgba(10, 53, 113, 1);
+//Globla Variables
+$footerColor: $mainAccent;
+$fontColor: #2F2F2F;
+$hoverColor: $mainAccent;
+//
+$navText: white;
+//
+$hamCircle: white;
+//
+$mainColorShade: darken($mainColor, 10%);
+$navHam: $hoverColor;
+//
+$cardBackgrounds: #D6D6D6;
+
+//mixins
+@mixin vertical-align($position: relative) {
+  position: $position;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}

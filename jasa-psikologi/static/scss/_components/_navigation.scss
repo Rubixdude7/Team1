@@ -1,0 +1,275 @@
+/*NAV:WIDE SCREEN*/
+
+@media only screen and (min-width: 1001px) {
+    /*main nav styling and positioning*/
+    nav * {
+        padding: 0;
+        margin: 0;
+    }
+    nav {
+        position: relative;
+        width: 100%;
+        height: 8em;
+        background-color: $mainColor;
+        display: block;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+		z-index: 1;
+    }
+    .nav-wrapper {
+        position: absolute;
+        right: 0;
+        top: 0;
+        display: block;
+        height: 100%;
+        line-height: 8em;
+    }
+    /*items styling and positioning*/
+    .nav-wrapper ul {
+        height: 100%;
+        list-style: none;
+        z-index: 2;
+    }
+    .nav-wrapper>ul {
+        padding-right: 2.5em;
+    }
+    .nav-wrapper ul li {
+        height: 100%;
+        position: relative;
+        float: left;
+        transition: background-color .3s linear;
+		
+		&:hover{
+			background: $mainColorShade !important;
+		}
+		
+    }
+    .nav-wrapper ul li a:hover,
+    .logo a:hover,
+    .nav-wrapper a.currentPage {
+        color: $hoverColor !important;
+    }
+    /*TEXT*/
+    .nav-wrapper a {
+        display: block;
+        text-align: center;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        letter-spacing: .1em;
+        padding: 0 .8em;
+        font-size: 1.2em;
+    }
+    /*LOGO*/
+    .logo {
+        height: 6em;
+        display: inline-block;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        overflow: hidden;
+    }
+    .logo>div {
+        display: table-cell;
+        vertical-align: middle;
+        padding-left: 1em;
+    }
+    .logo>div:nth-child(2) a {
+        font-size: 2em;
+        text-decoration: none;
+    }
+    .logo img {
+        height: 6em;
+        &:first-child{
+            padding-right: 1em;
+        }
+    }
+    /*MOBILE NAV*/
+	.hamburger-menu,
+	.navHome,
+	.nav-close,
+	#resourceDropdown input,
+    #resourceDropdown>img {
+        display: none;
+    }
+}
+
+
+/*NAV:NARROW SCREEN*/
+
+@media only screen and (max-width: 1000px) {
+    nav * {
+        padding: 0;
+        margin: 0;
+    }
+    /* Navigation Menu - Background */
+    .nav-wrapper {
+        background-color: $mainColor;
+        /* critical sizing and position styles */
+        width: 15.5em;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 0;
+        /*for scrolling*/
+        max-height: 100vh;
+        display: flex;
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex-direction: column;
+    }
+    /* Navigation Menu - List items */
+    .nav-wrapper ul {
+        width: 100%;
+        line-height: 4em;
+    }
+    .nav-wrapper ul li {
+        /* non-critical appearance styles */
+        width: 100%;
+        transition: background-color .3s linear;
+        display: block;
+        overflow: hidden;
+    }
+    .nav-wrapper ul li:hover {
+        background-color: $mainColorShade;
+    }
+    .nav-wrapper a {
+        display: block;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        transition: .3s linear;
+        text-align: left;
+        font-size: 1.5em;
+        padding-left: .5em;
+    }
+    .nav-wrapper a:hover,
+    .logo a:hover,
+    .nav-wrapper a.currentPage {
+        color: $hoverColor;
+    }
+    /* Site Wrapper - Everything that isn't navigation */
+    .wrapper {
+        /* Critical position and size styles */
+        min-height: 100%;
+        min-width: 100%;
+        //background-color: $backgroundColor;
+        background-color: white;
+        /* Needs a background or else the nav will show through */
+        position: relative;
+        top: 0;
+        bottom: 100%;
+        right: 0;
+        z-index: 1;
+        box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.5);
+    }
+    /*following header*/
+    .fixed-mobile-nav {
+        width: 100%;
+        height: 4em;
+        background-color: $mainColor;
+        box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.5);
+        position: fixed;
+        z-index: 10;
+        transition: .5s linear;
+    }
+    .fixed-mobile-nav-content {
+        position: absolute;
+        top: 0;
+        height: 4em;
+        width: 100%;
+        background-color: $mainColor;
+        z-index: 2;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    }
+    
+    /*space for mobile nav*/
+    .nav-wrapper ul li:first-child{
+        margin-top: 4em;
+        width: 100%;
+    }
+    /*LOGO*/
+    .logo {
+        position: fixed;
+        left: .5em;
+        top: .25em;
+        z-index: 12;
+        display: table;
+        height: 4em;
+        overflow: hidden;
+    }
+    .logo>div {
+        display: table-cell;
+        vertical-align: middle;
+        height: 4em;
+        padding-left: 1em;
+        img:first-child{
+            padding-right: 1em;
+        }
+    }
+    .logo>div:nth-child(2) a {
+        font-size: 2em;
+        text-decoration: none;
+    }
+    .logo>div:nth-child(2) {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 0;
+        line-height: 4em;
+    }
+    .logo img {
+        height: 3em;
+    }
+    /**/
+    .mobile-nav-spacer {
+        height: 4em;
+        width: 100%;
+    }
+    
+	/*hamburger style*/
+	@import '_hamburger';
+	.hamburger-menu{
+		z-index: 15;
+	}
+	/*full screen close nav*/
+	.nav-close{
+		display: none;
+		width: 100vw;
+		height: 100vh;
+		cursor: pointer;
+		z-index: 10;
+	}
+    /* Make the Magic Happen */
+    .wrapper{
+        transition: right .5s ease-in-out;
+    }
+	
+	.hamburger-checkbox:checked{
+		&~{
+			.wrapper,
+			.nav-close{
+				/*The window*/
+				right: 15.5em;
+			}
+			.nav-close{
+				position: fixed;
+				display: block;
+			}
+			.fixed-mobile-nav {
+        box-shadow: 0 0 7px 7px rgba(0, 0, 0, 0.4);
+    }
+		}
+		
+	}
+	
+    /* Without this, the body has excess horizontal scroll when the menu is open */
+    body {
+        overflow-x: hidden;
+    }
+}
+
+/*common*/
+.hamburger-checkbox{
+	display: none;
+}
