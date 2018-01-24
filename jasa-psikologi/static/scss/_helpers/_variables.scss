@@ -13,12 +13,3 @@ $mainColorShade: darken($mainColor, 10%);
 $navHam: $hoverColor;
 //
 $cardBackgrounds: #D6D6D6;
-
-//mixins
-@mixin vertical-align($position: relative) {
-  position: $position;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%);
-}
