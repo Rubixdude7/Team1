@@ -9,7 +9,8 @@
 </head>
 <body>
 
-<nav>
+    <input class="hamburger-checkbox" id="hamburger-checkbox" type="checkbox">
+    <nav>
         <div class="logo">
             <div>
                 <a href="{{url_for('index')}}"><img alt="logo" src="{{url_for('static', filename='contents/p.png')}}"/><img alt="logo" src="{{url_for('static', filename='contents/passion.png')}}"/></a>
@@ -28,14 +29,12 @@
         </div>
     </nav>
 
-    <input class="hamburger-checkbox" id="hamburger-checkbox" type="checkbox">
-    <label for="hamburger-checkbox" class="nav-close"></label>
-    <div class="hamburger-menu">
-        <label class="hamburger-label" for="hamburger-checkbox"></label>
-        <span class="hamburger">
-		<span class="burger"></span>
+
+    <label for="hamburger-checkbox" class="nav-close">
+        <span class='menu'>
+            <span class='hamburger'></span>
         </span>
-    </div>
+    </label>
 
     <div class="fixed-mobile-nav"></div>
 
@@ -53,6 +52,6 @@
                 <p>&copy; {{ year }} by Passion Konsultan.</p>
             </div>
         </footer>
-
+    </div>
 </body>
 </html>
