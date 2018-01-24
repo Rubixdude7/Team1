@@ -13,7 +13,7 @@ Contains classes that are models for tables in the database
 
 
 """ the database connection string """
-db = MySQLDatabase("spice_rack", host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh", passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
+db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d", host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh", passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
 
 
 class MySQLModel(Model):
@@ -73,7 +73,7 @@ class psychologist_child_xref(MySQLModel):
 
 
 class consultation(MySQLModel):
-    cnslt = PrimaryKeyField()
+    cnslt_id = PrimaryKeyField()
     child = ForeignKeyField(child, to_field="child_id")
     psyc = ForeignKeyField(psychologist, to_field="psyc_id")
     fee = DoubleField()
