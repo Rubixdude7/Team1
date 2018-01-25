@@ -2,13 +2,16 @@ from flask import Flask, render_template
 import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_user import login_required, UserManager, UserMixin, SQLAlchemyAdapter
+from flask_user.forms import RegisterForm
 from flask_mail import Mail
-
+from wtforms import StringField, DateField
+from wtforms.validators import DataRequired
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d'
 app.config['CSRF_ENABLED'] = True
+app.config['USER_APP_NAME'] = 'Passion'
 app.config.from_pyfile('config.cfg')
 
 db = SQLAlchemy(app)
@@ -30,11 +33,18 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean(), nullable=False, server_default='0')
     first_name = db.Column(db.String(100), nullable=False, server_default='')
     last_name = db.Column(db.String(100), nullable=False, server_default='')
+    user_dob = db.column(db.Date)
+
+
+class MyRegisterForm(RegisterForm):
+    first_name = StringField('First name', validators=[DataRequired('First name is required')])
+    last_name = StringField('Last name',  validators=[DataRequired('Last name is required')])
+    user_dob = DateField('Date of birth', format='%m/%d/%Y', validators=[DataRequired('Date of birth is required')])
 
 
 # Setup Flask-User
 db_adapter = SQLAlchemyAdapter(db, User)  # Register the User model
-user_manager = UserManager(db_adapter, app)  # Initialize Flask-User
+user_manager = UserManager(db_adapter, app, register_form=MyRegisterForm)  # Initialize Flask-User
 
 # Needed for all pages, be sure to add as a parameter!
 year = datetime.datetime.now().year
