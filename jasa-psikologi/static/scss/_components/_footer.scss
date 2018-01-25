@@ -1,0 +1,114 @@
+footer * {
+    margin: 0;
+    padding: 0;
+}
+
+.footer-content {
+    width: 100%;
+    height: 70%;
+}
+
+.footer-accent {
+    width: 100%;
+    height: 30%;
+    background-color: darken($footerColor, 10%);
+
+    p{
+        padding-top: .7em;
+        text-align: center;
+        font-size: 1em;
+        color: white;
+    }
+}
+
+.buttons-wrapper {
+    position: relative;
+    top: 25%;
+    height: 50%;
+    margin: 0 auto;
+}
+
+.buttons {
+    width: 100%;
+    height: 100%;
+}
+
+.buttons tr td {
+    padding: 0 .5em;
+    height: 100%;
+    //line-height: 2em;
+    //width: 33.33333333333333%;
+}
+
+.buttons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 3px;
+    color: white;
+    background-color: $mainAccent;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease-in-out;
+}
+
+.buttons a:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+}
+
+.buttons a div {
+    display: inline-block;
+    //vertical-align: middle;	
+}
+
+.buttons img {
+    height: 1.2em;
+    margin-left: .5em;
+}
+
+
+/*SCREEN SIZE: WIDE  || SUB-PAGES*/
+
+@media only screen and (min-width: 750px) {
+    .buttons-wrapper {
+        width: 50%;
+    }
+}
+
+
+/*SCREEN SIZE: NARROW */
+
+@media only screen and (max-width: 749px) {
+    .buttons-wrapper {
+        width: 100%;
+    }
+}
+
+
+/*FOOTER> KEEP AT BOTTOM*/
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    position: relative;
+}
+
+.content {
+    padding-bottom: 8em;
+    /* Height of the footer element */
+}
+
+footer {
+    background: $footerColor;
+    width: 100%;
+    height: 8em;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}

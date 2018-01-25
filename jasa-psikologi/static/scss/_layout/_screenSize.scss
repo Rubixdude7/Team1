@@ -1,0 +1,22 @@
+/*SCREEN SIZE: WIDE  || SUB-PAGES*/
+
+@media only screen and (min-width: 750px) {
+    main {
+        width: 70%;
+    }
+}
+
+
+/*SCREEN SIZE: NARROW */
+
+@media only screen and (max-width: 749px) {
+    main {
+        width: 90%;
+    }
+}
+
+main {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}

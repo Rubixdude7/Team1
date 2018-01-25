@@ -1,0 +1,66 @@
+/*FONT IMPORT*/
+
+@font-face {
+    font-family: roboto;
+    src: url(roboto-regular.ttf);
+}
+
+
+/*FONT*/
+
+* {
+    font-family: 'roboto';
+    color: $fontColor;
+}
+
+
+/*TEXT*/
+
+main h1 {
+    font-size: 2.4em;
+}
+
+main h2 {
+    font-size: 2.2em;
+}
+
+main h3 {
+    font-size: 2em;
+}
+
+main h4 {
+    font-size: 1.8em;
+}
+
+main h5 {
+    font-size: 1.6em;
+}
+
+main {
+  p,
+  label,
+  input {
+    font-size: 1.2em;
+  }
+}
+
+a {
+  -webkit-transition: .3s ease-in-out;
+  -moz-transition: .3s ease-in-out;
+  -o-transition: .3s ease-in-out;
+  transition: .3s ease-in-out;
+}
+
+main a:hover {
+  color: $hoverColor;
+}
+
+
+/*fixes padding issue;
+puts the page at the top of the screen*/
+
+.subPage p:first-child {
+  margin: 0;
+  padding: 0;
+}
+

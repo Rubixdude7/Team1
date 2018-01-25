@@ -1,0 +1,274 @@
+/*NAV:WIDE SCREEN*/
+@media only screen and (min-width: 1001px) {
+  /*main nav styling and positioning*/
+  nav * {
+    padding: 0;
+    margin: 0;
+  }
+
+  nav {
+    position: relative;
+    width: 100%;
+    height: 5em;
+    background-color: $mainColor;
+    display: block;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    z-index: 1;
+  }
+
+  .nav-wrapper {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: block;
+    height: 100%;
+    line-height: 5em;
+  }
+  /*items styling and positioning*/
+  .nav-wrapper ul {
+    height: 100%;
+    list-style: none;
+    z-index: 2;
+  }
+
+  .nav-wrapper > ul {
+    padding-right: 2.5em;
+  }
+
+  .nav-wrapper ul li {
+    height: 100%;
+    position: relative;
+    float: left;
+    transition: background-color 0.3s linear;
+
+    &:hover {
+      background: $mainColorShade !important;
+    }
+  }
+
+  .logo a:hover,
+  .nav-wrapper a.currentPage,
+  .nav-wrapper ul li a:hover {
+    color: $hoverColor !important;
+  }
+  /*TEXT*/
+  .nav-wrapper a {
+    display: block;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    padding: 0 0.8em;
+    font-size: 1.2em;
+  }
+  /*LOGO*/
+  .logo {
+    height: 4em;
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    overflow: hidden;
+  }
+
+  .logo > div {
+    display: table-cell;
+    vertical-align: middle;
+    padding-left: 1em;
+  }
+
+  .logo > div:nth-child(2) a {
+    font-size: 2em;
+    text-decoration: none;
+  }
+
+  .logo img {
+    height: 4em;
+
+    &:first-child {
+      padding-right: 1em;
+    }
+  }
+  /*MOBILE NAV*/
+  #resourceDropdown > img,
+  #resourceDropdown input,
+  .hamburger-menu,
+  .nav-close,
+  .navHome {
+    display: none;
+  }
+}
+/*NAV:NARROW SCREEN*/
+@media only screen and (max-width: 1000px) {
+  nav {
+    ul {
+      z-index: 200;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: 0.25s 0s ease-in-out;
+      list-style: none;
+
+      a {
+        margin-bottom: 1em;
+        display: block;
+        color: white;
+        font-size: 1.4em;
+        text-align: center;
+        text-decoration: none;
+
+        &:hover,
+        .currentPage {
+          color: $mainColor !important;
+        }
+
+      }
+    }
+
+    * {
+      padding: 0;
+      margin: 0;
+    }
+  }
+  /* Navigation Menu - Background */
+  .menu {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 100;
+    width: 4em;
+    height:4em;
+    //background: purple;
+    border-radius: 50%;
+    transition: 0.5s ease-in-out;
+    box-shadow: 0 0 0 0 darken($mainAccent, 10%), 0 0 0 0 darken($mainAccent, 10%);
+    cursor: pointer;
+  }
+
+  .hamburger {
+    position: absolute;
+    top: 1.85em;
+    left: .75em;
+    width: 2.5em;
+    height: .2em;
+    background: $mainAccent;
+    display: block;
+    transform-origin: center;
+    transition: 0.5s ease-in-out;
+
+    &:after,
+    &:before {
+      transition: 0.5s ease-in-out;
+      content: "";
+      position: absolute;
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: $mainAccent;
+    }
+
+    &:before {
+      top: -.7em;
+    }
+
+    &:after {
+      bottom: -.7em;
+    }
+  }
+
+  .hamburger-checkbox:checked ~ .nav-close > .menu {
+    box-shadow: 0 0 0 150vw $mainAccent, 0 0 0 150vh $mainAccent;
+    border-radius: 0;
+
+    .hamburger {
+      transform: rotate(45deg);
+
+      &:after {
+        transform: rotate(90deg);
+        bottom: 0;
+      }
+
+      &:before {
+        transform: rotate(90deg);
+        top: 0;
+      }
+    }
+  }
+
+  .hamburger-checkbox:checked {
+    &~ .nav-close > .menu,
+    ~nav > .nav-wrapper> ul {
+      opacity: 1;
+    }
+  }
+  /*following header*/
+  .mobile-nav-spacer {
+        height: 4em;
+        width: 100%;
+    }
+
+  .fixed-mobile-nav {
+    width: 100%;
+    height: 4em;
+    background-color: $mainColor;
+    box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.5);
+    position: fixed;
+    z-index: 10;
+    transition: 0.5s linear;
+  }
+
+  .fixed-mobile-nav-content {
+    position: absolute;
+    top: 0;
+    height: 4em;
+    width: 100%;
+    background-color: $mainColor;
+    z-index: 2;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  }
+  /*LOGO*/
+  .logo {
+    position: fixed;
+    left: 0.5em;
+    top: 0.25em;
+    z-index: 12;
+    display: table;
+    height: 4em;
+    overflow: hidden;
+  }
+
+  .logo > div {
+    display: table-cell;
+    vertical-align: middle;
+    height: 4em;
+    padding-left: 1em;
+
+    img:first-child {
+      padding-right: 1em;
+    }
+  }
+
+  .logo > div:nth-child(2) a {
+    font-size: 2em;
+    text-decoration: none;
+  }
+
+  .logo > div:nth-child(2) {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0;
+    line-height: 4em;
+  }
+
+  .logo img {
+    height: 3em;
+  }
+}
+/*common*/
+.hamburger-checkbox {
+  display: none;
+}
