@@ -25,13 +25,14 @@ class MySQLModel(Model):
 class user(MySQLModel):
     user_id = PrimaryKeyField()
     username = CharField()
-    user_nm_fst = CharField()
-    user_nm_lst = CharField()
-    user_email = CharField()
-    user_pass = CharField()
-    user_dob = DateField()
-    verified = BooleanField()
-    void_ind = CharField
+    password = CharField()
+    email = CharField()
+    confirmed_at = DateTimeField()
+    active = BooleanField()
+    first_name = CharField()
+    last_name = CharField()
+    user_dob = DateTimeField()
+    void_ind = CharField()
 
     class Meta:
         db_table = "user"
@@ -194,8 +195,8 @@ class role(MySQLModel):
         db_table = "role"
 
 
-class user_role_xref(MySQLModel):
-    urx_id = PrimaryKeyField()
+class user_roles(MySQLModel):
+    user_role_id = PrimaryKeyField()
     user = ForeignKeyField(user, to_field="user_id")
     role = ForeignKeyField(role, to_field="role_id")
 

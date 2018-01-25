@@ -18,6 +18,7 @@ app.config.from_pyfile('config.cfg')
 db = SQLAlchemy(app)
 mail = Mail(app)
 
+
 class User(db.Model, UserMixin):
 
     id = db.Column('user_id', db.BigInteger, primary_key=True)
