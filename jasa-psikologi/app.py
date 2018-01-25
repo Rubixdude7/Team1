@@ -74,10 +74,15 @@ year = datetime.datetime.now().year
 
 @app.route('/')
 def index():
-    current_user.name = user_manager.get_user_by_id(current_user.id).first_name.upper()
-    # TODO this is in testing
 
     return render_template("index.html", year=year)
+
+
+@app.route('/test')
+@login_required
+def test():
+
+    return render_template("test.html", year=year)
 
 
 @app.route('/profile')
