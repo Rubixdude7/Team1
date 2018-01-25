@@ -4,22 +4,19 @@
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %} | Passion</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='contents/favicon.ico') }}">
-
-    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="apple-touch-icon-57x57.png" />
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="apple-touch-icon-114x114.png" />
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="apple-touch-icon-72x72.png" />
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="apple-touch-icon-144x144.png" />
-    <link rel="apple-touch-icon-precomposed" sizes="60x60" href="apple-touch-icon-60x60.png" />
-    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120.png" />
-    <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76.png" />
-    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152.png" />
-    <link rel="icon" type="image/png" href="favicon-196x196.png" sizes="196x196" />
-    <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" />
-    <link rel="icon" type="image/png" href="favicon-128.png" sizes="128x128" />
-
+    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="{{ url_for('static', filename='contents/fav/apple-touch-icon-57x57.png') }}" />
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{ url_for('static', filename='contents/fav/apple-touch-icon-114x114.png') }}" />
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{ url_for('static', filename='contents/fav/apple-touch-icon-72x72.png') }}" />
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ url_for('static', filename='contents/fav/apple-touch-icon-144x144.png') }}" />
+    <link rel="apple-touch-icon-precomposed" sizes="60x60" href="{{ url_for('static', filename='contents/fav/apple-touch-icon-60x60.png') }}" />
+    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="{{ url_for('static', filename='contents/fav/apple-touch-icon-120x120.png') }}" />
+    <link rel="apple-touch-icon-precomposed" sizes="76x76" href="{{ url_for('static', filename='contents/fav/apple-touch-icon-76x76.png') }}" />
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="{{ url_for('static', filename='contents/fav/apple-touch-icon-152x152.png') }}" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='contents/fav/favicon-196x196.png') }}" sizes="196x196" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='contents/fav/favicon-96x96.png') }}" sizes="96x96" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='contents/fav/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='contents/fav/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='contents/fav/favicon-128.png') }}" sizes="128x128" />
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">
 </head>
 <body>
@@ -28,27 +25,27 @@
         <nav>
             <div class="logo">
                 <div>
-                    <a href="{{url_for('index')}}"><img alt="logo" src="{{url_for('static', filename='contents/p.png')}}"/><img alt="logo" src="{{url_for('static', filename='contents/passion.png')}}"/></a>
+                    <a href="{{ url_for('index') }}"><img alt="logo" src="{{ url_for('static', filename='contents/p.png') }}"/><img alt="logo" src="{{ url_for('static', filename='contents/passion.png') }}"/></a>
                 </div>
             </div>
             <div class="nav-wrapper">
                 <ul>
                     <li>
-                        <a href="{{url_for('index')}}">HOME</a>
+                        <a href="{{ url_for('index') }}">HOME</a>
                     </li>
                     <li>
-                        <a href="{{url_for('test')}}">TEST</a>
+                        <a href="{{ url_for('test') }}">TEST</a>
                     </li>
                     {% if current_user.is_authenticated %}
                         <li>
-                            <a href="/user/profile">WELCOME: {{ current_user.first_name.upper() }}</a>
+                            <a href="{{ url_for('user.profile') }}">WELCOME: {{ current_user.first_name.upper() }}</a>
                         </li>
                         <li>
-                            <a href="/user/sign-out">LOG OUT</a>
+                            <a href="{{ url_for('user.logout') }}">LOG OUT</a>
                         </li>
                     {% else %}
                         <li>
-                            <a href="/user/sign-in">LOG IN</a>
+                            <a href="{{ url_for('user.login') }}">LOG IN</a>
                         </li>
                     {% endif %}
                 </ul>
