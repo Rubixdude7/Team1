@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 import datetime
 from flask_sqlalchemy import SQLAlchemy
-from flask_user import login_required,roles_required, UserManager, UserMixin, SQLAlchemyAdapter
+from flask_user import login_required, roles_required, UserManager, UserMixin, SQLAlchemyAdapter, current_user
 from flask_user.forms import RegisterForm
 from flask_mail import Mail
 from wtforms import StringField, DateTimeField
@@ -74,6 +74,8 @@ year = datetime.datetime.now().year
 
 @app.route('/')
 def index():
+    current_user.name = user_manager.get_user_by_id(current_user.id).first_name.upper()
+    # TODO this is in testing
 
     return render_template("index.html", year=year)
 
