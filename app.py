@@ -68,21 +68,18 @@ class MyRegisterForm(RegisterForm):
 db_adapter = SQLAlchemyAdapter(db, User)  # Register the User model
 user_manager = UserManager(db_adapter, app, register_form=MyRegisterForm)  # Initialize Flask-User
 
-# Needed for all pages, be sure to add as a parameter!
-year = datetime.datetime.now().year
-
 
 @app.route('/')
 def index():
 
-    return render_template("index.html", year=year)
+    return render_template("index.html")
 
 
 @app.route('/test')
 @login_required
 def test():
 
-    return render_template("test.html", year=year)
+    return render_template("test.html")
 
 
 @app.route('/profile')

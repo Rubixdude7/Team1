@@ -18,6 +18,7 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='contents/fav/favicon-16x16.png') }}" sizes="16x16" />
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='contents/fav/favicon-128.png') }}" sizes="128x128" />
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">
+    <script src="{{url_for('static', filename='script.js')}}" type="text/jscript"></script>
 </head>
 <body>
     <header>
@@ -72,7 +73,7 @@
 
         </div>
         <div class="footer-accent">
-            <p>&copy; {{ year }} by Passion Konsultan.</p>
+            <p>&copy; <span id="year"></span> by Passion Konsultan.</p>
         </div>
     </footer>
 </body>
