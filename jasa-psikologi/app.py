@@ -2,18 +2,17 @@ from flask import Flask, render_template
 import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_user import login_required, UserManager, UserMixin, SQLAlchemyAdapter
+from flask_mail import Mail
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d'
 app.config['CSRF_ENABLED'] = True
-app.config['USER_EMAIL_ENABLE'] = False
-app.config['USER_SEND_PASSWORD_CHANGED_EMAIL'] = False
-app.config['USER_SEND_REGISTERED_EMAIL'] = False
-app.config['USER_SEND_USERNAME_CHANGED_EMAIL'] = False
-db = SQLAlchemy(app)
+app.config.from_pyfile('config.cfg')
 
+db = SQLAlchemy(app)
+mail = Mail(app)
 
 class User(db.Model, UserMixin):
 
