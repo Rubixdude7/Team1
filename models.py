@@ -59,10 +59,24 @@ class child(MySQLModel):
 class psychologist(MySQLModel):
     psyc_id = PrimaryKeyField()
     user = ForeignKeyField(user, to_field="user_id")
+    photo = CharField()
+    qualifications = CharField()
 
     class Meta:
         db_table = "psychologist"
 
+
+class contact(MySQLModel):
+    contact_id = PrimaryKeyField()
+    user = ForeignKeyField(user, to_field="user_id")
+    phone_no = CharField()
+    street_addr = CharField()
+    city = CharField()
+    providence = CharField()
+    zip = CharField()
+
+    class Meta:
+        db_table = "contact"
 
 class psychologist_child_xref(MySQLModel):
     pcx_id = PrimaryKeyField()
@@ -78,9 +92,9 @@ class consultation(MySQLModel):
     child = ForeignKeyField(child, to_field="child_id")
     psyc = ForeignKeyField(psychologist, to_field="psyc_id")
     fee = DoubleField()
-    paid = DoubleField()
+    paid = CharField()
     length = DoubleField()
-    approved = BooleanField()
+    approved = CharField()
 
     class Meta:
         db_table = "consultation"
@@ -90,8 +104,8 @@ class consult_time(MySQLModel):
     cnslt_tm_id = PrimaryKeyField()
     cnslt = ForeignKeyField(consultation, to_field="cnslt_id")
     time_st = DateTimeField()
-    time_end = DateField()
-    approved = BooleanField()
+    time_end = DateTimeField()
+    approved = CharField()
 
     class Meta:
         db_table = "consult_time"
@@ -102,8 +116,8 @@ class notes(MySQLModel):
     cnslt = ForeignKeyField(consultation, to_field="cnslt_id")
     note = CharField()
     user_id_crea = BigIntegerField()
-    crea_dtm = TimestampField()
-    user_id_updt = BigIntegerField()
+    crea_dtm = DateTimeField()
+    user_id_upd = BigIntegerField()
     updt_dtm = DateTimeField()
     void_ind = CharField()
 
@@ -129,28 +143,34 @@ class consultation_length(MySQLModel):
         db_table = "consultation_length"
 
 
-class questinoare(MySQLModel):
+class questions(MySQLModel):
     q_id = PrimaryKeyField()
+    question = CharField()
+    user_id_crea = BigIntegerField()
+    crea_dtm = DateTimeField()
+    user_id_upd = BigIntegerField()
+    upd_dtm = DateTimeField()
     void_ind = CharField()
 
     class Meta:
-        db_table = "questionare"
+        db_table = "questions"
 
 
-class questionare_answers(MySQLModel):
+class question_answers(MySQLModel):
     qa_id = PrimaryKeyField()
     child = ForeignKeyField(child, to_field="child_id")
-    void_ind = CharField()
+    q = ForeignKeyField(questions, to_field="q_id")
+    answer = CharField()
 
     class Meta:
-        db_table = "questionare_answers"
+        db_table = "question_answers"
 
 
 class blog(MySQLModel):
     blog_id = PrimaryKeyField()
     psyc = ForeignKeyField(psychologist, to_field="psyc_id")
     text = CharField()
-    crea_dtm = TimestampField()
+    crea_dtm = DateTimeField()
     user_id_upd = BigIntegerField()
     updt_dtm = DateTimeField()
     void_ind = CharField()
@@ -179,12 +199,16 @@ class calendar(MySQLModel):
         db_table = "calendar"
 
 
-class reviews(MySQLModel):
+class review(MySQLModel):
     rev_id = PrimaryKeyField()
-    psyc = ForeignKeyField(psychologist, to_field="psyc_id")
+    cnslt = ForeignKeyField(consultation, to_field="cnslt_id")
+    review = CharField()
+    stars = DoubleField()
+    approved = CharField()
+    void_ind = CharField()
 
     class Meta:
-        db_table = "reviews"
+        db_table = "review"
 
 
 class role(MySQLModel):
@@ -201,7 +225,7 @@ class user_roles(MySQLModel):
     role = ForeignKeyField(role, to_field="role_id")
 
     class Meta:
-        db_table = "user_role_xref"
+        db_table = "user_roles"
 
 
 db.connect()
