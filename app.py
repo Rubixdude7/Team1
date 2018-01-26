@@ -6,6 +6,7 @@ from flask_user.forms import RegisterForm
 from flask_mail import Mail
 from wtforms import StringField, DateTimeField
 from wtforms.validators import DataRequired
+import query
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
@@ -69,6 +70,7 @@ class MyRegisterForm(RegisterForm):
 db_adapter = SQLAlchemyAdapter(db, User)  # Register the User model
 user_manager = UserManager(db_adapter, app, register_form=MyRegisterForm)  # Initialize Flask-User
 
+db = query.query()
 
 @app.route('/')
 def index():
@@ -80,7 +82,7 @@ def index():
 @login_required
 def test():
 
-    return render_template("test.html")
+    return render_template("test.html", test=db.test())
 
 
 @app.route('/profile')
