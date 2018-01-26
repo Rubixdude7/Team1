@@ -81,7 +81,7 @@ def index():
 @app.route('/test')
 @login_required
 def test():
-
+    #  pulls its data from the corresponding test method in query.py
     return render_template("test.html", test=db.test())
 
 

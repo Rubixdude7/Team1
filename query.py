@@ -15,7 +15,7 @@ class query(object):
         """
 
     def test(self):
-
+        # used to get dat from app.py page methods
         data = db.user.select(db.user.first_name).where(db.user.user_id == 1).tuples()
         data = list(data)[0][0]
         return data
