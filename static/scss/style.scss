@@ -10,6 +10,7 @@
 @import '_base/_reset';
 @import '_base/_typography';
 @import '_layout/_screenSize';
+@import '_layout/_box';
 @import '_components/_navigation';
 @import '_components/_footer';
 
@@ -21,3 +22,9 @@
 @import '_pages/_home';
 
 /**********END HOME**********/
+
+/**********BEGIN USER MANAGEMENT PAGES**********/
+
+@import '_pages/_user-mgnt';
+
+/**********END USER MANAGEMENT PAGES**********/

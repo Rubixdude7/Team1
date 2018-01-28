@@ -21,60 +21,62 @@
     <script src="{{url_for('static', filename='script.js')}}" type="text/jscript"></script>
 </head>
 <body>
-    <header>
-        <input class="hamburger-checkbox" id="hamburger-checkbox" type="checkbox">
-        <nav>
-            <div class="logo">
-                <div>
-                    <a href="{{ url_for('index') }}"><img alt="logo" src="{{ url_for('static', filename='contents/p.png') }}"/><img alt="logo" src="{{ url_for('static', filename='contents/passion.png') }}"/></a>
+    <div class="wrapper">
+        <header>
+            <input class="hamburger-checkbox" id="hamburger-checkbox" type="checkbox">
+            <nav>
+                <div class="logo">
+                    <div>
+                        <a href="{{ url_for('index') }}"><img alt="logo" src="{{ url_for('static', filename='contents/p.png') }}"/><img alt="logo" src="{{ url_for('static', filename='contents/passion.png') }}"/></a>
+                    </div>
                 </div>
+                <div class="nav-wrapper">
+                    <ul>
+                        <li>
+                            <a href="{{ url_for('index') }}">HOME</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('test') }}">TEST</a>
+                        </li>
+                        {% if current_user.is_authenticated %}
+                            <li>
+                                <a href="{{ url_for('user.profile') }}">WELCOME: {{ current_user.first_name.upper() }}</a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('user.logout') }}">LOG OUT</a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="{{ url_for('user.login') }}">LOG IN</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
+
+
+            <label for="hamburger-checkbox" class="nav-close">
+                <span class='menu'>
+                    <span class='hamburger'></span>
+                </span>
+            </label>
+        </header>
+        <div class="fixed-mobile-nav"></div>
+
+
+        <div class="mobile-nav-spacer"></div>
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+
+        <footer>
+            <div class="footer-content">
+
             </div>
-            <div class="nav-wrapper">
-                <ul>
-                    <li>
-                        <a href="{{ url_for('index') }}">HOME</a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('test') }}">TEST</a>
-                    </li>
-                    {% if current_user.is_authenticated %}
-                        <li>
-                            <a href="{{ url_for('user.profile') }}">WELCOME: {{ current_user.first_name.upper() }}</a>
-                        </li>
-                        <li>
-                            <a href="{{ url_for('user.logout') }}">LOG OUT</a>
-                        </li>
-                    {% else %}
-                        <li>
-                            <a href="{{ url_for('user.login') }}">LOG IN</a>
-                        </li>
-                    {% endif %}
-                </ul>
+            <div class="footer-accent">
+                <p>&copy; <span id="year"></span> by Passion Konsultan.</p>
             </div>
-        </nav>
-
-
-        <label for="hamburger-checkbox" class="nav-close">
-            <span class='menu'>
-                <span class='hamburger'></span>
-            </span>
-        </label>
-    </header>
-    <div class="fixed-mobile-nav"></div>
-
-
-    <div class="mobile-nav-spacer"></div>
-    <div class="content">
-        {% block content %}{% endblock %}
+        </footer>
     </div>
-
-    <footer>
-        <div class="footer-content">
-
-        </div>
-        <div class="footer-accent">
-            <p>&copy; <span id="year"></span> by Passion Konsultan.</p>
-        </div>
-    </footer>
 </body>
 </html>
