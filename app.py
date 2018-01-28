@@ -6,7 +6,6 @@ from flask_user.forms import RegisterForm
 from flask_mail import Mail
 from wtforms import StringField, DateTimeField
 from wtforms.validators import DataRequired
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d'
