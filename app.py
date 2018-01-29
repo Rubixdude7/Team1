@@ -6,20 +6,19 @@ from flask_user.forms import RegisterForm
 from flask_mail import Mail
 from wtforms import StringField, DateTimeField
 from wtforms.validators import DataRequired
-import query
+from data import Children #part of the dummy data. This and the other dummy data stuff can be deleted later
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = 'thisisasecret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # TODO make sure this is ok, this gets rid of the warning in the terminal
 app.config['CSRF_ENABLED'] = True
 app.config['USER_APP_NAME'] = 'Passion'
 app.config['USER_AFTER_REGISTER_ENDPOINT'] = 'user.login'
 app.config.from_pyfile('config.cfg')
+Children = Children() #part of the dummy data file
 
 db = SQLAlchemy(app)
 mail = Mail(app)
-
 
 class User(db.Model, UserMixin):
 
@@ -71,19 +70,21 @@ class MyRegisterForm(RegisterForm):
 db_adapter = SQLAlchemyAdapter(db, User)  # Register the User model
 user_manager = UserManager(db_adapter, app, register_form=MyRegisterForm)  # Initialize Flask-User
 
-db = query.query()
+# Needed for all pages, be sure to add as a parameter!
+year = datetime.datetime.now().year
+
 
 @app.route('/')
 def index():
 
-    return render_template("index.html")
+    return render_template("index.html", year=year)
 
 
 @app.route('/test')
 @login_required
 def test():
-    #  pulls its data from the corresponding test method in query.py
-    return render_template("test.html", test=db.test())
+
+    return render_template("test.html", year=year)
 
 
 @app.route('/profile')
@@ -99,6 +100,9 @@ def role():
 
     return 'you have permission'
 
+@app.route('/parent')
+def parent():
+    return render_template('parent.html', children=Children)
 
 if __name__ == '__main__':
     app.run(debug=True)
