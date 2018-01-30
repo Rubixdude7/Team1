@@ -5,3 +5,4 @@ peewee==2.10.2
 PyMySQL==0.8.0
 Werkzeug==0.14.1
 Flask-User==0.6.19
+blinker==1.4
