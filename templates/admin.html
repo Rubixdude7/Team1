@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<main id="mainHome">
+    <h1>Admin content here</h1>
+    <table>
+        <tr>
+            <th>Email</th>
+            <th>Role</th>
+        </tr>
+        {% for u in users %}
+            {% if u.void_ind == 'n' %}
+            <tr>
+                <td>{{ u.email }}</td>
+                <td>{{ u.user_id }}</td>
+                {% if current_user.id == u.user_id %}
+
+                {% else %}
+                    <td><a href="{{ url_for('edit', u_id=u.user_id) }}">Edit</a></td>
+                    <td><a href="{{ url_for('delete', u_id=u.user_id) }}">Delete</a></td>
+                {% endif %}
+            </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+</main>
+
+{% endblock %}

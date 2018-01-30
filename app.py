@@ -1,15 +1,19 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_user import login_required, roles_required, UserManager, UserMixin, SQLAlchemyAdapter, current_user
 from flask_user.forms import RegisterForm
 from flask_mail import Mail
-from wtforms import StringField, DateTimeField
+from flask_wtf import FlaskForm
+from wtforms import StringField, DateTimeField, Form, SelectField, SubmitField
 from wtforms.validators import DataRequired
 from data import Children #part of the dummy data. This and the other dummy data stuff can be deleted later
 
 app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = 'thisisasecret'
+#Jason's database
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://mgqmsvhuvgtovyte:Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU@42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com/db42576e98688b4ab28226a87601334c89'
+#Brandon's database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # TODO make sure this is ok, this gets rid of the warning in the terminal
 app.config['CSRF_ENABLED'] = True
@@ -65,11 +69,13 @@ class MyRegisterForm(RegisterForm):
     # user_dob = DateTimeField('Date of birth', format='%Y-%m-%d %H:%M:%S')
     # TODO fix date of birth, and add 18 yr validation
 
+
 # db.create_all()
 
 # Setup Flask-User
 db_adapter = SQLAlchemyAdapter(db, User)  # Register the User model
 user_manager = UserManager(db_adapter, app, register_form=MyRegisterForm)  # Initialize Flask-User
+
 
 
 @app.route('/')
@@ -88,6 +94,45 @@ def test():
 @app.route('/parent')
 def parent():
     return render_template('parent.html', children=Children)
+
+@app.route('/admin')
+@roles_required('admin')
+def admin():
+    users = db.getAllUsers()
+    return render_template('admin.html', users=users)
+
+
+class RoleChangeForm(FlaskForm):
+    role = SelectField('Role', coerce=str, validators=[DataRequired()], option_widget='Select')
+    submit = SubmitField('Submit')
+
+
+@app.route('/edit', methods=['GET', 'POST'])
+@roles_required('admin')
+def edit():
+    form = RoleChangeForm()
+    roles = db.getAllRoles()
+    rolenames = []
+    for a in roles:
+        rolenames.append(a.role_nm)
+    form.role.choices = [(r, r) for r in rolenames]
+    if form.validate_on_submit():
+        user_id = request.args.get('u_id')
+        newRole = form.role.data
+        db.updateUserRole(user_id, newRole)
+        #flash('Your changes have been saved.')
+        return redirect(url_for('admin'))
+    return render_template('edit.html', title='Edit Profile',
+                           form=form, current_user=current_user.id)
+
+
+@app.route('/delete')
+def delete():
+    user_id = request.args.get('u_id')
+    db.softDeleteUser(user_id)
+    return redirect(url_for('admin'))
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

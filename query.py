@@ -19,3 +19,24 @@ class query(object):
         data = db.user.select(db.user.first_name).where(db.user.user_id == 1).tuples()
         data = list(data)[0][0]
         return data
+
+    def getAllUsers(self):
+        users = db.user.select()
+        return users
+
+    def getAllRoles(self):
+        roles = db.role.select(db.role.role_nm)
+        return roles
+
+    def updateUserRole(self, a, r):
+        user = db.user.select(db.user.user_id).where(db.user.user_id == a)
+        userrole = db.user_roles.get(db.user_roles.user == user)
+        roleid = db.role.select(db.role.role_id).where(db.role.role_nm == r)
+        userrole.role = roleid
+        userrole.save()
+
+    def softDeleteUser(self, u_id):
+        user = db.user.get(db.user.user_id == u_id)
+        user.void_ind = 'y'
+        user.save()
+
