@@ -2,49 +2,64 @@
 
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field %}
-<main>
-    <h1>{%trans%}Register{%endtrans%}</h1>
+<main class="main-user-mgnt" id="register">
+    <div class="box">
+        <h1>{%trans%}Register{%endtrans%}</h1>
+        <hr>
+        <form action="" method="POST" novalidate formnovalidate class="form" role="form">
+            {{ form.hidden_tag() }}
 
-    <form action="" method="POST" novalidate formnovalidate class="form" role="form">
-        {{ form.hidden_tag() }}
-
-        {# Username or Email #}
-        {% set field = form.username if user_manager.enable_username else form.email %}
-        <div class="form-group {% if field.errors %}has-error{% endif %}">
-            {# Label on left, "Already registered? Sign in." on right #}
-            <div class="row">
-                <div class="col-xs-6">
-                    <label for="{{ field.id }}" class="control-label">{{ field.label.text }}</label>
+            {# Username or Email #}
+            {% set field = form.username if user_manager.enable_username else form.email %}
+            <div class="form-control-1 {% if field.errors %}has-error{% endif %}">
+                {# Label on left, "Already registered? Sign in." on right #}
+                <div class="row">
+                    <div class="col-xs-6">
+                        <label for="{{ field.id }}" class="control-label">{{ field.label.text }}</label>
+                    </div>
                 </div>
-                <div class="col-xs-6 text-right">
-                    {% if user_manager.enable_register %}
-                        <a href="{{ url_for('user.login') }}" tabindex='290'>
-                            {%trans%}Already registered? Sign in.{%endtrans%}</a>
-                    {% endif %}
-                </div>
+                {{ field(class_='form-control', tabindex=210) }}
+                {% if field.errors %}
+                    {% for e in field.errors %}
+                        <p class="help-block">{{ e }}</p>
+                    {% endfor %}
+                {% endif %}
             </div>
-            {{ field(class_='form-control', tabindex=210) }}
-            {% if field.errors %}
-                {% for e in field.errors %}
-                    <p class="help-block">{{ e }}</p>
-                {% endfor %}
+
+            {% if user_manager.enable_email and user_manager.enable_username %}
+                <div class="form-control-2">
+                    {{ render_field(form.email, tabindex=220) }}
+                </div>
             {% endif %}
-        </div>
 
-        {% if user_manager.enable_email and user_manager.enable_username %}
-            {{ render_field(form.email, tabindex=220) }}
-        {% endif %}
+            <div class="form-control-2">
+                {{ render_field(form.password, tabindex=230) }}
+            </div>
 
-        {{ render_field(form.password, tabindex=230) }}
+            {% if user_manager.enable_retype_password %}
+                <div class="form-control-2">
+                    {{ render_field(form.retype_password, tabindex=240) }}
+                </div>
+            {% endif %}
 
-        {% if user_manager.enable_retype_password %}
-            {{ render_field(form.retype_password, tabindex=240) }}
-        {% endif %}
+            <div class="form-control-2">
+                {{ render_field(form.first_name) }}
+            </div>
+            <div class="form-control-2">
+                {{ render_field(form.last_name) }}
+            </div>
 
-        {{ render_field(form.first_name) }}
-        {{ render_field(form.last_name) }}
+            <div class="form-control-2">
+                {{ render_submit_field(form.submit, tabindex=280) }}
+            </div>
 
-        {{ render_submit_field(form.submit, tabindex=280) }}
-    </form>
+            <div class="col-xs-6 text-right form-control-2 link">
+                {% if user_manager.enable_register %}
+                    <a href="{{ url_for('user.login') }}" tabindex='290'>
+                        {%trans%}Already registered? Sign in.{%endtrans%}</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
 </main>
 {% endblock %}
