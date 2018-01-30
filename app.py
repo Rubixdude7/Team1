@@ -1,12 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for
 import datetime
 from flask_sqlalchemy import SQLAlchemy
-from flask_user import login_required, roles_required, UserManager, UserMixin, SQLAlchemyAdapter, current_user
+from flask_user import login_required, roles_required, UserManager, UserMixin, SQLAlchemyAdapter, current_user, user_registered
 from flask_user.forms import RegisterForm
 from flask_mail import Mail
 from flask_wtf import FlaskForm
 from wtforms import StringField, DateTimeField, Form, SelectField, SubmitField
 from wtforms.validators import DataRequired
+from wtforms import StringField, DateField
+from wtforms.validators import DataRequired, ValidationError
 from data import Children #part of the dummy data. This and the other dummy data stuff can be deleted later
 import query
 
@@ -26,6 +28,7 @@ Children = Children() #part of the dummy data file
 db = SQLAlchemy(app)
 mail = Mail(app)
 
+
 class User(db.Model, UserMixin):
 
     id = db.Column('user_id', db.BigInteger, primary_key=True)
@@ -42,22 +45,23 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean(), nullable=False, server_default='0')
     first_name = db.Column(db.String(100), nullable=False, server_default='')
     last_name = db.Column(db.String(100), nullable=False, server_default='')
-    # user_dob = db.column(db.DateTime)
+    user_dob = db.column('user_dob', db.String(10))
 
     # Relationships
     roles = db.relationship('Role', secondary='user_roles',
                             backref=db.backref('users', lazy='dynamic'))
 
-    # Define the Role data model
+    def is_active(self):
+        return self.active
 
 
+# Define the Role data model
 class Role(db.Model):
     id = db.Column('role_id', db.BigInteger(), primary_key=True)
     name = db.Column('role_nm', db.String(50), unique=True)
 
-    # Define the UserRoles data model
 
-
+# Define the UserRoles data model
 class UserRoles(db.Model):
     id = db.Column('user_role_id', db.BigInteger(), primary_key=True)
     user_id = db.Column(db.Integer(), db.ForeignKey('user.user_id', ondelete='CASCADE'))
@@ -65,19 +69,32 @@ class UserRoles(db.Model):
 
 
 class MyRegisterForm(RegisterForm):
-    first_name = StringField('First name', validators=[DataRequired('First name is required')])
-    last_name = StringField('Last name',  validators=[DataRequired('Last name is required')])
-    # user_dob = DateTimeField('Date of birth', format='%Y-%m-%d %H:%M:%S')
-    # TODO fix date of birth, and add 18 yr validation
+    first_name = StringField('First Name', validators=[DataRequired('First name is required')])
+    last_name = StringField('Last Name',  validators=[DataRequired('Last name is required')])
+    user_dob = StringField('Date of Birth')
 
+    def validate_user_dob(form, field):
+        born = datetime.datetime.strptime(field.data, "%Y-%m-%d").date()
+        today = datetime.date.today()
+        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+        if age < 18:
+            raise ValidationError("We're sorry, you must be 18 or older to register")
 
-# db.create_all()
 
 # Setup Flask-User
-db_adapter = SQLAlchemyAdapter(db, User)  # Register the User model
+db_adapter = SQLAlchemyAdapter(db, UserClass=User)  # Register the User model
 user_manager = UserManager(db_adapter, app, register_form=MyRegisterForm)  # Initialize Flask-User
 
+#set up query class as db
 db = query.query()
+
+# new user registered
+@user_registered.connect_via(app)
+def _after_register_hook(sender, user, **extra):
+    role = Role.query.filter_by(name="user").first()
+    user_role = UserRoles(user_id=user.id, role_id=role.id)
+    db.session.add(user_role)
+    db.session.commit()
 
 @app.route('/')
 def index():
