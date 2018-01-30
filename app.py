@@ -8,6 +8,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, DateTimeField, Form, SelectField, SubmitField
 from wtforms.validators import DataRequired
 from data import Children #part of the dummy data. This and the other dummy data stuff can be deleted later
+import query
 
 app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = 'thisisasecret'
@@ -76,7 +77,7 @@ class MyRegisterForm(RegisterForm):
 db_adapter = SQLAlchemyAdapter(db, User)  # Register the User model
 user_manager = UserManager(db_adapter, app, register_form=MyRegisterForm)  # Initialize Flask-User
 
-
+db = query.query()
 
 @app.route('/')
 def index():
