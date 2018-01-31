@@ -1,4 +1,5 @@
 import models as db
+from peewee import *
 
 
 class query(object):
@@ -44,3 +45,7 @@ class query(object):
         user = db.user.get(db.user.user_id == 3)
         user.void_ind = 'n'
         user.save()
+
+    def role(self, id):
+        db.role.select(db.role.role_nm).join(db.user_roles, JOIN_FULL, db.role.role_id ==
+                                             db.user_roles.select(db.user_roles.role.join(db.user, JOIN_FULL, db.user_roles.user == db.user.user_id and db.user.user_id == id)))

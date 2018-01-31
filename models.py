@@ -1,5 +1,5 @@
 from peewee import *
-from flask_peewee_crud import generate_crud
+#from flask_peewee_crud import generate_crud
 
 __author__ = "Brandon Duke"
 
