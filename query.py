@@ -21,7 +21,7 @@ class query(object):
         return data
 
     def getAllUsers(self):
-        users = db.user.select()
+        users = db.user.select().where(db.user.void_ind == 'n')
         return users
 
     def getAllRoles(self):
@@ -40,3 +40,7 @@ class query(object):
         user.void_ind = 'y'
         user.save()
 
+    def bringHimBack(self):
+        user = db.user.get(db.user.user_id == 3)
+        user.void_ind = 'n'
+        user.save()

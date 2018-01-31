@@ -15,9 +15,9 @@ import query
 app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = 'thisisasecret'
 #Jason's database
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://mgqmsvhuvgtovyte:Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU@42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com/db42576e98688b4ab28226a87601334c89'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://mgqmsvhuvgtovyte:Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU@42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com/db42576e98688b4ab28226a87601334c89'
 #Brandon's database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # TODO make sure this is ok, this gets rid of the warning in the terminal
 app.config['CSRF_ENABLED'] = True
 app.config['USER_APP_NAME'] = 'Passion'
@@ -86,7 +86,7 @@ db_adapter = SQLAlchemyAdapter(db, UserClass=User)  # Register the User model
 user_manager = UserManager(db_adapter, app, register_form=MyRegisterForm)  # Initialize Flask-User
 
 #set up query class as db
-db = query.query()
+querydb = query.query()
 
 # new user registered
 @user_registered.connect_via(app)
@@ -116,7 +116,7 @@ def parent():
 @app.route('/admin')
 @roles_required('admin')
 def admin():
-    users = db.getAllUsers()
+    users = querydb.getAllUsers()
     return render_template('admin.html', users=users)
 
 
@@ -129,7 +129,7 @@ class RoleChangeForm(FlaskForm):
 @roles_required('admin')
 def edit():
     form = RoleChangeForm()
-    roles = db.getAllRoles()
+    roles = querydb.getAllRoles()
     rolenames = []
     for a in roles:
         rolenames.append(a.role_nm)
@@ -137,7 +137,7 @@ def edit():
     if form.validate_on_submit():
         user_id = request.args.get('u_id')
         newRole = form.role.data
-        db.updateUserRole(user_id, newRole)
+        querydb.updateUserRole(user_id, newRole)
         #flash('Your changes have been saved.')
         return redirect(url_for('admin'))
     return render_template('edit.html', title='Edit Profile',
@@ -147,7 +147,7 @@ def edit():
 @app.route('/delete')
 def delete():
     user_id = request.args.get('u_id')
-    db.softDeleteUser(user_id)
+    querydb.softDeleteUser(user_id)
     return redirect(url_for('admin'))
 
 

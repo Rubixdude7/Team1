@@ -9,7 +9,7 @@
             <th>Role</th>
         </tr>
         {% for u in users %}
-            {% if u.void_ind == 'n' %}
+
             <tr>
                 <td>{{ u.email }}</td>
                 <td>{{ u.user_id }}</td>
@@ -20,7 +20,7 @@
                     <td><a href="{{ url_for('delete', u_id=u.user_id) }}">Delete</a></td>
                 {% endif %}
             </tr>
-            {% endif %}
+
         {% endfor %}
     </table>
 </main>
