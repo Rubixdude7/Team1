@@ -128,8 +128,9 @@ def add_questions():
 def post_questions():
     # question = request.args.get('question')
     question = request.form.get('question')
-    print(question);
-    querydb.addQuestion(question, current_user.id)
+    print(question)
+    print(current_user.user_id)
+    querydb.addQuestion(question, current_user.user_id)
 
     return redirect(url_for('questions'))
 

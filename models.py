@@ -180,6 +180,7 @@ class questions(MySQLModel):
     crea_dtm = DateTimeField()
     user_id_upd = BigIntegerField()
     upd_dtm = DateTimeField()
+    active = CharField()
     void_ind = CharField()
 
     class Meta:
