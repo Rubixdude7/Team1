@@ -39,7 +39,7 @@ class MySQLModel(Model):
         database = db
 
 
-class user(MySQLModel):
+class user(MySQLModel, flask_user.UserMixin):
     user_id = PrimaryKeyField()
     username = CharField()
     password = CharField()
