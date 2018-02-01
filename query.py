@@ -22,7 +22,7 @@ class query(object):
         return data
 
     def getAllUsers(self):
-        users = db.user.select().where(db.user.void_ind == 'n')
+        users = db.user.select().where(db.user.void_ind == 'n') #TODO based on how flask-user works may need to change to active not void_ind, just needs tested
         return users
 
     def getAllRoles(self):
