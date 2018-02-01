@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ psyc_info.full_name }}{% endblock %}
+{% block content %}
+<main id="psyc-page">
+    <div class="psyc-summary">
+        <img src="{{ psyc_info.photo }}" alt="[photograph of {{ psyc_info.full_name }}]" style="float:right" />
+        <h2>{{ psyc_info.full_name }}</h2>
+        <p class="psyc-qualifications">{{ psyc_info.qualifications }}</p>
+    </div>
+    <div class="calendar" style="background-color: white; height: 5in;">
+        Calendar will go here
+    </div>
+</main>
+{% endblock %}

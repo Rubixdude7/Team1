@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}List of Psychologists{% endblock %}
+{% block content %}
+<main id="psyc-list-page">
+    <h2>List of Psychologists</h2>
+    <ul class="psyc-list">
+        {% for psyc in psychologist_links %}
+            <li><a href="/psikolog/{{ psyc.id }}">{{ psyc.full_name }}</a></li>
+        {% endfor %}
+    </ul>
+</main>
+{% endblock %}

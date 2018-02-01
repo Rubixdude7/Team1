@@ -87,3 +87,47 @@ class query(object):
         db.role.select(db.role.role_nm).join(db.user_roles, JOIN_FULL, db.role.role_id ==
                                              db.user_roles.select(db.user_roles.role.join(db.user, JOIN_FULL,
                                                                                           db.user_roles.user == db.user.user_id and db.user.user_id == id)))
+
+    def lookupPsychologist(self, id):
+        info = None
+        try:
+            info_tuple = db.psychologist.select(db.psychologist.photo,
+                                                db.psychologist.qualifications,
+                                                db.user.first_name,
+                                                db.user.last_name)\
+                                         .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                                         .where(db.user.void_ind != 'y')\
+                                         .tuples()[0]
+            info = PsychologistLookupResult()
+            info.photo = info_tuple[0]
+            info.qualifications = info_tuple[1]
+            info.first_name = info_tuple[2]
+            info.last_name = info_tuple[3]
+            info.full_name = '{0} {1}'.format(info.first_name, info.last_name)
+        except IndexError:
+            pass
+        return info
+
+    def psychologistLinks(self):
+        tuples = db.psychologist.select(db.psychologist.psyc_id,
+                                        db.psychologist.photo,
+                                        db.user.first_name,
+                                        db.user.last_name)\
+                                .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                                .where(db.user.void_ind != 'y')\
+                                .tuples()
+        links = [PsychologistLink(t[0], '{2} {3}'.format(*t)) for t in tuples]
+        return links
+
+class PsychologistLookupResult:
+    def __init__(self):
+        self.photo = None
+        self.qualifications = None
+        self.first_name = None
+        self.last_name = None
+        self.full_name = None
+
+class PsychologistLink:
+    def __init__(self, id, full_name):
+        self.id = id
+        self.full_name = full_name

@@ -242,6 +242,17 @@ def edit():
     return render_template('edit.html', title='Edit Profile',
                            form=form, current_user=current_user.id)
 
+@app.route('/psikolog/')
+@app.route('/psikolog/<int:id>')
+def psikolog(id=None):
+    if id is not None:
+        psyc_info = querydb.lookupPsychologist(id)
+        if psyc_info is not None:
+            return render_template('psikolog.html', psyc_info=psyc_info)
+
+    # Either no id was given or no psychologist was found.
+    # In both cases, show a list of psychologists.
+    return render_template('list_psikolog.html', psychologist_links=querydb.psychologistLinks())
 
 @app.route('/delete')
 def delete():
