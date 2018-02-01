@@ -5,6 +5,8 @@
     <div class="box">
         <h1 class="title">Your Profile</h1>
         <hr>
+    <div><a href="add_child/">Add Child</a></div>
+    <div><a href="parent/contact">Update Contact Information</a></div>
         <ul class="list-group">
             {% for child in children %}
                 <li class="list-group-item"><a href="parent/{{ child.id }}">{{ child.first_name }}</a></li>
