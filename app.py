@@ -1,16 +1,22 @@
 from flask import Flask, render_template, request, redirect, url_for
 import datetime
-from flask_user import login_required, roles_required, UserManager, UserMixin, current_user, user_registered
+from flask_sqlalchemy import SQLAlchemy
+from flask import request
+from flask_user import login_required, roles_required, UserManager, UserMixin, SQLAlchemyAdapter, current_user
+from flask_user import login_required, roles_required, UserManager, UserMixin, SQLAlchemyAdapter, current_user, \
+    user_registered
 from flask_user.forms import RegisterForm
 from flask_mail import Mail
 from flask_wtf import FlaskForm
 from wtforms import StringField, DateTimeField, Form, SelectField, SubmitField
+from wtforms.validators import DataRequired
+from flask import redirect, url_for
+from models import *
 from wtforms import StringField, DateField
 from wtforms.validators import DataRequired, ValidationError
 from data import Children  # part of the dummy data. This and the other dummy data stuff can be deleted later
-import models
 import query
-
+import models
 from flask import flash, render_template, request, redirect
 
 app = Flask(__name__, template_folder='templates')
@@ -21,6 +27,8 @@ app.config['USER_AFTER_REGISTER_ENDPOINT'] = 'user.login'
 app.config.from_pyfile('config.cfg')
 Children = Children()  # part of the dummy data file
 
+# Setup Flask-User
+
 mail = Mail(app)
 
 
@@ -29,8 +37,6 @@ class MyRegisterForm(RegisterForm):
     last_name = StringField('Last Name', validators=[DataRequired('Last name is required')])
 
 
-
-# Setup Flask-User
 db_adapter = models.PeeweeAdapter(models.db, models.user)  # Register the User model
 user_manager = UserManager(db_adapter, app, register_form=MyRegisterForm)  # Initialize Flask-User
 
@@ -62,10 +68,14 @@ def _after_register_hook(sender, user, **extra):
     user_role = models.user_roles(user=user, role=role)
     user_role.save()
 
+#           BRANDON         #
+
 
 @app.route('/')
 def index():
     return render_template("index.html")
+
+#           END BRANDON         #
 
 
 @app.route('/editQuestion', methods=['GET', 'POST'])
@@ -123,7 +133,8 @@ def post_questions():
     # question = request.args.get('question')
     question = request.form.get('question')
     print(question)
-    querydb.addQuestion(question, current_user.id)
+    print(current_user.user_id)
+    querydb.addQuestion(question, current_user.user_id)
 
     return redirect(url_for('questions'))
 
@@ -139,15 +150,16 @@ def post_questionAnswers():
 
 
 @app.route('/parent')
+@login_required
 def parent():
-    return render_template('parent.html', children=Children)
-
+    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name)
 
 
 @app.route('/parent/contact')
 def contact():
     return render_template('contact.html')
 
+# Start Jason's code
 
 # methods Brody added (may not work '-__- )
 @app.route('/child')
@@ -207,7 +219,15 @@ def edit():
         # flash('Your changes have been saved.')
         return redirect(url_for('admin'))
     return render_template('edit.html', title='Edit Profile',
-                           form=form, current_user=current_user.id)
+                           form=form, current_user=current_user.user_id)
+
+@app.route('/delete')
+def delete():
+    user_id = request.args.get('u_id')
+    querydb.softDeleteUser(user_id)
+    return redirect(url_for('admin'))
+
+# End Jason's code
 
 @app.route('/psikolog/')
 @app.route('/psikolog/<int:id>')
@@ -221,11 +241,6 @@ def psikolog(id=None):
     # In both cases, show a list of psychologists.
     return render_template('list_psikolog.html', psychologist_links=querydb.psychologistLinks())
 
-@app.route('/delete')
-def delete():
-    user_id = request.args.get('u_id')
-    querydb.softDeleteUser(user_id)
-    return redirect(url_for('admin'))
 
 
 if __name__ == '__main__':

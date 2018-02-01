@@ -1,0 +1,25 @@
+.table{
+  background-color: white;
+  color: #363636;
+  margin-bottom: 1.5rem;
+  border-collapse: collapse;
+  border-spacing: 0;
+
+  thead th,
+  tbody td{
+    //border-width: 0 0 2px;
+    color: #363636;
+    text-align: left;
+    padding: 0.5em 0.75em;
+    vertical-align: top;
+  }
+
+  tbody td{
+    border-top: 1px solid #dbdbdb;
+  }
+
+  tbody tr:hover{
+    background-color: #00d1b2;
+    color: #fff;
+  }
+}

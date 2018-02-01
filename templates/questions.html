@@ -5,7 +5,7 @@
 
 <main id="mainHome">
     <h1>Question List</h1>
-    <head>
+
         <link rel="stylesheet"
               href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <script>
@@ -36,7 +36,7 @@ document.getElementById("error").innerHTML = "Error!";
 }
 
         </script>
-    </head>
+
     <style>
 .alert {
     padding: 20px;
@@ -127,7 +127,6 @@ background-color:#ebebe0;
 }
 
     </style>
-    <body>
     <form action="{{ url_for('add_questions') }}">
         <button class="add"><i class="fa fa-plus"></i> Add Question</button>
     </form>
@@ -195,5 +194,4 @@ background-color:#ebebe0;
 
         {% endblock %}
 
-    </body>
 </main>
