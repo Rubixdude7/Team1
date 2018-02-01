@@ -107,7 +107,6 @@ def _after_register_hook(sender, user, **extra):
 
 @app.route('/')
 def index():
-    print(current_user.is_in_role('parent'))
     return render_template("index.html")
 
 
