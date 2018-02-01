@@ -195,7 +195,7 @@ def edit():
         #flash('Your changes have been saved.')
         return redirect(url_for('admin'))
     return render_template('edit.html', title='Edit Profile',
-                           form=form, current_user=current_user.id)
+                           form=form, current_user=current_user.user_id)
 
 @app.route('/psikolog/')
 @app.route('/psikolog/<int:id>')
