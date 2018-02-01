@@ -150,9 +150,9 @@ def post_questionAnswers():
 
 
 @app.route('/parent')
+@login_required
 def parent():
-    return render_template('parent.html', children=Children)
-
+    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name)
 
 
 @app.route('/parent/contact')

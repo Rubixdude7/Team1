@@ -121,6 +121,8 @@ class query(object):
         links = [PsychologistLink(t[0], '{2} {3}'.format(*t)) for t in tuples]
         return links
 
+    #def editContactInfo(self):
+
 
 class PsychologistLookupResult:
     def __init__(self):
