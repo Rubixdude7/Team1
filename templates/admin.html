@@ -17,7 +17,7 @@
                     <tr>
                         <td>{{ u.email }}</td>
                         <td>{{ usersandroles[u.email] }}</td>
-                        {% if current_user.id == u.user_id %}
+                        {% if current_user.user_id == u.user_id %}
 
                         {% else %}
                             <td><a href="{{ url_for('edit', u_id=u.user_id) }}">Edit</a></td>

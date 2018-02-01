@@ -219,13 +219,13 @@ def edit():
         rolenames.append(a.role_nm)
     form.role.choices = [(r, r) for r in rolenames]
     if form.validate_on_submit():
-        user_id = request.args.get('u_id')
+        u_id = request.args.get('u_id')
         newRole = form.role.data
-        querydb.updateUserRole(user_id, newRole)
-        # flash('Your changes have been saved.')
+        querydb.updateUserRole(u_id, newRole)
+        #flash('Your changes have been saved.')
         return redirect(url_for('admin'))
     return render_template('edit.html', title='Edit Profile',
-                           form=form, current_user=current_user.user_id)
+                           form=form)
 
 @app.route('/delete')
 def delete():

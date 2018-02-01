@@ -24,10 +24,10 @@ db = MySQLDatabase("db42576e98688b4ab28226a87601334c89", host="42576e98-688b-4ab
 #db = SqliteDatabase('C:\\Users\\Scott\\PythonProjects\\jasa-psikologi.db')
 
 # Brandon's
-#db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d", host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh", passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
+db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d", host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh", passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
 
 #Gabe's
-db = MySQLDatabase("db8a50d083362f4984b1a7a87a011640fe", host="8a50d083-362f-4984-b1a7-a87a011640fe.mysql.sequelizer.com", port=3306, user="qbesdejnezzeyzvs", passwd="EnHF8XoLGxzpBLjxnjVEGyeueVuoxfo2j256WxbYWFkSRhdFUF6VivkgioAkBanB")
+#db = MySQLDatabase("db8a50d083362f4984b1a7a87a011640fe", host="8a50d083-362f-4984-b1a7-a87a011640fe.mysql.sequelizer.com", port=3306, user="qbesdejnezzeyzvs", passwd="EnHF8XoLGxzpBLjxnjVEGyeueVuoxfo2j256WxbYWFkSRhdFUF6VivkgioAkBanB")
 
 
 # For flask_user
