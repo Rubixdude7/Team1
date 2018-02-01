@@ -41,6 +41,7 @@ user_manager = UserManager(db_adapter, app, register_form=MyRegisterForm)  # Ini
 #set up query class as db
 querydb = query.query()
 
+
 # new user registered
 @user_registered.connect_via(app)
 def _after_register_hook(sender, user, **extra):
@@ -48,17 +49,10 @@ def _after_register_hook(sender, user, **extra):
     user_role = models.user_roles(user=user, role=role)
     user_role.save()
 
+
 @app.route('/')
 def index():
-
     return render_template("index.html")
-
-
-@app.route('/test')
-@login_required
-def test():
-
-    return render_template("test.html")
 
 
 @app.route('/parent')
@@ -108,7 +102,6 @@ def delete():
     user_id = request.args.get('u_id')
     querydb.softDeleteUser(user_id)
     return redirect(url_for('admin'))
-
 
 
 if __name__ == '__main__':
