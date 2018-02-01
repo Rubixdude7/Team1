@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Edit{% endblock %}
+{% block content %}
+<main id="editQuestion">
+    <h1>Edit Question Title</h1>
+    <p>Current Question Title: <b> {{ question.question }} </b> </p>
+
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+           <input id ="question" name = "question" type="text" />
+
+
+
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+</main>
+{% endblock %}

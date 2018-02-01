@@ -1,4 +1,5 @@
 import models as db
+import datetime
 from peewee import *
 
 
@@ -14,6 +15,42 @@ class query(object):
         Default Constructor
         There are no parameters, default is here as there has to be code in the constructor
         """
+
+    def deactivateQuestion(self, q_id):
+        question = db.questions.get(db.questions.q_id == q_id)
+        question.void_ind = 'y'
+        question.save()
+
+    def getQuestion(selfs, q_id):
+        question = db.questions.get(db.questions.q_id == q_id)
+        return question;
+
+    def reactivateQuestion(self, q_id):
+        question = db.questions.get(db.questions.q_id == q_id)
+        question.void_ind = 'n'
+        question.save()
+
+    def questionDelete(self, q_id):
+        question = db.questions.get(db.questions.q_id == q_id)
+        question.delete_instance()
+        question.save()
+
+    def addQuestion(self, question2, user):
+        q = db.questions(question=question2, user_id_crea=user, crea_dtm=datetime.datetime.now())
+        q.save()
+
+    def paginate(self, num):
+        count = db.questions.query.paginate(per_page=2, page=num, error_out=True)
+        return count;
+
+    def getAllQuestions(self):
+        questions = db.questions.select()
+        return questions
+
+    def editQuestion(self, a, newQuestion):
+        current = db.questions.get(db.questions.q_id == a)
+        current.question = newQuestion
+        current.save()
 
     def test(self):
         # used to get dat from app.py page methods
@@ -48,4 +85,5 @@ class query(object):
 
     def role(self, id):
         db.role.select(db.role.role_nm).join(db.user_roles, JOIN_FULL, db.role.role_id ==
-                                             db.user_roles.select(db.user_roles.role.join(db.user, JOIN_FULL, db.user_roles.user == db.user.user_id and db.user.user_id == id)))
+                                             db.user_roles.select(db.user_roles.role.join(db.user, JOIN_FULL,
+                                                                                          db.user_roles.user == db.user.user_id and db.user.user_id == id)))

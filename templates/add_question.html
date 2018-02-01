@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<main id="mainHome">
+    <h1>Add A Question</h1>
+
+    <body>
+
+
+<form method="post" action="/post_add_questions">
+    <label>question Title</label>
+    <input id ="question" name = "question" type="text" />
+    <input type="submit" />
+
+</form>
+
+    </body>
+
+</main>
+
+{% endblock %}

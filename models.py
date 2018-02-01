@@ -1,5 +1,6 @@
 from peewee import *
-#from flask_peewee_crud import generate_crud
+
+# from flask_peewee_crud import generate_crud
 
 __author__ = "Brandon Duke"
 
@@ -12,17 +13,28 @@ models:
 Contains classes that are models for tables in the database
 """
 
-
 """ the database connection string """
-#Jason's
-db = MySQLDatabase("db42576e98688b4ab28226a87601334c89", host="42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com", port=3306, user="mgqmsvhuvgtovyte", passwd="Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU")
+# brandon's db
+db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d",
+                   host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh",
+                   passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
+# jared lewis db
+# db = MySQLDatabase("db38b32831bc8a4cf6acefa878003849f7", host="38b32831-bc8a-4cf6-acef-a878003849f7.sqlserver.sequelizer.com", port=3306, user="vnqimdibqlqhqgap", passwd="pdCJFgqiUjR68iGphryN5g6sdHEf3Voi7WQYPHvTpCFuyxdE3xkvYuQhgkF6Hjo8")
 
-#Brandon's
-#db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d", host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh", passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
+
+# Jason's
+db = MySQLDatabase("db42576e98688b4ab28226a87601334c89",
+                   host="42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com", port=3306, user="mgqmsvhuvgtovyte",
+                   passwd="Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU")
+
+
+# Brandon's
+# db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d", host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh", passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
 
 
 class MySQLModel(Model):
     """A base model that will use our MySQL database"""
+
     class Meta:
         database = db
 
@@ -82,6 +94,7 @@ class contact(MySQLModel):
 
     class Meta:
         db_table = "contact"
+
 
 class psychologist_child_xref(MySQLModel):
     pcx_id = PrimaryKeyField()

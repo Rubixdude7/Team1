@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+
+<main id="mainHome">
+    <h1>Question List</h1>
+    <head>
+        <link rel="stylesheet"
+              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script>
+function dropItDown() {
+
+    document.getElementById("myDropdown").classList.toggle("show");
+}
+function pagination() {
+
+var divs = document.getElementsByClassName('question');
+var numTabs = 0;
+for (var i = 0; i < divs.length; i++) {
+	if (divs[i].id.indexOf('tab') != -1)
+		numTabs++;
+}
+}
+
+ window.onload = pagination;
+
+function validateForm() {
+    var x = document.forms["myForm"]["fname"].value;
+    if (x == "") {
+var div = document.createElement("alert");
+        alert("All questions must be filled out.");
+document.getElementById("error").innerHTML = "Error!";
+        return false;
+    }
+}
+
+        </script>
+    </head>
+    <style>
+.alert {
+    padding: 20px;
+    background-color: #f44336;
+    color: white;
+}
+.delete {
+    background-color: Red;
+    border: none;
+    color: white;
+    padding: 7px 11px;
+    font-size: 12px;
+    cursor: pointer;
+float:left;
+}
+.delete:hover {
+    background-color: #cc0000;
+}
+.edit {
+    background-color: #cc9900;
+    border: none;
+    color: white;
+    padding: 7px 11px;
+    font-size: 12px;
+    cursor: pointer;
+float:left;
+}
+.edit:hover {
+    background-color: #b38600;
+}
+.deactivate {
+    background-color: #ff9900;
+    border: none;
+    color: white;
+    padding: 7px 11px;
+    font-size: 12px;
+    cursor: pointer;
+float:left;
+}
+.deactivate:hover {
+    background-color: #e68a00;
+}
+.add {
+    background-color: #00cc00;
+    border: none;
+    color: white;
+    padding: 7px 11px;
+    font-size: 12px;
+    cursor: pointer;
+
+
+
+}
+.add:hover {
+    background-color: #00b300;
+}
+.question {
+
+width:300px;
+height:100px;
+  margin: 30  auto;
+
+}
+.question:hover {
+
+background-color:#ebebe0;
+}
+
+
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+    </style>
+    <body>
+    <form action="{{ url_for('add_questions') }}">
+        <button class="add"><i class="fa fa-plus"></i> Add Question</button>
+    </form>
+
+    {% for u in questions %}
+    <!-- question list -->
+    {% if u.void_ind == 'y' %}
+    <div class="question" style="background-color:#ff8080">
+        {% else %}
+        <div class="question">
+            {% endif %}
+            <form name="myForm" action="/action_page.php"
+                  onsubmit="return validateForm()" method="post">
+                <p id="questiontitle"><b>{{ u.q_id }} {{ u.question }}</b></p>
+                <input type="text" name="fname">
+            </form>
+
+
+            <!--DROPDOWN CONTENT YOU CAN TEST ADMIN HERE!!! -->
+            <div class="dropdown">
+                <span onclick="dropItDown()"><i class="fa fa-bars"></i></span>
+                <div class="dropdown-content">
+                    <button class="edit"><i class="fa fa-pencil"></i><a
+                            href="{{ url_for('editQuestion', q_id=u.q_id) }}">Edit Question</a></button>
+
+                    <br></br>
+
+                    {% if u.void_ind == 'y' %}
+                    <button class="deactivate"><i class="fa fa-close"></i><a
+                            href="{{ url_for('questionreactivate', q_id=u.q_id) }}">Reactivate</a></button>
+
+                    {% else %}
+                    <button class="deactivate"><i class="fa fa-close"></i><a
+                            href="{{ url_for('questiondeactivate', q_id=u.q_id) }}">Deactivate</a></button>
+
+                    {% endif %}
+                    <br></br>
+                    <button class="delete"><i class="fa fa-close"></i><a
+                            href="{{ url_for('questionDelete', q_id=u.q_id) }}">Delete Question</a></button>
+                </div>
+                <!-- END -->
+            </div>
+            <span id="error" style="color:red"></span>
+            <!-- END QUESTION -->
+        </div>
+
+
+        <tr>
+
+
+            {% if current_user.id == u.user_id %}
+
+            {% else %}
+
+            <!--<td><a href="{{ url_for('delete', u_id=u.user_id) }}">Delete</a></td> -->
+            {% endif %}
+        </tr>
+
+        {% endfor %}
+        </table>
+        <form method="post" action="/post_add_questionAnswers" onsubmit="return validateForm()">
+            <input type="submit" value="Submit">
+        </form>
+
+
+        {% endblock %}
+
+    </body>
+</main>
