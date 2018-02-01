@@ -49,6 +49,11 @@ class user(MySQLModel, flask_user.UserMixin):
     # For flask_user
     roles = [FlaskUserRoleInfo(name) for name in ['admin', 'staff', 'psyc', 'user']]
 
+    def is_in_role(self, role_name):
+        role_nm = role.select(role.role_nm).join(user_roles).where(role.role_id == user_roles.role and user_roles.user == self.user_id).tuples()
+        print(role_nm)
+        return role_nm
+
     class Meta:
         db_table = "user"
 
