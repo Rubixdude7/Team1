@@ -68,10 +68,14 @@ def _after_register_hook(sender, user, **extra):
     user_role = models.user_roles(user=user, role=role)
     user_role.save()
 
+#           BRANDON         #
+
 
 @app.route('/')
 def index():
     return render_template("index.html")
+
+#           END BRANDON         #
 
 
 @app.route('/editQuestion', methods=['GET', 'POST'])
