@@ -48,11 +48,24 @@ class user(MySQLModel, flask_user.UserMixin):
     username = CharField()
     password = CharField()
     email = CharField()
-    confirmed_at = DateTimeField(null=True)
+    _confirmed_at = DateTimeField(null=True, db_column='confirmed_at')
     active = BooleanField()
     first_name = CharField()
     last_name = CharField()
     void_ind = CharField(default='n')
+
+    # Fix for confirmed_at.
+    # Explanation: Our version of Flask_User does not correctly use PeeweeAdapter to
+    # update the confirmed_at field.  So, we are fixing this by making confirmed_at
+    # automatically save to the DB whenever it is accessed.
+    @property
+    def confirmed_at(self):
+        return self._confirmed_at
+
+    @confirmed_at.setter
+    def confirmed_at(self, value):
+        self._confirmed_at = value
+        self.save()
 
     # For flask_user
     roles = [FlaskUserRoleInfo(name) for name in ['admin', 'staff', 'psyc', 'user']]
