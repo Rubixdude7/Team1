@@ -6,7 +6,6 @@ from flask_user.forms import RegisterForm
 from flask_mail import Mail
 from flask_wtf import FlaskForm
 from wtforms import StringField, DateTimeField, Form, SelectField, SubmitField
-from wtforms.validators import DataRequired
 from wtforms import StringField, DateField
 from wtforms.validators import DataRequired, ValidationError
 from data import Children #part of the dummy data. This and the other dummy data stuff can be deleted later
@@ -121,7 +120,13 @@ def parent():
 @roles_required('admin')
 def admin():
     users = querydb.getAllUsers()
-    return render_template('admin.html', users=users)
+    roles = list()
+    usersandroles = dict()
+    for u in users:
+        r = querydb.role(u.user_id)
+        roles.append(r)
+        usersandroles[u.email] = r
+    return render_template('admin.html', users=users, roles=roles, usersandroles=usersandroles)
 
 
 class RoleChangeForm(FlaskForm):

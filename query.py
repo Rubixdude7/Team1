@@ -47,5 +47,8 @@ class query(object):
         user.save()
 
     def role(self, id):
-        db.role.select(db.role.role_nm).join(db.user_roles, JOIN_FULL, db.role.role_id ==
-                                             db.user_roles.select(db.user_roles.role.join(db.user, JOIN_FULL, db.user_roles.user == db.user.user_id and db.user.user_id == id)))
+        role = db.role.select(db.role.role_nm).join(db.user_roles, JOIN_INNER, db.role.role_id ==
+                                             db.user_roles.select(db.user_roles.role).where(db.user_roles.user == id)).tuples()
+        role = list(role)[0][0]
+        print(role)
+        return role

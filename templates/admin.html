@@ -9,10 +9,9 @@
             <th>Role</th>
         </tr>
         {% for u in users %}
-
             <tr>
                 <td>{{ u.email }}</td>
-                <td>{{ u.user_id }}</td>
+                <td>{{ usersandroles[u.email] }}</td>
                 {% if current_user.id == u.user_id %}
 
                 {% else %}
@@ -20,7 +19,6 @@
                     <td><a href="{{ url_for('delete', u_id=u.user_id) }}">Delete</a></td>
                 {% endif %}
             </tr>
-
         {% endfor %}
     </table>
 </main>
