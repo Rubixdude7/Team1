@@ -19,7 +19,7 @@ import query
 import models
 from flask import flash, render_template, request, redirect
 
-app = Flask(__name__, template_folder='templates')
+app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
 app.config['CSRF_ENABLED'] = True
 app.config['USER_APP_NAME'] = 'Passion'
@@ -152,10 +152,10 @@ def post_questionAnswers():
 @app.route('/parent')
 @login_required
 def parent():
-    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name)
+    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.user_id))
 
 
-@app.route('/parent/contact')
+@app.route('/parent/contact', methods=['POST'])
 def contact():
     return render_template('contact.html')
 

@@ -131,7 +131,13 @@ class query(object):
         links = [PsychologistLink(t[0], '{2} {3}'.format(*t)) for t in tuples]
         return links
 
-    #def editContactInfo(self):
+    #Beginnning of Gabe's code
+
+    def getChildren(self, id):
+        c = db.child.select().where(db.child.user_id == id)
+        return c
+
+    #End of Gabe's code
 
 
 class PsychologistLookupResult:
