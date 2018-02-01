@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Parent Profile{% endblock %}
 {% block content %}
-<h1>Your Profile</h1>
-    <ul class="list-group">
-        {% for child in children %}
-            <li class="list-group-item"><a href="parent/{{ child.id }}">{{ child.first_name }}</a></li>
-        {% endfor %}
-    </ul>
-
-
+<main>
+    <div class="box">
+        <h1 class="title">Your Profile</h1>
+        <hr>
+        <ul class="list-group">
+            {% for child in children %}
+                <li class="list-group-item"><a href="parent/{{ child.id }}">{{ child.first_name }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</main>
 {% endblock %}

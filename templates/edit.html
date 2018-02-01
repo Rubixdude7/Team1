@@ -2,15 +2,19 @@
 {% block title %}Edit{% endblock %}
 {% block content %}
 <main id="edit">
-    <h1>Choose new role</h1>
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.role.label }}<br>
-            {{ form.role(size=1) }}<br>
-
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
+    <div class="box">
+        <h1 class="title">Choose new role</h1>
+        <hr>
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <div class="form-control-1">
+                {{ form.role.label }}
+                {{ form.role(size=1) }}
+            </div>
+            <div class="form-control-2">
+                {{ form.submit() }}
+            </div>
+        </form>
+    </div>
 </main>
 {% endblock %}

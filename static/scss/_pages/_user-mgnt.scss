@@ -1,0 +1,28 @@
+/* generic */
+.main-user-mgnt{
+
+  h1 {
+    text-align: center;
+  }
+
+  .link *{
+    display: inline;
+    text-decoration: none;
+    color: #2672ec;
+  }
+}
+
+.form-control-1{
+  margin: 1em 0;
+}
+
+.form-control-2{
+  margin: 0 0 1em 0;
+}
+
+/*REGISTER*/
+#register{
+  label{
+    display: block;
+  }
+}
