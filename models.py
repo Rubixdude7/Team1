@@ -71,17 +71,10 @@ class user(MySQLModel, flask_user.UserMixin):
         db_table = "user"
 
 
-class parent(MySQLModel):
-    parent_id = PrimaryKeyField()
-    user = ForeignKeyField(user, to_field="user_id")
-
-    class Meta:
-        db_table = "parent"
-
 
 class child(MySQLModel):
     child_id = PrimaryKeyField()
-    parent = ForeignKeyField(parent, to_field="parent_id")
+    user = ForeignKeyField(user, to_field="user_id")
     child_nm_fst = CharField()
     child_nm_lst = CharField()
 

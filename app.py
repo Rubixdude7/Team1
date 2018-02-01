@@ -248,6 +248,5 @@ def psikolog(id=None):
     return render_template('list_psikolog.html', psychologist_links=querydb.psychologistLinks())
 
 
-
 if __name__ == '__main__':
     app.run(debug=True)
