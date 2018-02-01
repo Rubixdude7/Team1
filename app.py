@@ -159,6 +159,7 @@ def parent():
 def contact():
     return render_template('contact.html')
 
+# Start Jason's code
 
 @app.route('/admin')
 @roles_required('admin')
@@ -201,6 +202,14 @@ def edit():
     return render_template('edit.html', title='Edit Profile',
                            form=form, current_user=current_user.user_id)
 
+@app.route('/delete')
+def delete():
+    user_id = request.args.get('u_id')
+    querydb.softDeleteUser(user_id)
+    return redirect(url_for('admin'))
+
+# End Jason's code
+
 @app.route('/psikolog/')
 @app.route('/psikolog/<int:id>')
 def psikolog(id=None):
@@ -213,11 +222,6 @@ def psikolog(id=None):
     # In both cases, show a list of psychologists.
     return render_template('list_psikolog.html', psychologist_links=querydb.psychologistLinks())
 
-@app.route('/delete')
-def delete():
-    user_id = request.args.get('u_id')
-    querydb.softDeleteUser(user_id)
-    return redirect(url_for('admin'))
 
 
 if __name__ == '__main__':

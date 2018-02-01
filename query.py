@@ -52,6 +52,8 @@ class query(object):
         current.question = newQuestion
         current.save()
 
+# Start Jason's code
+
     def getAllUsers(self):
         users = db.user.select().where(
             db.user.void_ind == 'n')  # TODO based on how flask-user works may need to change to active not void_ind, just needs tested
@@ -85,6 +87,8 @@ class query(object):
         role = list(role)[0][0]
         print(role)
         return role
+
+# End Jason's code
 
     def lookupPsychologist(self, id):
         info = None
