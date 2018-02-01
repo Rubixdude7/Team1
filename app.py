@@ -150,6 +150,11 @@ def parent():
 
 
 
+@app.route('/parent/contact')
+def contact():
+    return render_template('contact.html')
+
+
 @app.route('/admin')
 @roles_required('admin')
 def admin():
