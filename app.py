@@ -11,7 +11,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, DateTimeField, Form, SelectField, SubmitField
 from wtforms.validators import DataRequired
 from flask import redirect, url_for
-from models import *
+
 from wtforms import StringField, DateField
 from wtforms.validators import DataRequired, ValidationError
 from data import Children  # part of the dummy data. This and the other dummy data stuff can be deleted later
@@ -162,25 +162,27 @@ def contact():
 
 # methods Brody added (may not work '-__- )
 @app.route('/child')
-def child():
-    return render_template('child.html', child)
+@app.route('/child/<int:child_id>')
+@roles_required('user')
+def child(child_id=None):
+    if child_id is not None:
+        child_info = querydb.findChild(child_id)
+        if child_info is not None:
+            return render_template('child.html', child_info=child_info)
+    return render_template('parent.html')
 
 
 @app.route('/childform')
+@roles_required('user')
 def childform():
     return render_template('childform.html')
 
 
 @app.route('/childform', methods=['post'])
+@roles_required('user')
 def addChild():
-
-    kid = models.child
-    kid.child_nm_fst = request.form['firstname']
-    kid.child_nm_lst = request.form['lastname']
-    kid.parent = current_user.user_id
-    addChild(kid)
-
-    return render_template('parent.html')
+    querydb.addChild(current_user.user_id, request.form.get('firstname'), request.form.get('lastname'))
+    return parent()
 
 # End Brody's
 

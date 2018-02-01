@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Child Registration Form{% endblock %}
+{% block content %}
+<h1>Child Registration Form</h1>
+    <form method="post">
+        First name:<br>
+        <input type="text" name="firstname"><br>
+        Last name:<br>
+        <input type="text" name="lastname"><br>
+        <br>
+        <br>
+
+        <button type="submit">
+            Add Child
+        </button>
+    </form>
+
+
+{% endblock %}

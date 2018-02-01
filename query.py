@@ -29,6 +29,7 @@ class query(object):
 
     def reactivateQuestion(self, q_id):
         question = db.questions.get(db.questions.q_id == q_id)
+
         question.void_ind = 'n'
         question.save()
 
@@ -56,10 +57,13 @@ class query(object):
 
     # Brody's code
 
-    def addChild(self, child2):
-        c = db.child(child=child2)
+    def addChild(self, user_id, first, last):
+        c = db.child(user_id=user_id, child_nm_fst=first, child_nm_lst=last)
         c.save()
 
+    def findChild(self, child_id):
+        c = db.child.get(db.child.child_id == child_id)
+        return c
     # End Brody's code
 
 # Start Jason's code
@@ -133,8 +137,8 @@ class query(object):
 
     #Beginnning of Gabe's code
 
-    def getChildren(self, id):
-        c = db.child.select().where(db.child.user_id == id)
+    def getChildren(self, user_id):
+        c = db.child.select().where(db.child.user_id == user_id)
         return c
 
     #End of Gabe's code
