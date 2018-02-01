@@ -53,12 +53,13 @@ class User(db.Model, UserMixin):
     def is_active(self):
         return self.active
 
-    def is_in_role(self):
+    def is_in_role(self, r):
         role_nm = db.session.query(Role.name).join(UserRoles, (Role.id == UserRoles.role_id) & (UserRoles.user_id == self.id)).all()
-        role_nm = list(role_nm)[0]
-
-        print(role_nm)
-        return role_nm
+        rs = False
+        for rn in role_nm:
+            if r == rn[0]:
+                rs = True
+        return rs
 
 
 # Define the Role data model
@@ -106,8 +107,7 @@ def _after_register_hook(sender, user, **extra):
 
 @app.route('/')
 def index():
-    print(current_user.is_active())
-    current_user.is_in_role()
+    print(current_user.is_in_role('parent'))
     return render_template("index.html")
 
 
