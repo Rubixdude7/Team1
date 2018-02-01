@@ -161,7 +161,6 @@ def contact():
 
 
 # methods Brody added (may not work '-__- )
-@app.route('/child')
 @app.route('/child/<int:child_id>')
 @roles_required('user')
 def child(child_id=None):

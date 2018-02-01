@@ -9,7 +9,7 @@
     <div><a href="parent/contact">Update Contact Information</a></div>
         <ul class="list-group">
             {% for child in children %}
-                <li class="list-group-item"><a href="parent/{{ child.child_id }}">{{ child.child_nm_fst }}</a></li>
+                <li class="list-group-item"><a href="{{ url_for('child', child_id=child.child_id) }}">{{ child.child_nm_fst }}</a></li>
             {% endfor %}
         </ul>
     </div>
