@@ -35,9 +35,11 @@
                         <li>
                             <a href="{{ url_for('index') }}">HOME</a>
                         </li>
-                        <li>
-                            <a href="{{ url_for('admin') }}">HOME</a>
-                        </li>
+                        {% if current_user.is_authenticated and current_user.is_in_role("admin") %}
+                            <li>
+                                <a href="{{ url_for('admin') }}">ADMIN</a>
+                            </li>
+                        {% endif %}
                         {% if current_user.is_authenticated %}
                             <li>
                                 <a href="{{ url_for('user.profile') }}">WELCOME: {{ current_user.first_name.upper() }}</a>

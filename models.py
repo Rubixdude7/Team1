@@ -50,17 +50,8 @@ class user(MySQLModel, flask_user.UserMixin):
     roles = [FlaskUserRoleInfo(name) for name in ['admin', 'staff', 'psyc', 'user']]
 
     def is_in_role(self, r):
-        """def is_in_role(self, r):
-            role_nm = db.session.query(Role.name).join(UserRoles, (Role.id == UserRoles.role_id) & (
-                        UserRoles.user_id == self.id)).all()
-            rs = False
-            for rn in role_nm:
-                if r == rn[0]:
-                    rs = True
-            return rs"""
         role_nm = role.select(role.role_nm).join(user_roles).where(role.role_id == user_roles.role and user_roles.user == self.user_id).tuples()
         role_nm = list(role_nm)
-
         rs = False
         for rn in role_nm:
             if r == rn[0]:
@@ -316,7 +307,7 @@ class PeeweeAdapter(flask_user.DBAdapter):
             setattr(object, key, value)
         object.save()
 
-db.connect()
+#db.connect()
 '''
 db.create_tables([
     user,

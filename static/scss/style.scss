@@ -11,6 +11,7 @@
 @import '_base/_typography';
 @import '_layout/_screenSize';
 @import '_layout/_box';
+@import '_layout/_table';
 @import '_components/_navigation';
 @import '_components/_footer';
 
@@ -22,6 +23,12 @@
 @import '_pages/_home';
 
 /**********END HOME**********/
+
+/**********BEGIN ADMIN**********/
+
+@import '_pages/_admin';
+
+/**********END ADMIN**********/
 
 /**********BEGIN USER MANAGEMENT PAGES**********/
 
