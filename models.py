@@ -43,7 +43,6 @@ class user(MySQLModel, flask_user.UserMixin):
     active = BooleanField()
     first_name = CharField()
     last_name = CharField()
-    user_dob = DateTimeField()
     void_ind = CharField(default='n')
 
     # For flask_user
