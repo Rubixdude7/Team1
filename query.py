@@ -17,7 +17,9 @@ class query(object):
         """
 
     def deactivateQuestion(self, q_id):
+
         question = db.questions.get(db.questions.q_id == q_id)
+        question
         question.void_ind = 'y'
         question.save()
 

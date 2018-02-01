@@ -5,7 +5,7 @@
 
 <main id="mainHome">
     <h1>Question List</h1>
-
+    <head>
         <link rel="stylesheet"
               href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <script>
@@ -36,7 +36,7 @@ document.getElementById("error").innerHTML = "Error!";
 }
 
         </script>
-
+    </head>
     <style>
 .alert {
     padding: 20px;
@@ -127,10 +127,12 @@ background-color:#ebebe0;
 }
 
     </style>
+    <body>
+    {% if current_user.is_authenticated and current_user.is_in_role("admin") %}
     <form action="{{ url_for('add_questions') }}">
         <button class="add"><i class="fa fa-plus"></i> Add Question</button>
     </form>
-
+ {% endif %}
     {% for u in questions %}
     <!-- question list -->
     {% if u.void_ind == 'y' %}
@@ -143,11 +145,16 @@ background-color:#ebebe0;
                 <p id="questiontitle"><b>{{ u.q_id }} {{ u.question }}</b></p>
                 <input type="text" name="fname">
             </form>
-
-
+        <br>
             <!--DROPDOWN CONTENT YOU CAN TEST ADMIN HERE!!! -->
+
             <div class="dropdown">
-                <span onclick="dropItDown()"><i class="fa fa-bars"></i></span>
+            {% if current_user.is_authenticated and current_user.is_in_role("admin") %}
+            <span onclick="dropItDown()"><i class="fa fa-bars"></i></span>
+        {% endif %}
+
+                <br>
+            <br>
                 <div class="dropdown-content">
                     <button class="edit"><i class="fa fa-pencil"></i><a
                             href="{{ url_for('editQuestion', q_id=u.q_id) }}">Edit Question</a></button>
@@ -168,12 +175,13 @@ background-color:#ebebe0;
                             href="{{ url_for('questionDelete', q_id=u.q_id) }}">Delete Question</a></button>
                 </div>
                 <!-- END -->
+
             </div>
             <span id="error" style="color:red"></span>
             <!-- END QUESTION -->
+
         </div>
-
-
+<br>
         <tr>
 
 
@@ -187,6 +195,8 @@ background-color:#ebebe0;
 
         {% endfor %}
         </table>
+        <br>
+            <br>
         <form method="post" action="/post_add_questionAnswers" onsubmit="return validateForm()">
             <input type="submit" value="Submit">
         </form>
@@ -194,4 +204,5 @@ background-color:#ebebe0;
 
         {% endblock %}
 
+    </body>
 </main>
