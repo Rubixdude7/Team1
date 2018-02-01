@@ -144,28 +144,23 @@ def post_questionAnswers():
     return redirect(url_for('index'))
 
 
-@app.route('/profile')
-@login_required
-def profile():
-    return 'This is protected page'
-
-
-@app.route('/role')
-@roles_required('admin')
-def role():
-    return 'you have permission'
-
-
 @app.route('/parent')
 def parent():
     return render_template('parent.html', children=Children)
+
 
 
 @app.route('/admin')
 @roles_required('admin')
 def admin():
     users = querydb.getAllUsers()
-    return render_template('admin.html', users=users)
+    roles = list()
+    usersandroles = dict()
+    for u in users:
+        r = querydb.role(u.user_id)
+        roles.append(r)
+        usersandroles[u.email] = r
+    return render_template('admin.html', users=users, roles=roles, usersandroles=usersandroles)
 
 
 class RoleChangeForm(FlaskForm):
@@ -191,7 +186,7 @@ def edit():
         user_id = request.args.get('u_id')
         newRole = form.role.data
         querydb.updateUserRole(user_id, newRole)
-        # flash('Your changes have been saved.')
+        #flash('Your changes have been saved.')
         return redirect(url_for('admin'))
     return render_template('edit.html', title='Edit Profile',
                            form=form, current_user=current_user.id)
