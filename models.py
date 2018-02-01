@@ -1,4 +1,5 @@
 from peewee import *
+import flask_user
 #from flask_peewee_crud import generate_crud
 
 __author__ = "Brandon Duke"
@@ -20,28 +21,36 @@ db = MySQLDatabase("db42576e98688b4ab28226a87601334c89", host="42576e98-688b-4ab
 #Brandon's
 #db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d", host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh", passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
 
+#Charlie's local db
+#db = SqliteDatabase('C:\\Users\\Scott\\PythonProjects\\jasa-psikologi.db')
+
+# For flask_user
+class FlaskUserRoleInfo:
+    def __init__(self, name):
+        self.name = name
 
 class MySQLModel(Model):
     """A base model that will use our MySQL database"""
     class Meta:
         database = db
 
-
-class user(MySQLModel):
+class user(MySQLModel, flask_user.UserMixin):
     user_id = PrimaryKeyField()
     username = CharField()
     password = CharField()
     email = CharField()
-    confirmed_at = DateTimeField()
+    confirmed_at = DateTimeField(null=True)
     active = BooleanField()
     first_name = CharField()
     last_name = CharField()
     user_dob = DateTimeField()
-    void_ind = CharField()
+    void_ind = CharField(default='n')
+
+    # For flask_user
+    roles = [FlaskUserRoleInfo(name) for name in ['admin', 'staff', 'psyc', 'user']]
 
     class Meta:
         db_table = "user"
-
 
 class parent(MySQLModel):
     parent_id = PrimaryKeyField()
@@ -232,5 +241,84 @@ class user_roles(MySQLModel):
     class Meta:
         db_table = "user_roles"
 
+# For flask_user
+class PeeweeAdapter(flask_user.DBAdapter):
+    def __init__(self, db, UserClass, **kwargs):
+        super(PeeweeAdapter, self).__init__(db, UserClass, **kwargs)
+
+    def _dict_to_conditions(self, ObjectClass, d, case_sensitive):
+        '''Converts a dictionary into a list of filters compatible with peewee'''
+        conds = []
+
+        for key, value in d.items():
+            if case_sensitive:
+                conds.append(getattr(ObjectClass, key) == value)
+            else:
+                conds.append(getattr(ObjectClass, key) ** value)
+
+        return conds
+
+    def add_object(self, ObjectClass, **kwargs):
+        obj = ObjectClass(**kwargs)
+        obj.save()
+        return obj
+
+    def commit(self):
+        self.db.commit()
+
+    def delete_object(self, object):
+        object.delete_instance()
+
+    def find_all_objects(self, ObjectClass, **kwargs):
+        return ObjectClass.select().where(*self._dict_to_conditions(ObjectClass, kwargs, True))
+
+    def find_first_object(self, ObjectClass, **kwargs):
+        try:
+            return ObjectClass.select().where(*self._dict_to_conditions(ObjectClass, kwargs, True)).get()
+        except DoesNotExist:
+            return None
+
+    def ifind_first_object(self, ObjectClass, **kwargs):
+        try:
+            return ObjectClass.select().where(*self._dict_to_conditions(ObjectClass, kwargs, False)).get()
+        except DoesNotExist:
+            return None
+
+    def get_object(self, ObjectClass, id):
+        # Find the primary key field
+        primary_key_field = ObjectClass._meta.primary_key
+
+        try:
+            return ObjectClass.select().where(primary_key_field == id).get()
+        except DoesNotExist:
+            return None
+
+    def update_object(self, object, **kwargs):
+        for key, value in kwargs.items():
+            setattr(object, key, value)
+        object.save()
 
 db.connect()
+'''
+db.create_tables([
+    user,
+    parent,
+    child,
+    psychologist,
+    contact,
+    psychologist_child_xref,
+    consultation,
+    consult_time,
+    notes,
+    consultation_fee,
+    consultation_length,
+    questions,
+    question_answers,
+    blog,
+    day_typ_cd,
+    calendar,
+    review,
+    role,
+    user_roles
+], safe=True)
+'''
