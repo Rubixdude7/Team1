@@ -16,10 +16,10 @@ Contains classes that are models for tables in the database
 
 """ the database connection string """
 #Jason's
-db = MySQLDatabase("db42576e98688b4ab28226a87601334c89", host="42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com", port=3306, user="mgqmsvhuvgtovyte", passwd="Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU")
+#db = MySQLDatabase("db42576e98688b4ab28226a87601334c89", host="42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com", port=3306, user="mgqmsvhuvgtovyte", passwd="Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU")
 
 #Brandon's
-#db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d", host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh", passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
+db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d", host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh", passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
 
 #Charlie's local db
 #db = SqliteDatabase('C:\\Users\\Scott\\PythonProjects\\jasa-psikologi.db')
@@ -49,10 +49,23 @@ class user(MySQLModel, flask_user.UserMixin):
     # For flask_user
     roles = [FlaskUserRoleInfo(name) for name in ['admin', 'staff', 'psyc', 'user']]
 
-    def is_in_role(self, role_name):
+    def is_in_role(self, r):
+        """def is_in_role(self, r):
+            role_nm = db.session.query(Role.name).join(UserRoles, (Role.id == UserRoles.role_id) & (
+                        UserRoles.user_id == self.id)).all()
+            rs = False
+            for rn in role_nm:
+                if r == rn[0]:
+                    rs = True
+            return rs"""
         role_nm = role.select(role.role_nm).join(user_roles).where(role.role_id == user_roles.role and user_roles.user == self.user_id).tuples()
-        print(role_nm)
-        return role_nm
+        role_nm = list(role_nm)
+
+        rs = False
+        for rn in role_nm:
+            if r == rn[0]:
+                rs = True
+        return rs
 
     class Meta:
         db_table = "user"
