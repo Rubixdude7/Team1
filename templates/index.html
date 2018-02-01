@@ -3,6 +3,8 @@
 {% block content %}
 <main id="mainHome">
     <h1>Home page content here</h1>
+    <p>{{ current_user.is_active }}</p>
+    <p>{{ current_user.is_in_role }}</p>
 
 </main>
 

@@ -15,9 +15,9 @@ import query
 app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = 'thisisasecret'
 #Jason's database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://mgqmsvhuvgtovyte:Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU@42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com/db42576e98688b4ab28226a87601334c89'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://mgqmsvhuvgtovyte:Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU@42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com/db42576e98688b4ab28226a87601334c89'
 #Brandon's database
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # TODO make sure this is ok, this gets rid of the warning in the terminal
 app.config['CSRF_ENABLED'] = True
 app.config['USER_APP_NAME'] = 'Passion'
@@ -54,6 +54,13 @@ class User(db.Model, UserMixin):
     def is_active(self):
         return self.active
 
+    def is_in_role(self):
+        role_nm = db.session.query(Role.name).join(UserRoles, (Role.id == UserRoles.role_id) & (UserRoles.user_id == self.id)).all()
+        role_nm = list(role_nm)[0]
+
+        print(role_nm)
+        return role_nm
+
 
 # Define the Role data model
 class Role(db.Model):
@@ -85,8 +92,9 @@ class MyRegisterForm(RegisterForm):
 db_adapter = SQLAlchemyAdapter(db, UserClass=User)  # Register the User model
 user_manager = UserManager(db_adapter, app, register_form=MyRegisterForm)  # Initialize Flask-User
 
-#set up query class as db
+# set up query class as db
 querydb = query.query()
+
 
 # new user registered
 @user_registered.connect_via(app)
@@ -96,22 +104,18 @@ def _after_register_hook(sender, user, **extra):
     db.session.add(user_role)
     db.session.commit()
 
+
 @app.route('/')
 def index():
-
+    print(current_user.is_active())
+    current_user.is_in_role()
     return render_template("index.html")
-
-
-@app.route('/test')
-@login_required
-def test():
-
-    return render_template("test.html")
 
 
 @app.route('/parent')
 def parent():
     return render_template('parent.html', children=Children)
+
 
 @app.route('/admin')
 @roles_required('admin')
@@ -149,7 +153,6 @@ def delete():
     user_id = request.args.get('u_id')
     querydb.softDeleteUser(user_id)
     return redirect(url_for('admin'))
-
 
 
 if __name__ == '__main__':
