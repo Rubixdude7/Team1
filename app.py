@@ -159,27 +159,33 @@ def parent():
 def contact():
     return render_template('contact.html')
 
-# Start Jason's code
 
 # methods Brody added (may not work '-__- )
 @app.route('/child')
 def child():
-    return render_template('child.html')
+    return render_template('child.html', child)
 
 
-@app.route('/child', methods=['post'])
+@app.route('/childform')
+def childform():
+    return render_template('childform.html')
+
+
+@app.route('/childform', methods=['post'])
 def addChild():
-
-    # Ask how to get current user id for parent ID
 
     kid = models.child
     kid.child_nm_fst = request.form['firstname']
     kid.child_nm_lst = request.form['lastname']
+    kid.parent = current_user.user_id
+    addChild(kid)
 
-    return render_template('parent.html', children=Children)
+    return render_template('parent.html')
 
-# End danger zone (Brody Land)
+# End Brody's
 
+
+# Start Jason's code
 @app.route('/admin')
 @roles_required('admin')
 def admin():

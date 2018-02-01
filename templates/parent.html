@@ -14,14 +14,8 @@
         </ul>
     </div>
 </main>
-<h1>Your Profile</h1>
-    <ul class="list-group">
-        {% for child in children %}
-            <li class="list-group-item"><a href="parent/{{ child.id }}">{{ child.first_name }}</a></li>
-        {% endfor %}
-    </ul>
 
-    <form action="http://127.0.0.1:5000/child">
+    <form action="http://127.0.0.1:5000/childform">
         <button type="submit">
                 Add Child
             </button>

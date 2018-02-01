@@ -52,6 +52,14 @@ class query(object):
         current.question = newQuestion
         current.save()
 
+    # Brody's code
+
+    def addChild(self, child2):
+        c = db.child(child=child2)
+        c.save()
+
+    # End Brody's code
+
 # Start Jason's code
 
     def getAllUsers(self):
