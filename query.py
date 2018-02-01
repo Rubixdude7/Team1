@@ -52,12 +52,6 @@ class query(object):
         current.question = newQuestion
         current.save()
 
-    def test(self):
-        # used to get dat from app.py page methods
-        data = db.user.select(db.user.first_name).where(db.user.user_id == 1).tuples()
-        data = list(data)[0][0]
-        return data
-
     def getAllUsers(self):
         users = db.user.select().where(db.user.void_ind == 'n')
         return users

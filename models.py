@@ -1,6 +1,5 @@
 from peewee import *
-
-# from flask_peewee_crud import generate_crud
+import flask_user
 
 __author__ = "Brandon Duke"
 
@@ -14,22 +13,23 @@ Contains classes that are models for tables in the database
 """
 
 """ the database connection string """
-# brandon's db
-db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d",
-                   host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh",
-                   passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
 # jared lewis db
 # db = MySQLDatabase("db38b32831bc8a4cf6acefa878003849f7", host="38b32831-bc8a-4cf6-acef-a878003849f7.sqlserver.sequelizer.com", port=3306, user="vnqimdibqlqhqgap", passwd="pdCJFgqiUjR68iGphryN5g6sdHEf3Voi7WQYPHvTpCFuyxdE3xkvYuQhgkF6Hjo8")
 
 
 # Jason's
-db = MySQLDatabase("db42576e98688b4ab28226a87601334c89",
-                   host="42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com", port=3306, user="mgqmsvhuvgtovyte",
-                   passwd="Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU")
+#db = MySQLDatabase("db42576e98688b4ab28226a87601334c89", host="42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com", port=3306, user="mgqmsvhuvgtovyte", passwd="Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU")
 
+#Charlie's local db
+#db = SqliteDatabase('C:\\Users\\Scott\\PythonProjects\\jasa-psikologi.db')
 
 # Brandon's
-# db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d", host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh", passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
+db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d", host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh", passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
+
+# For flask_user
+class FlaskUserRoleInfo:
+    def __init__(self, name):
+        self.name = name
 
 
 class MySQLModel(Model):
@@ -44,12 +44,25 @@ class user(MySQLModel):
     username = CharField()
     password = CharField()
     email = CharField()
-    confirmed_at = DateTimeField()
+    confirmed_at = DateTimeField(null=True)
     active = BooleanField()
     first_name = CharField()
     last_name = CharField()
     user_dob = DateTimeField()
-    void_ind = CharField()
+    void_ind = CharField(default='n')
+
+    # For flask_user
+    roles = [FlaskUserRoleInfo(name) for name in ['admin', 'staff', 'psyc', 'user']]
+
+    def is_in_role(self, r):
+        role_nm = role.select(role.role_nm).join(user_roles).where(
+            role.role_id == user_roles.role and user_roles.user == self.user_id).tuples()
+        role_nm = list(role_nm)
+        rs = False
+        for rn in role_nm:
+            if r == rn[0]:
+                rs = True
+        return rs
 
     class Meta:
         db_table = "user"
@@ -246,4 +259,59 @@ class user_roles(MySQLModel):
         db_table = "user_roles"
 
 
-db.connect()
+# For flask_user
+class PeeweeAdapter(flask_user.DBAdapter):
+    def __init__(self, db, UserClass, **kwargs):
+        super(PeeweeAdapter, self).__init__(db, UserClass, **kwargs)
+
+    def _dict_to_conditions(self, ObjectClass, d, case_sensitive):
+        '''Converts a dictionary into a list of filters compatible with peewee'''
+        conds = []
+
+        for key, value in d.items():
+            if case_sensitive:
+                conds.append(getattr(ObjectClass, key) == value)
+            else:
+                conds.append(getattr(ObjectClass, key) ** value)
+
+        return conds
+
+    def add_object(self, ObjectClass, **kwargs):
+        obj = ObjectClass(**kwargs)
+        obj.save()
+        return obj
+
+    def commit(self):
+        self.db.commit()
+
+    def delete_object(self, object):
+        object.delete_instance()
+
+    def find_all_objects(self, ObjectClass, **kwargs):
+        return ObjectClass.select().where(*self._dict_to_conditions(ObjectClass, kwargs, True))
+
+    def find_first_object(self, ObjectClass, **kwargs):
+        try:
+            return ObjectClass.select().where(*self._dict_to_conditions(ObjectClass, kwargs, True)).get()
+        except DoesNotExist:
+            return None
+
+    def ifind_first_object(self, ObjectClass, **kwargs):
+        try:
+            return ObjectClass.select().where(*self._dict_to_conditions(ObjectClass, kwargs, False)).get()
+        except DoesNotExist:
+            return None
+
+    def get_object(self, ObjectClass, id):
+        # Find the primary key field
+        primary_key_field = ObjectClass._meta.primary_key
+
+        try:
+            return ObjectClass.select().where(primary_key_field == id).get()
+        except DoesNotExist:
+            return None
+
+    def update_object(self, object, **kwargs):
+        for key, value in kwargs.items():
+            setattr(object, key, value)
+        object.save()
