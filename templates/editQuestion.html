@@ -1,29 +1,31 @@
 {% extends "base.html" %}
 {% block title %}Edit{% endblock %}
 {% block content %}
-       <script>
-    function validateForm() {
-    var x = document.forms["myForm"]["question"].value;
-    if (x == "" || x.length > 45) {
-        alert("Question size needs to be between 1 and 45!");
-        return false;
-    }
-}
+    <script>
+        function validateForm() {
+            var x = document.forms["myForm"]["question"].value;
+            if (x == "" || x.length > 45) {
+                alert("Question size needs to be between 1 and 45!");
+                return false;
+            }
+        }
 
     </script>
-<main id="editQuestion">
-    <h1>Edit Question Title</h1>
-    <p>Current Question Title: <b> {{ question.question }} </b> </p>
+    <main id="editQuestion">
+        <div class="box">
+            <h1 class="title">Edit Question Title</h1>
+            <hr>
+            <p>Current Question Title: <b> {{ question.question }} </b></p>
 
-    <form action="" method="post" name="myForm" onsubmit="return validateForm()">
-        {{ form.hidden_tag() }}
-        <p>
-           <input id ="question" name = "question" type="text"  />
+            <form action="" method="post" name="myForm" onsubmit="return validateForm()">
+                {{ form.hidden_tag() }}
+                <p>
+                    <input id="question" name="question" type="text"/>
 
 
-
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
-</main>
+                </p>
+                <p>{{ form.submit() }}</p>
+            </form>
+        </div>
+    </main>
 {% endblock %}

@@ -89,7 +89,7 @@ def editQuestion():
         # flash('Your changes have been saved.')
         return redirect(url_for('questions'))
     return render_template('editQuestion.html', title='Edit Question',
-                           form=form, current_user=current_user.id, question=getQuestion)
+                           form=form, question=getQuestion)
 
 
 @app.route('/questiondeactivate')

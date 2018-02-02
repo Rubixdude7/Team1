@@ -2,30 +2,35 @@
 {% block title %}Home{% endblock %}
 {% block content %}
     <script>
-    function validateForm() {
-    var x = document.forms["myForm"]["question"].value;
-    if (x == "" || x.length > 45) {
-        alert("Question size needs to be between 1 and 45!");
-        return false;
-    }
-}
+        function validateForm() {
+            var x = document.forms["myForm"]["question"].value;
+            if (x == "" || x.length > 45) {
+                alert("Question size needs to be between 1 and 45!");
+                return false;
+            }
+        }
 
     </script>
-<main id="mainHome">
-    <h1>Add A Question</h1>
+    <main>
+        <div class="box">
+            <h1>Add A Question</h1>
+            <hr>
 
-    <body>
 
+            <form method="post" name="myForm" action="/post_add_questions" onsubmit="return validateForm()">
+                <div class="form-control-1">
+                    <label>Question Title</label>
+                </div>
+                <div class="form-control-2">
+                    <input id="question" name="question" type="text"/>
+                </div>
+                <div class="form-control-2">
+                    <input type="submit"/>
+                </div>
 
-<form method="post" name="myForm" action="/post_add_questions" onsubmit="return validateForm()">
-    <label>question Title</label>
-    <input id ="question" name = "question" type="text"  />
-    <input type="submit"  />
+            </form>
+        </div>
 
-</form>
-
-    </body>
-
-</main>
+    </main>
 
 {% endblock %}

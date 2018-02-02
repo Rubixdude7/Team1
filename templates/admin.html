@@ -5,28 +5,30 @@
     <div class="box">
         <h1 class="title">Admin Portal</h1>
         <hr>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Email</th>
-                    <th>Role</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for u in users %}
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>{{ u.email }}</td>
-                        <td>{{ usersandroles[u.email] }}</td>
-                        {% if current_user.user_id == u.user_id %}
-
-                        {% else %}
-                            <td><a href="{{ url_for('edit', u_id=u.user_id) }}">Edit</a></td>
-                            <td><a href="{{ url_for('delete', u_id=u.user_id) }}">Delete</a></td>
-                        {% endif %}
+                        <th>Email</th>
+                        <th>Role</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                        <tr>
+                            <td>{{ u.email }}</td>
+                            <td>{{ usersandroles[u.email] }}</td>
+                            {% if current_user.user_id == u.user_id %}
+
+                            {% else %}
+                                <td><a href="{{ url_for('edit', u_id=u.user_id) }}">Edit</a></td>
+                                <td><a href="{{ url_for('delete', u_id=u.user_id) }}">Delete</a></td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </main>
 

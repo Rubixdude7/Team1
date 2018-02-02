@@ -1,24 +1,28 @@
 {% extends "base.html" %}
 {% block title %}Child Information{% endblock %}
 {% block content %}
-<h1>Child Information</h1>
-    <form method="post">
-        First name: {{  child_info.child_nm_fst }}<br>
-        Last name: {{ child_info.child_nm_lst }}<br>
+    <main>
+        <div class="box">
+            <h1 class="title">Child Information</h1>
+            <hr>
+            <form method="post">
+                First name: {{ child_info.child_nm_fst }}<br>
+                Last name: {{ child_info.child_nm_lst }}<br>
 
-        <!--
-        <button type="submit">
-            Schedule Consultation
-        </button>
-        -->
-        <br>
-        <br>
+                <!--
+                <button type="submit">
+                    Schedule Consultation
+                </button>
+                -->
+                <br>
+                <br>
 
-        <button type="button">
-            Complete Questionnaire
-        </button>
+                <button type="button">
+                    Complete Questionnaire
+                </button>
 
-    </form>
-
+            </form>
+        </div>
+    </main>
 
 {% endblock %}

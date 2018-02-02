@@ -104,6 +104,7 @@
   nav {
     ul {
       z-index: 200;
+      visibility: hidden;
       position: absolute;
       top: 50%;
       left: 50%;
@@ -202,6 +203,7 @@
     &~ .nav-close > .menu,
     ~nav > .nav-wrapper> ul {
       opacity: 1;
+      visibility: visible;
     }
   }
   /*following header*/
