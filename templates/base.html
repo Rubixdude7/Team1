@@ -34,6 +34,11 @@
                     <li>
                         <a href="{{ url_for('index') }}">HOME</a>
                     </li>
+                    {% if current_user.is_authenticated and current_user.is_in_role("user") %}
+                            <li>
+                            <a href="{{ url_for('parent') }}">PARENTS</a>
+                        </li>
+                    {% endif %}
                     <li>
                         <a href="{{ url_for('psikolog') }}">PSYCHOLOGISTS</a>
                     </li>
