@@ -151,11 +151,13 @@ def post_questionAnswers():
 
 @app.route('/parent')
 @login_required
+@roles_required('user')
 def parent():
     return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.user_id))
 
 
 @app.route('/parent/contact', methods=['POST'])
+@roles_required('user')
 def contact():
     return render_template('contact.html')
 
