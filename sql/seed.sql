@@ -20,11 +20,3 @@ insert into consultation_length (length) values (2);
 
 /*fees*/
 insert into consultation_fee (fee) values (500);
-*/
-
-/*insert admin*/
-/*
-insert into user_roles values (1, 1, 1);
-*/
-
-insert into user_roles values(2, 3, 4)
