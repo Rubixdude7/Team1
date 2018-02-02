@@ -4,8 +4,8 @@
        <script>
     function validateForm() {
     var x = document.forms["myForm"]["question"].value;
-    if (x == "") {
-        alert("Question can't be empty.");
+    if (x == "" || x.length > 45) {
+        alert("Question size needs to be between 1 and 45!");
         return false;
     }
 }

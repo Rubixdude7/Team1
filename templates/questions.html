@@ -11,7 +11,7 @@
         <script>
 function dropItDown() {
 
-    document.getElementById("myDropdown").classList.toggle("show");
+    document.getElementById("dropdown-content").classList.toggle("show");
 }
 function pagination() {
 
@@ -27,8 +27,7 @@ for (var i = 0; i < divs.length; i++) {
 
 function validateForm() {
     var x = document.forms["myForm"]["fname"].value;
-    if (x == "") {
-var div = document.createElement("alert");
+    if (x == "" || x.length() > 45) {
         alert("All questions must be filled out.");
 //document.getElementById("error").innerHTML = "Error!";
         return false;
@@ -135,9 +134,12 @@ background-color:#ebebe0;
  {% endif %}
     {% for u in questions %}
     <!-- question list -->
-    {% if u.void_ind == 'y' %}
+
+    {% if u.void_ind == 'y' and current_user.is_authenticated and current_user.is_in_role("admin") %}
 
     <div class="question" style="background-color:#ff8080">
+        {% elif u.void_ind == 'y' and current_user.is_authenticated and current_user.is_in_role("user") %}
+        <div class="question" style="display:none; ">
         {% else %}
         <div class="question">
         {% endif %}
@@ -152,7 +154,7 @@ background-color:#ebebe0;
 
             <div class="dropdown">
             {% if current_user.is_authenticated and current_user.is_in_role("admin") %}
-            <span onclick="dropItDown()"><i class="fa fa-bars"></i></span>
+            <span onclick="dropItDown()"><i class="fa fa-bars" style="width:500px; visibility:hidden"></i></span>
         {% endif %}
 
                 <br>
