@@ -68,7 +68,7 @@ CREATE TABLE `psychologist` (
 	`psyc_id` bigint NOT NULL AUTO_INCREMENT,
 	`user_id` bigint NOT NULL,
 	`photo` varchar(1000) NOT NULL,
-	`quaifications` varchar(1000) NOT NULL,
+	`qualifications` varchar(1000) NOT NULL,
 	PRIMARY KEY (`psyc_id`)
 );
 
