@@ -70,6 +70,13 @@ class user(MySQLModel, flask_user.UserMixin):
     # For flask_user
     roles = [FlaskUserRoleInfo(name) for name in ['admin', 'staff', 'psyc', 'user']]
 
+    @property
+    def roles(self):
+        tuples = user_roles.select(role.role_id)\
+            .join(user, JOIN_INNER, user_roles.user == user.user_id)\
+            .join(role, JOIN_INNER, user_roles.role == role.role_id).tuples()
+        return [t[0] for t in tuples]
+
     def is_in_role(self, r):
         role_nm = role.select(role.role_nm).join(user_roles).where(
             role.role_id == user_roles.role and user_roles.user == self.user_id).tuples()
