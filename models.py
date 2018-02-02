@@ -1,5 +1,4 @@
 from peewee import *
-import flask_user
 
 __author__ = "Brandon Duke"
 
@@ -30,12 +29,6 @@ db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d", host="9a6e80b2-e34b-41f
 # db = MySQLDatabase("db8a50d083362f4984b1a7a87a011640fe", host="8a50d083-362f-4984-b1a7-a87a011640fe.mysql.sequelizer.com", port=3306, user="qbesdejnezzeyzvs", passwd="EnHF8XoLGxzpBLjxnjVEGyeueVuoxfo2j256WxbYWFkSRhdFUF6VivkgioAkBanB")
 
 
-# For flask_user
-class FlaskUserRoleInfo:
-    def __init__(self, name):
-        self.name = name
-
-
 class MySQLModel(Model):
     """A base model that will use our MySQL database"""
 
@@ -43,53 +36,19 @@ class MySQLModel(Model):
         database = db
 
 
-class user(MySQLModel, flask_user.UserMixin):
+class user(MySQLModel):
     user_id = PrimaryKeyField()
     username = CharField()
     password = CharField()
     email = CharField()
-    _confirmed_at = DateTimeField(null=True, db_column='confirmed_at')
+    confirmed_at = DateTimeField(null=True)
     active = BooleanField()
     first_name = CharField()
     last_name = CharField()
     void_ind = CharField(default='n')
 
-    # Fix for confirmed_at.
-    # Explanation: Our version of Flask_User does not correctly use PeeweeAdapter to
-    # update the confirmed_at field.  So, we are fixing this by making confirmed_at
-    # automatically save to the DB whenever it is accessed.
-    @property
-    def confirmed_at(self):
-        return self._confirmed_at
-
-    @confirmed_at.setter
-    def confirmed_at(self, value):
-        self._confirmed_at = value
-        self.save()
-
-    # For flask_user
-    roles = [FlaskUserRoleInfo(name) for name in ['admin', 'staff', 'psyc', 'user']]
-
-    @property
-    def roles(self):
-        tuples = user_roles.select(role.role_nm)\
-            .join(user, JOIN_INNER, user_roles.user == user.user_id)\
-            .join(role, JOIN_INNER, user_roles.role == role.role_id).tuples()
-        return [FlaskUserRoleInfo(t[0]) for t in tuples]
-
-    def is_in_role(self, r):
-        role_nm = role.select(role.role_nm).join(user_roles).where(
-            role.role_id == user_roles.role and user_roles.user == self.user_id).tuples()
-        role_nm = list(role_nm)
-        rs = False
-        for rn in role_nm:
-            if r == rn[0]:
-                rs = True
-        return rs
-
     class Meta:
         db_table = "user"
-
 
 
 class child(MySQLModel):
@@ -274,61 +233,3 @@ class user_roles(MySQLModel):
 
     class Meta:
         db_table = "user_roles"
-
-
-# For flask_user
-class PeeweeAdapter(flask_user.DBAdapter):
-    def __init__(self, db, UserClass, **kwargs):
-        super(PeeweeAdapter, self).__init__(db, UserClass, **kwargs)
-
-    def _dict_to_conditions(self, ObjectClass, d, case_sensitive):
-        '''Converts a dictionary into a list of filters compatible with peewee'''
-        conds = []
-
-        for key, value in d.items():
-            if case_sensitive:
-                conds.append(getattr(ObjectClass, key) == value)
-            else:
-                conds.append(getattr(ObjectClass, key) ** value)
-
-        return conds
-
-    def add_object(self, ObjectClass, **kwargs):
-        obj = ObjectClass(**kwargs)
-        obj.save()
-        return obj
-
-    def commit(self):
-        self.db.commit()
-
-    def delete_object(self, object):
-        object.delete_instance()
-
-    def find_all_objects(self, ObjectClass, **kwargs):
-        return ObjectClass.select().where(*self._dict_to_conditions(ObjectClass, kwargs, True))
-
-    def find_first_object(self, ObjectClass, **kwargs):
-        try:
-            return ObjectClass.select().where(*self._dict_to_conditions(ObjectClass, kwargs, True)).get()
-        except DoesNotExist:
-            return None
-
-    def ifind_first_object(self, ObjectClass, **kwargs):
-        try:
-            return ObjectClass.select().where(*self._dict_to_conditions(ObjectClass, kwargs, False)).get()
-        except DoesNotExist:
-            return None
-
-    def get_object(self, ObjectClass, id):
-        # Find the primary key field
-        primary_key_field = ObjectClass._meta.primary_key
-
-        try:
-            return ObjectClass.select().where(primary_key_field == id).get()
-        except DoesNotExist:
-            return None
-
-    def update_object(self, object, **kwargs):
-        for key, value in kwargs.items():
-            setattr(object, key, value)
-        object.save()

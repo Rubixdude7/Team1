@@ -151,7 +151,7 @@ class query(object):
     #Beginnning of Gabe's code
 
     def getChildren(self, user_id):
-        c = db.child.select().where(db.child.user_id == user_id)
+        c = db.child.select().where(db.child.user == user_id)
         return c
 
     #End of Gabe's code

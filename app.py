@@ -14,30 +14,89 @@ from flask import redirect, url_for
 
 from wtforms import StringField, DateField
 from wtforms.validators import DataRequired, ValidationError
-from data import Children  # part of the dummy data. This and the other dummy data stuff can be deleted later
 import query
 import models
 from flask import flash, render_template, request, redirect
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
+#Jason's database
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://mgqmsvhuvgtovyte:Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU@42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com/db42576e98688b4ab28226a87601334c89'
+#Brandon's database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # TODO make sure this is ok, this gets rid of the warning in the terminal
 app.config['CSRF_ENABLED'] = True
 app.config['USER_APP_NAME'] = 'Passion'
 app.config['USER_AFTER_REGISTER_ENDPOINT'] = 'user.login'
 app.config.from_pyfile('config.cfg')
-Children = Children()  # part of the dummy data file
 
 # Setup Flask-User
 
+db = SQLAlchemy(app)
 mail = Mail(app)
+
+
+class User(db.Model, UserMixin):
+
+    id = db.Column('user_id', db.BigInteger, primary_key=True)
+
+    # User authentication information
+    username = db.Column(db.String(50), nullable=False, unique=True)
+    password = db.Column(db.String(255), nullable=False, server_default='')
+
+    # User email information
+    email = db.Column(db.String(255), nullable=False, unique=True)
+    confirmed_at = db.Column(db.DateTime())
+
+    # User information
+    active = db.Column(db.Boolean(), nullable=False, server_default='0')
+    first_name = db.Column(db.String(100), nullable=False, server_default='')
+    last_name = db.Column(db.String(100), nullable=False, server_default='')
+
+    # Relationships
+    roles = db.relationship('Role', secondary='user_roles',
+                            backref=db.backref('users', lazy='dynamic'))
+
+    def is_active(self):
+        return self.active
+
+    def is_in_role(self, r):
+        role_nm = db.session.query(Role.name).join(UserRoles, (Role.id == UserRoles.role_id) & (UserRoles.user_id == self.id)).all()
+        rs = False
+        for rn in role_nm:
+            if r == rn[0]:
+                rs = True
+        return rs
+
+
+# Define the Role data model
+class Role(db.Model):
+    id = db.Column('role_id', db.BigInteger(), primary_key=True)
+    name = db.Column('role_nm', db.String(50), unique=True)
+
+
+# Define the UserRoles data model
+class UserRoles(db.Model):
+    id = db.Column('user_role_id', db.BigInteger(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.user_id', ondelete='CASCADE'))
+    role_id = db.Column(db.Integer(), db.ForeignKey('role.role_id', ondelete='CASCADE'))
 
 
 class MyRegisterForm(RegisterForm):
     first_name = StringField('First Name', validators=[DataRequired('First name is required')])
-    last_name = StringField('Last Name', validators=[DataRequired('Last name is required')])
+    last_name = StringField('Last Name',  validators=[DataRequired('Last name is required')])
+    user_dob = StringField('Date of Birth')
+
+    def validate_user_dob(form, field):
+        born = datetime.datetime.strptime(field.data, "%Y-%m-%d").date()
+        today = datetime.date.today()
+        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+        if age < 18:
+            raise ValidationError("We're sorry, you must be 18 or older to register")
 
 
-db_adapter = models.PeeweeAdapter(models.db, models.user)  # Register the User model
+# Setup Flask-User
+db_adapter = SQLAlchemyAdapter(db, UserClass=User)  # Register the User model
 user_manager = UserManager(db_adapter, app, register_form=MyRegisterForm)  # Initialize Flask-User
 
 # set up query class as db
@@ -64,9 +123,10 @@ def _db_close(exc):
 # new user registered
 @user_registered.connect_via(app)
 def _after_register_hook(sender, user, **extra):
-    role = models.role.get(models.role.role_nm == 'user')
-    user_role = models.user_roles(user=user, role=role)
-    user_role.save()
+    role = Role.query.filter_by(name="user").first()
+    user_role = UserRoles(user_id=user.id, role_id=role.id)
+    db.session.add(user_role)
+    db.session.commit()
 
 #           BRANDON         #
 
@@ -133,8 +193,8 @@ def post_questions():
     # question = request.args.get('question')
     question = request.form.get('question')
     print(question)
-    print(current_user.user_id)
-    querydb.addQuestion(question, current_user.user_id)
+    print(current_user.id)
+    querydb.addQuestion(question, current_user.id)
 
     return redirect(url_for('questions'))
 
@@ -153,7 +213,7 @@ def post_questionAnswers():
 @login_required
 @roles_required('user')
 def parent():
-    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.user_id))
+    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.id))
 
 
 @app.route('/parent/contact', methods=['POST'])
@@ -182,7 +242,7 @@ def childform():
 @app.route('/childform', methods=['post'])
 @roles_required('user')
 def addChild():
-    querydb.addChild(current_user.user_id, request.form.get('firstname'), request.form.get('lastname'))
+    querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'))
     return parent()
 
 # End Brody's
