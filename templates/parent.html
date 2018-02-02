@@ -10,6 +10,11 @@
         <div><a href="add_child/">Add Child</a></div>
         <div><a href="parent/contact">Update Contact Information</a></div>
         -->
+        <form action="/childform">
+        <button type="submit">
+                Add Child
+            </button>
+    </form>
         <ul class="list-group">
             {% for child in children %}
                 <li class="list-group-item"><a href="{{ url_for('child', child_id=child.child_id) }}">{{ child.child_nm_fst }}</a></li>
@@ -18,10 +23,6 @@
     </div>
 </main>
 
-    <form action="/childform">
-        <button type="submit">
-                Add Child
-            </button>
-    </form>
+
 
 {% endblock %}
