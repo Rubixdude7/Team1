@@ -5,8 +5,11 @@
     <div class="box">
         <h1 class="title">{{ user }}</h1>
         <hr>
-    <div><a href="add_child/">Add Child</a></div>
-    <div><a href="parent/contact">Update Contact Information</a></div>
+
+        <!--
+        <div><a href="add_child/">Add Child</a></div>
+        <div><a href="parent/contact">Update Contact Information</a></div>
+        -->
         <ul class="list-group">
             {% for child in children %}
                 <li class="list-group-item"><a href="{{ url_for('child', child_id=child.child_id) }}">{{ child.child_nm_fst }}</a></li>
@@ -15,7 +18,7 @@
     </div>
 </main>
 
-    <form action="http://127.0.0.1:5000/childform">
+    <form action="/childform">
         <button type="submit">
                 Add Child
             </button>
