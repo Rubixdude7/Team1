@@ -222,6 +222,8 @@ def edit():
     if form.validate_on_submit():
         u_id = request.args.get('u_id')
         newRole = form.role.data
+        if newRole == 'psyc':
+            querydb.addPsychologistIfNotExist(u_id)
         querydb.updateUserRole(u_id, newRole)
         #flash('Your changes have been saved.')
         return redirect(url_for('admin'))

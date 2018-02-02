@@ -104,6 +104,17 @@ class query(object):
 
 # End Jason's code
 
+# Begin Charlie's code
+    def addPsychologistIfNotExist(self, u_id):
+        # Check if user already has psychologist row
+        tuples = db.psychologist.select().where(db.psychologist.user == u_id).tuples()
+        if len(tuples) >= 1:
+            return
+
+        # None exist, so go ahead and make one
+        psyc = db.psychologist(user=u_id, photo='', qualifications='This psychologist has not listed their qualifications.')
+        psyc.save()
+
     def lookupPsychologist(self, id):
         info = None
         try:
@@ -134,6 +145,8 @@ class query(object):
                                 .tuples()
         links = [PsychologistLink(t[0], '{2} {3}'.format(*t)) for t in tuples]
         return links
+
+    # End Charlie's code
 
     #Beginnning of Gabe's code
 
