@@ -1,0 +1,110 @@
+/********** SLIDE INDICATORS **********/
+
+
+/*PAGE INDICATORS APPEARANCE*/
+
+#cssSlider>#pageIndicators {
+    position: absolute;
+    bottom: 0;
+    text-align: center;
+    width: 100%;
+    z-index: 15;
+}
+
+#cssSlider>#pageIndicators>.indicator {
+    display: inline-block;
+    height: 1.5em;
+    width: 1.5em;
+    border-radius: 100%;
+    background-color: #ABB7B7;
+    /*color of page indicator*/
+    cursor: pointer;
+}
+
+
+/*why can't i mix in or anything here?*/
+
+#cssSlider>#pageIndicators>.indicator>.hoverPoint {
+    margin: .5em;
+    display: inline-block;
+    height: .5em;
+    width: .5em;
+    border-radius: 100%;
+    background: transparent;
+    transition: .3s ease-in-out;
+    -webkit-transition: .3s ease-in-out;
+    z-index: 16;
+}
+
+#cssSlider>#pageIndicators>.indicator>.hoverPoint>.point {
+    margin-bottom: .5em;
+    display: inline-block;
+    height: .5em;
+    width: .5em;
+    border-radius: 100%;
+    background: transparent;
+    transition: .3s ease-in-out;
+    -webkit-transition: .3s ease-in-out;
+}
+
+
+/*STARTING PAGE INDICATOR WHICH TO BE LIT ANIMATION*/
+
+@mixin pointTime($time) {
+    -webkit-animation: point 40000ms infinite $time;
+    animation: point 40000ms infinite $time;
+}
+
+#cssSlider>#play:checked~#pageIndicators>.indicator>.hoverPoint>#point1,
+#cssSlider>#pause:checked~#pageIndicators>.indicator>.hoverPoint>#point1 {
+    @include pointTime(0ms);
+}
+
+#cssSlider>#play:checked~#pageIndicators>.indicator>.hoverPoint>#point2,
+#cssSlider>#pause:checked~#pageIndicators>.indicator>.hoverPoint>#point2 {
+    @include pointTime(6666.6666666667ms);
+}
+
+#cssSlider>#play:checked~#pageIndicators>.indicator>.hoverPoint>#point3,
+#cssSlider>#pause:checked~#pageIndicators>.indicator>.hoverPoint>#point3 {
+    @include pointTime(13333.333333333ms);
+}
+
+#cssSlider>#play:checked~#pageIndicators>.indicator>.hoverPoint>#point4,
+#cssSlider>#pause:checked~#pageIndicators>.indicator>.hoverPoint>#point4 {
+    @include pointTime(20000ms);
+}
+
+#cssSlider>#play:checked~#pageIndicators>.indicator>.hoverPoint>#point5,
+#cssSlider>#pause:checked~#pageIndicators>.indicator>.hoverPoint>#point5 {
+    @include pointTime(26666.666666666ms);
+}
+
+#cssSlider>#play:checked~#pageIndicators>.indicator>.hoverPoint>#point6,
+#cssSlider>#pause:checked~#pageIndicators>.indicator>.hoverPoint>#point6 {
+    @include pointTime(33333.333333333ms);
+}
+
+
+/*WHICH INDICATOR SHOULD BE LIT*/
+
+#cssSlider>#slide1:checked~#pageIndicators>.indicator>.hoverPoint>#point1,
+#cssSlider>#slide2:checked~#pageIndicators>.indicator>.hoverPoint>#point2,
+#cssSlider>#slide3:checked~#pageIndicators>.indicator>.hoverPoint>#point3,
+#cssSlider>#slide4:checked~#pageIndicators>.indicator>.hoverPoint>#point4,
+#cssSlider>#slide5:checked~#pageIndicators>.indicator>.hoverPoint>#point5,
+#cssSlider>#slide6:checked~#pageIndicators>.indicator>.hoverPoint>#point6 {
+    background: $indicatorColor;
+    /*color of page indicator dot*/
+}
+
+
+/*used to override the animation for lit indicator*/
+
+#cssSlider>#pageIndicators>.indicator:hover>.hoverPoint {
+    background: $indicatorColor;
+    /*color of page indicator dot*/
+}
+
+
+/********** END SLIDE INDICATORS **********/

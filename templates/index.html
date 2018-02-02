@@ -2,7 +2,25 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 <main id="mainHome">
-    <h1>Home page content here</h1>
+    <div class="box">
+        <div id="circle">
+            <img src="{{ url_for('static', filename='contents/home/p.svg') }}"/>
+        </div>
+    </div>
+    <div class="box">
+        <h2>"Anda juga dapat menikmati layanan kami dan mendapatkan manfaat seperti klien-klien kami! "</h2>
+    </div>
+    <div class="box">
+        <h2 class="title">Services</h2>
+        <h5>Layanan kami mencakup di bidang Industri organisasi, klinis anak, dan pendidikan.</h5>
+        <hr>
+        <h4>Di bidang Industri organisasi</h4>
+        <p>Kami melayani rekrutmen dan seleksi, promosi karyawan.</p>
+        <h4>Di bidang Pendidikan</h4>
+        <p>Kami melayani tes bakat minat, tes inteligensi, seminar, tes kesiapan masuk sekolah.</p>
+        <h4>Di Bidang Klinis Anak</h4>
+        <p>Kami melayani terapi anak berkebutuhan khusus, terapi anak yang mengalami masalah, konseling, training untuk anak.</p>
+    </div>
 
 </main>
 

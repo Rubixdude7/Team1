@@ -1,0 +1,38 @@
+/*CSS RESET*/
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+
+/*FONT IMPORT*/
+
+@font-face {
+    font-family: timeburner;
+    src: url(timeburner.ttf);
+}
+
+@import '_variables';
+
+/*slider imports*/
+
+@import '_arrowNavigation';
+@import '_slideIndicators';
+@import '_slider';
+@import '_slideDesc';
+@import '_slideAdvancement';
+
+ /*FOR MOBILE*/
+    
+    @media screen and (max-width: 1000px) {
+        #cssSlider>#slideDesc>.slideText,
+        #cssSlider>#pageIndicators {
+            display: none;
+        }
+    }

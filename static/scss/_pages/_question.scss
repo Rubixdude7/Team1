@@ -1,0 +1,90 @@
+.alert {
+    padding: 20px;
+    background-color: #f44336;
+    color: white;
+}
+.delete {
+    background-color: Red;
+    border: none;
+    color: white;
+    padding: 7px 11px;
+    font-size: 12px;
+    cursor: pointer;
+float:left;
+}
+.delete:hover {
+    background-color: #cc0000;
+}
+.edit {
+    background-color: #cc9900;
+    border: none;
+    color: white;
+    padding: 7px 11px;
+    font-size: 12px;
+    cursor: pointer;
+float:left;
+}
+.edit:hover {
+    background-color: #b38600;
+}
+.deactivate {
+    background-color: #ff9900;
+    border: none;
+    color: white;
+    padding: 7px 11px;
+    font-size: 12px;
+    cursor: pointer;
+float:left;
+}
+.deactivate:hover {
+    background-color: #e68a00;
+}
+.add {
+    background-color: #00cc00;
+    border: none;
+    color: white;
+    padding: 7px 11px;
+    font-size: 12px;
+    cursor: pointer;
+
+
+
+}
+.add:hover {
+    background-color: #00b300;
+}
+.question {
+
+width:300px;
+height:100px;
+    //margin: 30 auto;
+
+}
+.question:hover {
+
+background-color:#ebebe0;
+}
+
+
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 2em;
+    height: 1em;
+    background-color: black;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}

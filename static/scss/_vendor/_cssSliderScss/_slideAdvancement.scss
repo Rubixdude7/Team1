@@ -1,0 +1,398 @@
+/********** PLAY PAUSE OF ALL ANIMATIONS **********/
+
+
+/*restart the show*/
+
+#cssSlider>#slide1:checked~#sliderImages,
+#cssSlider>#slide2:checked~#sliderImages,
+#cssSlider>#slide3:checked~#sliderImages,
+#cssSlider>#slide4:checked~#sliderImages,
+#cssSlider>#slide5:checked~#sliderImages,
+#cssSlider>#slide6:checked~#sliderImages {
+    -webkit-animation: none;
+    animation: none;
+}
+
+
+/*pause all animations*/
+
+#cssSlider>#pause:checked~#sliderImages,
+#cssSlider>#pause:checked~#slideDesc>#slideText1,
+#cssSlider>#pause:checked~#slideDesc>#slideText2,
+#cssSlider>#pause:checked~#slideDesc>#slideText3,
+#cssSlider>#pause:checked~#slideDesc>#slideText4,
+#cssSlider>#pause:checked~#slideDesc>#slideText5,
+#cssSlider>#pause:checked~#slideDesc>#slideText6,
+#cssSlider>#pause:checked~#pageNav #previousArrow>#slideL6,
+#cssSlider>#pause:checked~#pageNav>#nextArrow>#slideR2,
+#cssSlider>#pause:checked~#pageNav>#previousArrow>#slideL1,
+#cssSlider>#pause:checked~#pageNav>#nextArrow>#slideR3,
+#cssSlider>#pause:checked~#pageNav>#previousArrow>#slideL2,
+#cssSlider>#pause:checked~#pageNav>#nextArrow>#slideR4,
+#cssSlider>#pause:checked~#pageNav>#previousArrow>#slideL3,
+#cssSlider>#pause:checked~#pageNav>#nextArrow>#slideR5,
+#cssSlider>#pause:checked~#pageNav>#previousArrow>#slideL4,
+#cssSlider>#pause:checked~#pageNav>#nextArrow>#slideR6,
+#cssSlider>#pause:checked~#pageNav>#previousArrow>#slideL5,
+#cssSlider>#pause:checked~#pageNav #nextArrow>#slideR1,
+#cssSlider>#pause:checked~#pageIndicators>.indicator>.hoverPoint>#point1,
+#cssSlider>#pause:checked~#pageIndicators>.indicator>.hoverPoint>#point2,
+#cssSlider>#pause:checked~#pageIndicators>.indicator>.hoverPoint>#point3,
+#cssSlider>#pause:checked~#pageIndicators>.indicator>.hoverPoint>#point4,
+#cssSlider>#pause:checked~#pageIndicators>.indicator>.hoverPoint>#point5,
+#cssSlider>#pause:checked~#pageIndicators>.indicator>.hoverPoint>#point6 {
+    -webkit-animation-play-state: paused;
+    animation-play-state: paused;
+}
+
+
+/********** END PLAY PAUSE OF ALL ANIMATIONS **********/
+
+
+/********** MANUAL PAGE ADVANCEMENT **********/
+
+@mixin manualAdvancement($width) {
+    #cssSlider>#slide1:checked~#sliderImages {
+        margin-left: 0;
+    }
+    #cssSlider>#slide2:checked~#sliderImages {
+        margin-left: -$width;
+    }
+    #cssSlider>#slide3:checked~#sliderImages {
+        margin-left: -$width * 2;
+    }
+    #cssSlider>#slide4:checked~#sliderImages {
+        margin-left: -$width * 3;
+    }
+    #cssSlider>#slide5:checked~#sliderImages {
+        margin-left: -$width * 4;
+    }
+    #cssSlider>#slide6:checked~#sliderImages {
+        margin-left: -$width * 5;
+    }
+}
+
+
+/********** END MANUAL PAGE ADVANCEMENT **********/
+
+
+/********** AUTOMATIC PAGE ADVANCEMENT **********/
+
+@mixin automaticAdvancement($width) {
+    @keyframes slider {
+        0%,
+        10% {
+            transform: translateX(0);
+        }
+        16.6666666667%,
+        26.6666666667% {
+            transform: translateX(-$width);
+        }
+        33.3333333333%,
+        43.3333333333% {
+            transform: translateX(-$width * 2);
+        }
+        50%,
+        60% {
+            transform: translateX(-$width * 3);
+        }
+        66.6666666667%,
+        76.6666666667% {
+            transform: translateX(-$width * 4);
+        }
+        83.3333333333%,
+        93.3333333333% {
+            transform: translateX(-$width * 5);
+        }
+        100% {
+            transform: translateX(0);
+        }
+    }
+    @-webkit-keyframes slider {
+        0%,
+        10% {
+            transform: translateX(0);
+        }
+        16.6666666667%,
+        26.6666666667% {
+            transform: translateX(-$width);
+        }
+        33.3333333333%,
+        43.3333333333% {
+            transform: translateX(-$width * 2);
+        }
+        50%,
+        60% {
+            transform: translateX(-$width * 3);
+        }
+        66.6666666667%,
+        76.6666666667% {
+            transform: translateX(-$width * 4);
+        }
+        83.3333333333%,
+        93.3333333333% {
+            transform: translateX(-$width * 5);
+        }
+        100% {
+            transform: translateX(0);
+        }
+    }
+}
+
+@mixin automaticAdvancementIE($width, $widthNarrow){
+	/* AGAIN, PLEASE DIE IE */
+	/*IE FIX*/
+	@if($MODE !='mixed'){
+		@keyframes slider-ie {
+			0%,
+			10% {
+				margin-left: 0;
+			}
+			16.6666666667%,
+			26.6666666667% {
+				margin-left: -$width;
+			}
+			33.3333333333%,
+			43.3333333333% {
+				margin-left: -$width * 2;
+			}
+			50%,
+			60% {
+				margin-left: -$width * 3;
+			}
+			66.6666666667%,
+			76.6666666667% {
+				margin-left: -$width * 4;
+			}
+			83.3333333333%,
+			93.3333333333% {
+				margin-left: -$width * 5;
+			}
+			100% {
+				margin-left: -.1vw;
+				/*can't be 0, gives blank page*/
+			}
+		}
+	}
+	@else{
+		@keyframes slider-ie-wide {
+			0%,
+			10% {
+				margin-left: 0;
+			}
+			16.6666666667%,
+			26.6666666667% {
+				margin-left: -$width;
+			}
+			33.3333333333%,
+			43.3333333333% {
+				margin-left: -$width * 2;
+			}
+			50%,
+			60% {
+				margin-left: -$width * 3;
+			}
+			66.6666666667%,
+			76.6666666667% {
+				margin-left: -$width * 4;
+			}
+			83.3333333333%,
+			93.3333333333% {
+				margin-left: -$width * 5;
+			}
+			100% {
+				margin-left: -.1vw;
+				/*can't be 0, gives blank page*/
+			}
+		}
+		@keyframes slider-ie-narrow {
+			0%,
+			10% {
+				margin-left: 0;
+			}
+			16.6666666667%,
+			26.6666666667% {
+				margin-left: -$widthNarrow;
+			}
+			33.3333333333%,
+			43.3333333333% {
+				margin-left: -$widthNarrow * 2;
+			}
+			50%,
+			60% {
+				margin-left: -$widthNarrow * 3;
+			}
+			66.6666666667%,
+			76.6666666667% {
+				margin-left: -$widthNarrow * 4;
+			}
+			83.3333333333%,
+			93.3333333333% {
+				margin-left: -$widthNarrow * 5;
+			}
+			100% {
+				margin-left: -.1vw;
+				/*can't be 0, gives blank page*/
+			}
+		}
+	}
+}
+
+/********** END AUTOMATIC PAGE ADVANCEMENT **********/
+
+
+/*advancement mode based on chosen size*/
+
+
+/*which mode to use*/
+
+@if($MODE=='immersive') {
+    /*immersive mode*/
+    @include manualAdvancement($IMMERSIVE_WIDTH);
+    @include automaticAdvancement($IMMERSIVE_WIDTH);
+	@include automaticAdvancementIE($IMMERSIVE_WIDTH, 0);
+}
+
+@else if($MODE=='mixed') {
+    @media screen and (min-width: 1001px) {
+        /*wide*/
+        @include manualAdvancement($IMMERSIVE_WIDTH);
+        @include automaticAdvancement($IMMERSIVE_WIDTH);
+    }
+    @media screen and (max-width: 1000px) {
+        /*narrow*/
+        @include manualAdvancement(100vw);
+        @include automaticAdvancement(100vw);
+    }
+	@include automaticAdvancementIE($IMMERSIVE_WIDTH, 100vw);
+}
+
+@else {
+    /*normal display*/
+    @include manualAdvancement(100vw);
+    @include automaticAdvancement(100vw);
+	@include automaticAdvancementIE(100vw, 0);
+}
+
+
+/********** ANIMATIONS **********/
+
+
+/*arrows*/
+
+@-webkit-keyframes arrows {
+    0%,
+    16.656666666666666% {
+        opacity: 1;
+        z-index: 15;
+    }
+    16.666666666666668%,
+    100% {
+        opacity: 0;
+        z-index: -1;
+    }
+}
+
+@keyframes arrows {
+    0%,
+    16.656666666666666% {
+        z-index: 15;
+    }
+    16.666666666666668%,
+    100% {
+        z-index: -1;
+    }
+}
+
+
+/*page indicators*/
+
+@keyframes point {
+    1%,
+    16% {
+        background: $indicatorColor;
+        /*color of page indicator dot*/
+    }
+    17%,
+    100% {
+        background: transparent;
+    }
+}
+
+@-webkit-keyframes point {
+    0%,
+    16% {
+        background: $indicatorColor;
+        /*color of page indicator dot*/
+    }
+    17%,
+    100% {
+        background: transparent;
+    }
+}
+
+
+/*text box*/
+
+@-webkit-keyframes textBoxBounce {
+    0.6927083333333334%,
+    15.963958333333334% {
+        opacity: 1;
+        z-index: 2;
+        visibility: visible;
+        -webkit-transform: translateY(10px);
+        transform: translateY(10px);
+    }
+    0.9895833333333334%,
+    15.667083333333334% {
+        opacity: 1;
+        z-index: 2;
+        visibility: visible;
+        -webkit-transform: translateY(0px);
+        transform: translateY(0px);
+    }
+    17.65625% {
+        opacity: 0;
+        z-index: 2;
+        visibility: hidden;
+        -webkit-transform: translateY(-100px);
+        transform: translateY(-100px);
+    }
+    17.66625%,
+    100% {
+        z-index: 0;
+    }
+}
+
+@keyframes textBoxBounce {
+    0.6927083333333334%,
+    15.963958333333334% {
+        opacity: 1;
+        z-index: 2;
+        visibility: visible;
+        -webkit-transform: translateY(10px);
+        transform: translateY(10px);
+    }
+    0.9895833333333334%,
+    15.667083333333334% {
+        opacity: 1;
+        z-index: 2;
+        visibility: visible;
+        -webkit-transform: translateY(0px);
+        transform: translateY(0px);
+    }
+    17.65625% {
+        opacity: 0;
+        z-index: 2;
+        visibility: hidden;
+        -webkit-transform: translateY(-100px);
+        transform: translateY(-100px);
+    }
+    17.66625%,
+    100% {
+        z-index: 0;
+    }
+}
+
+
+/********** END ANIMATIONS **********/

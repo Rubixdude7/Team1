@@ -1,0 +1,155 @@
+/********** NEXT SLIDE ARROW NAVIGATION **********/
+
+
+/*APPEARANCE*/
+
+#cssSlider>input {
+    /*new wrapper to this*/
+    display: none;
+}
+
+#cssSlider>#pageNav {
+    position: absolute;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    z-index: 15;
+    width: 100%;
+    height: 10vw;
+}
+
+#cssSlider>#pageNav>#previousArrow>.slideL,
+#cssSlider>#pageNav>#playPause>.playPauseBtn,
+#cssSlider>#pageNav>#nextArrow>.slideR {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    -webkit-transition: opacity .5s ease-in-out;
+    transition: opacity .5s ease-in-out;
+}
+
+@mixin arrowStyle($bckImg) {
+    width: 10vw;
+    height: 10vw;
+    background: url(#{$bckImg + png});
+    background-image: url(#{$bckImg + svg}),
+    none;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    z-index: -1;
+}
+
+#cssSlider>#pageNav>#previousArrow>.slideL {
+    @include arrowStyle('icons/previous.');
+}
+
+#cssSlider>#pageNav>#nextArrow>.slideR {
+    @include arrowStyle('icons/next.');
+}
+
+#cssSlider>#pageNav>#playPause>#playBtn {
+    @include arrowStyle('icons/play.');
+}
+
+#cssSlider>#pageNav>#playPause>#pauseBtn {
+    @include arrowStyle('icons/pause.');
+}
+
+
+/*POSITION*/
+
+#cssSlider>#pageNav>#previousArrow>.slideL {
+    left: 2vw;
+}
+
+#cssSlider>#pageNav>#playPause>.playPauseBtn {
+    left: 50%;
+    margin: 0 0 0 -5vw;
+}
+
+#cssSlider>#pageNav>#nextArrow>.slideR {
+    right: 2vw;
+}
+
+
+/*ONLY DISPLAY IF ON SLIDER*/
+
+$opacity: 0.7;
+#cssSlider>#pageNav:hover>#playPause>.playPauseBtn {
+    opacity: $opacity;
+}
+
+#cssSlider>#pageNav:hover>#previousArrow>.slideL,
+#cssSlider>#pageNav:hover>#nextArrow>.slideR {
+    opacity: $opacity/6;
+}
+
+
+/*DON'T SHOW PLAY AND PAUSE*/
+
+#cssSlider>#play:not(:checked)~#pageNav>#playPause>#pauseBtn {
+    display: none;
+}
+
+#cssSlider>#play:checked~#pageNav>#playPause>#playBtn {
+    display: none;
+}
+
+
+/*WHICH ARROW SHOULD BE ON TOP*/
+
+#cssSlider>#slide1:checked~#pageNav>#previousArrow>#slideL6,
+#cssSlider>#slide1:checked~#pageNav>#nextArrow>#slideR2,
+#cssSlider>#slide2:checked~#pageNav>#previousArrow>#slideL1,
+#cssSlider>#slide2:checked~#pageNav>#nextArrow>#slideR3,
+#cssSlider>#slide3:checked~#pageNav>#previousArrow>#slideL2,
+#cssSlider>#slide3:checked~#pageNav>#nextArrow>#slideR4,
+#cssSlider>#slide4:checked~#pageNav>#previousArrow>#slideL3,
+#cssSlider>#slide4:checked~#pageNav>#nextArrow>#slideR5,
+#cssSlider>#slide5:checked~#pageNav>#previousArrow>#slideL4,
+#cssSlider>#slide5:checked~#pageNav>#nextArrow>#slideR6,
+#cssSlider>#slide6:checked~#pageNav>#previousArrow>#slideL5,
+#cssSlider>#slide6:checked~#pageNav>#nextArrow>#slideR1 {
+    z-index: 15;
+}
+
+
+/*STARTING ARROW ANIMATION, FOR WHICH TO BE ON TOP*/
+
+@mixin arrowTime($time) {
+    -webkit-animation: arrows 40000ms infinite $time;
+    animation: arrows 40000ms infinite $time;
+}
+
+#cssSlider>#play:checked~#pageNav>#previousArrow>#slideL6,
+#cssSlider>#play:checked~#pageNav>#nextArrow>#slideR2 {
+    @include arrowTime(0ms);
+}
+
+#cssSlider>#play:checked~#pageNav>#previousArrow>#slideL1,
+#cssSlider>#play:checked~#pageNav>#nextArrow>#slideR3 {
+    @include arrowTime( 6666.6666666667ms);
+}
+
+#cssSlider>#play:checked~#pageNav>#previousArrow>#slideL2,
+#cssSlider>#play:checked~#pageNav>#nextArrow>#slideR4 {
+    @include arrowTime(13333.333333333ms);
+}
+
+#cssSlider>#play:checked~#pageNav>#previousArrow>#slideL3,
+#cssSlider>#play:checked~#pageNav>#nextArrow>#slideR5 {
+    @include arrowTime(20000ms);
+}
+
+#cssSlider>#play:checked~#pageNav>#previousArrow>#slideL4,
+#cssSlider>#play:checked~#pageNav>#nextArrow>#slideR6 {
+    @include arrowTime(26666.666666666ms);
+}
+
+#cssSlider>#play:checked~#pageNav>#previousArrow>#slideL5,
+#cssSlider>#play:checked~#pageNav>#nextArrow>#slideR1 {
+    @include arrowTime(33333.333333333ms);
+}
+
+
+/********** END NEXT SLIDE ARROW NAVIGATION **********/
