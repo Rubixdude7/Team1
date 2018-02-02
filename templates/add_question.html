@@ -1,16 +1,26 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block content %}
+    <script>
+    function validateForm() {
+    var x = document.forms["myForm"]["question"].value;
+    if (x == "") {
+        alert("Question can't be empty.");
+        return false;
+    }
+}
+
+    </script>
 <main id="mainHome">
     <h1>Add A Question</h1>
 
     <body>
 
 
-<form method="post" action="/post_add_questions">
+<form method="post" name="myForm" action="/post_add_questions" onsubmit="return validateForm()">
     <label>question Title</label>
-    <input id ="question" name = "question" type="text" />
-    <input type="submit" />
+    <input id ="question" name = "question" type="text"  />
+    <input type="submit"  />
 
 </form>
 

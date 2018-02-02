@@ -1,14 +1,24 @@
 {% extends "base.html" %}
 {% block title %}Edit{% endblock %}
 {% block content %}
+       <script>
+    function validateForm() {
+    var x = document.forms["myForm"]["question"].value;
+    if (x == "") {
+        alert("Question can't be empty.");
+        return false;
+    }
+}
+
+    </script>
 <main id="editQuestion">
     <h1>Edit Question Title</h1>
     <p>Current Question Title: <b> {{ question.question }} </b> </p>
 
-    <form action="" method="post">
+    <form action="" method="post" name="myForm" onsubmit="return validateForm()">
         {{ form.hidden_tag() }}
         <p>
-           <input id ="question" name = "question" type="text" />
+           <input id ="question" name = "question" type="text"  />
 
 
 

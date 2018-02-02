@@ -30,7 +30,7 @@ function validateForm() {
     if (x == "") {
 var div = document.createElement("alert");
         alert("All questions must be filled out.");
-document.getElementById("error").innerHTML = "Error!";
+//document.getElementById("error").innerHTML = "Error!";
         return false;
     }
 }
@@ -96,8 +96,8 @@ float:left;
 .question {
 
 width:300px;
-height:100px;
-  margin: 30  auto;
+height:100px
+    margin: 30 auto;
 
 }
 .question:hover {
@@ -136,13 +136,15 @@ background-color:#ebebe0;
     {% for u in questions %}
     <!-- question list -->
     {% if u.void_ind == 'y' %}
+
     <div class="question" style="background-color:#ff8080">
         {% else %}
         <div class="question">
-            {% endif %}
+        {% endif %}
+
             <form name="myForm" action="/action_page.php"
                   onsubmit="return validateForm()" method="post">
-                <p id="questiontitle"><b>{{ u.q_id }} {{ u.question }}</b></p>
+                <p id="questiontitle"><b>{{ u.question }}</b></p>
                 <input type="text" name="fname">
             </form>
         <br>
