@@ -1,0 +1,12 @@
+Productino - Brandon's 
+host- 9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com
+database- db9a6e80b2e34b41f3bd8da871003e804d
+user- bgrwfoetjnrliplh
+pass- GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw
+
+
+DEV - Jason's
+host- 42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com
+database- db42576e98688b4ab28226a87601334c89
+user- mgqmsvhuvgtovyte
+pass- Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU

@@ -85,14 +85,6 @@ class UserRoles(db.Model):
 class MyRegisterForm(RegisterForm):
     first_name = StringField('First Name', validators=[DataRequired('First name is required')])
     last_name = StringField('Last Name',  validators=[DataRequired('Last name is required')])
-    user_dob = StringField('Date of Birth')
-
-    def validate_user_dob(form, field):
-        born = datetime.datetime.strptime(field.data, "%Y-%m-%d").date()
-        today = datetime.date.today()
-        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
-        if age < 18:
-            raise ValidationError("We're sorry, you must be 18 or older to register")
 
 
 # Setup Flask-User
