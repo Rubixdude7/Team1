@@ -18,11 +18,11 @@
                         <tr>
                             <td>{{ u.email }}</td>
                             <td>{{ usersandroles[u.email] }}</td>
-                            {% if current_user.user_id == u.user_id %}
+                            {% if current_user.id == u.user_id %}
 
                             {% else %}
                                 <td><a href="{{ url_for('edit', u_id=u.user_id) }}">Edit</a></td>
-                                <td><a href="{{ url_for('delete', u_id=u.user_id) }}">Delete</a></td>
+                                <td><a href="{{ url_for('delete', u_id=u.user_id) }}" onclick="confirmAction()">Delete</a></td>
                             {% endif %}
                         </tr>
                     {% endfor %}
@@ -30,6 +30,14 @@
             </table>
         </div>
     </div>
+
+<script>
+function confirmAction() {
+    confirm("Are you sure you want to delete this user?");
+}
+
+</script>
+
 </main>
 
 {% endblock %}

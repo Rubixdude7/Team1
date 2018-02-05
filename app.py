@@ -174,6 +174,17 @@ def questions():
     return render_template("questions.html", questions=questions)
 
 
+@app.route('/questionsUserView')
+@login_required
+def questionsUserView():
+    questions = querydb.getAllQuestions()
+    #  count = querydb.paginate(page_num) --still working on pagination
+
+    return render_template("questionsUserView.html", questions=questions)
+
+
+
+
 @app.route('/add_questions')
 @login_required
 def add_questions():

@@ -141,7 +141,9 @@ class query(object):
                                         db.user.first_name,
                                         db.user.last_name)\
                                 .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
-                                .where(db.user.void_ind != 'y')\
+                                .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                                .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
+                                .where(db.user.void_ind != 'y' and db.role.role_nm == 'psyc')\
                                 .tuples()
         links = [PsychologistLink(t[0], '{2} {3}'.format(*t)) for t in tuples]
         return links
