@@ -51,7 +51,7 @@ class User(db.Model, UserMixin):
     # User information
     active = db.Column(db.Boolean(), nullable=False, server_default='0')
     first_name = db.Column(db.String(100), nullable=False, server_default='')
-    last_name = db.Column(db.String(100), nullable=False, server_default='')
+    last_name = db.Column(db.String(100), nullable=True, server_default='')
 
     # Relationships
     roles = db.relationship('Role', secondary='user_roles',
@@ -84,7 +84,7 @@ class UserRoles(db.Model):
 
 class MyRegisterForm(RegisterForm):
     first_name = StringField('First Name', validators=[DataRequired('First name is required')])
-    last_name = StringField('Last Name',  validators=[DataRequired('Last name is required')])
+    last_name = StringField('Last Name')
 
 
 # Setup Flask-User
