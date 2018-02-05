@@ -34,8 +34,7 @@ class user(MySQLModel):
     confirmed_at = DateTimeField(null=True)
     active = BooleanField()
     first_name = CharField()
-    last_name = CharField()
-    void_ind = CharField(default='n')
+    last_name = CharField(null=True)
 
     class Meta:
         db_table = "user"
@@ -65,10 +64,11 @@ class contact(MySQLModel):
     contact_id = PrimaryKeyField()
     user = ForeignKeyField(user, to_field="user_id")
     phone_no = CharField()
-    street_addr = CharField()
+    address_1 = CharField()
+    address_2 = CharField(null=True)
     city = CharField()
-    providence = CharField()
-    zip = CharField()
+    providence = CharField(null=True)
+    zip = CharField(null=True)
 
     class Meta:
         db_table = "contact"
