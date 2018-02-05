@@ -202,3 +202,5 @@ ALTER TABLE `question_answers` ADD CONSTRAINT `question_answers_fk0` FOREIGN KEY
 ALTER TABLE `question_answers` ADD CONSTRAINT `question_answers_fk1` FOREIGN KEY (`q_id`) REFERENCES `questions`(`q_id`);
 
 ALTER TABLE `contact` ADD CONSTRAINT `contact_fk0` FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`);
+
+CREATE VIEW office_view AS SELECT * from child, consultation WHERE child.child_id = consultation.child_id AND consultation.approved = "Y" AND consultation.paid = "N";

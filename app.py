@@ -318,3 +318,9 @@ def psikolog(id=None):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+@app.route('/staff')
+@app.roles_required('staff')
+def staff():
+
+    return
