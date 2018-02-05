@@ -211,7 +211,7 @@ def post_questionAnswers():
 
     return redirect(url_for('index'))
 
-
+#Gabe
 @app.route('/parent')
 @login_required
 @roles_required('user')
@@ -219,10 +219,14 @@ def parent():
     return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.id))
 
 
-@app.route('/parent/contact', methods=['POST'])
+@app.route('/parent/contact', methods=['GET', 'POST'])
 @roles_required('user')
 def contact():
+    querydb.updateContact(current_user.id, request.form.get('phone_no'), request.form.get('address_1'),
+                          request.form.get('address_2'), request.form.get('city'),
+                          request.form.get('providence'), request.form.get('zip'))
     return render_template('contact.html')
+#End Gabe
 
 
 # methods Brody added (may not work '-__- )

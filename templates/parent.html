@@ -6,15 +6,25 @@
         <h1 class="title">{{ user }}</h1>
         <hr>
 
-        <!--
-        <div><a href="add_child/">Add Child</a></div>
-        <div><a href="parent/contact">Update Contact Information</a></div>
-        -->
+
+        <p>
+        <form action="parent/contact">
+            <button type="submit">
+                Update Contact Information
+            </button>
+        </form>
+        </p>
+
+
+        <p>
         <form action="/childform">
-        <button type="submit">
+            <button type="submit">
                 Add Child
             </button>
-    </form>
+        </form>
+        </p>
+
+
         <ul class="list-group">
             {% for child in children %}
                 <li class="list-group-item"><a href="{{ url_for('child', child_id=child.child_id) }}">{{ child.child_nm_fst }}</a></li>
