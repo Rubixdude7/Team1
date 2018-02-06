@@ -227,9 +227,10 @@ def contact():
 @app.route('/parent/contact', methods=['GET', 'POST'])
 @roles_required('user')
 def editContact():
-    querydb.updateContact(current_user.id, request.form.get('phone_no'), request.form.get('address_1'),
-                          request.form.get('address_2'), request.form.get('city'),
-                          request.form.get('providence'), request.form.get('zip'))
+    contact_id=querydb.contactID(current_user.id)
+    querydb.updateContact(current_user.id, contact_id,request.form.get('phone_no'), request.form.get('address_1'),
+                          request.form.get('address_2'), request.form.get('city'), request.form.get('providence'),
+                          request.form.get('zip'))
     return parent()
 #End Gabe
 
