@@ -218,14 +218,19 @@ def post_questionAnswers():
 def parent():
     return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.id))
 
+@app.route('/parent/contact')
+@roles_required('user')
+def contact():
+    return render_template('contact.html')
+
 
 @app.route('/parent/contact', methods=['GET', 'POST'])
 @roles_required('user')
-def contact():
+def editContact():
     querydb.updateContact(current_user.id, request.form.get('phone_no'), request.form.get('address_1'),
                           request.form.get('address_2'), request.form.get('city'),
                           request.form.get('providence'), request.form.get('zip'))
-    return render_template('contact.html')
+    return parent()
 #End Gabe
 
 
