@@ -216,7 +216,7 @@ def post_questionAnswers():
 @login_required
 @roles_required('user')
 def parent():
-    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.id))
+    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.id), contact_info=querydb.getContact(current_user.id))
 
 @app.route('/parent/contact')
 @roles_required('user')

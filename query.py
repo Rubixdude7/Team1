@@ -156,6 +156,10 @@ class query(object):
         c = db.child.select().where(db.child.user == user_id)
         return c
 
+    def getContact(self, user_id):
+        c = db.contact.select().where(db.contact.user == user_id)
+        return c
+
     def updateContact(self, user_id, phone_no, address_1, address_2, city, providence, zip):
         c = db.contact(user_id=user_id, phone_no=phone_no, address_1=address_1, address_2=address_2, city=city, providence=providence, zip=zip)
         c.save()

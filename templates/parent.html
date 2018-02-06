@@ -8,7 +8,14 @@
 
 
         <p>
-        <form action="parent/contact">
+        <!--Phone Number: {{ contact_info.phone_no }}<br>
+        Address 1: {{ contact_info.address_1 }}<br>
+        {% if(contact_info.phone_no != null) %}
+            Address 2: {{ contact_info.address_2 }}
+        {% endif %}
+        -->
+
+        <form action="/parent/contact">
             <button type="submit">
                 Update Contact Information
             </button>
