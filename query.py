@@ -105,7 +105,6 @@ class query(object):
                                                     db.user_roles.select(db.user_roles.role).where(
                                                         db.user_roles.user == id)).tuples()
         role = list(role)[0][0]
-        print(role)
         return role
 
 # End Jason's code

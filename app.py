@@ -305,28 +305,39 @@ class QuestionEdit(FlaskForm):
 @app.route('/edit', methods=['GET', 'POST'])
 @roles_required('admin')
 def edit():
+    u_id = request.args.get('u_id')
+    if int(u_id) == int(current_user.id):
+        return redirect(url_for('admin'))
     form = RoleChangeForm()
     roles = querydb.getAllRoles()
-    rolenames = []
+    current_role = querydb.role(u_id)
+    rolenames = [current_role]
     for a in roles:
-        rolenames.append(a.role_nm)
+        if a.role_nm != current_role:
+            rolenames.append(a.role_nm)
     form.role.choices = [(r, r) for r in rolenames]
     if form.validate_on_submit():
-        u_id = request.args.get('u_id')
+        #u_id = request.args.get('u_id')
         newRole = form.role.data
         if newRole == 'psyc':
             querydb.addPsychologistIfNotExist(u_id)
         querydb.updateUserRole(u_id, newRole)
         #flash('Your changes have been saved.')
         return redirect(url_for('admin'))
-    return render_template('edit.html', title='Edit Profile',
-                           form=form)
+    return render_template('edit.html', title='Edit Profile',form=form)
 
 @app.route('/delete')
+@roles_required('admin')
 def delete():
     user_id = request.args.get('u_id')
     querydb.softDeleteUser(user_id)
     return redirect(url_for('admin'))
+
+
+@app.route('/editClient')
+@roles_required('admin')
+def editClient():
+    2+4
 
 # End Jason's code
 
