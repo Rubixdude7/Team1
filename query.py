@@ -86,7 +86,7 @@ class query(object):
 
     def softDeleteUser(self, u_id):
         user = db.user.get(db.user.user_id == u_id)
-        user.void_ind = 'y'
+        user.active = False
         user.save()
 
     def bringHimBack(self):
