@@ -330,6 +330,8 @@ def edit():
 @roles_required('admin')
 def delete():
     user_id = request.args.get('u_id')
+    if int(user_id) == int(current_user.id):
+        return redirect(url_for('admin'))
     querydb.softDeleteUser(user_id)
     return redirect(url_for('admin'))
 
