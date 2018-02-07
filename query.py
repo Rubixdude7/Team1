@@ -1,6 +1,8 @@
 import models as db
 import datetime
 from peewee import *
+import cloudinary
+import cloudinary.uploader
 
 
 class query(object):
@@ -15,6 +17,11 @@ class query(object):
         Default Constructor
         There are no parameters, default is here as there has to be code in the constructor
         """
+        cloudinary.config(
+            cloud_name="hbcgsvmyc",
+            api_key="483847116472347",
+            api_secret="UYew22cMiFrua6LbuHUQey40ahE"
+        )
 
     def deactivateQuestion(self, q_id):
 
@@ -170,6 +177,33 @@ class query(object):
 
     #End of Gabe's code
 
+# Begin Brandon
+    def get_slider(self):
+        slider_a = []
+        for slide in db.slider.select():
+            slider_a.append({
+                'id': slide.slider_id,
+                'img': slide.img,
+                'version': slide.version,
+                'desc': slide.desc,
+                'alt': slide.alt
+            })
+        return slider_a
+
+    def get_slide(self, s_id):
+        slide = db.slider.get(db.slider.slider_id == s_id)
+        url = cloudinary.CloudinaryImage(slide.img, version=slide.version).image()
+        return url
+
+    def update_slide(self, s_id, img):
+        slide = db.slider.get(db.slider.slider_id == s_id)
+        upload = cloudinary.uploader.upload(img, public_id=slide.img)
+        print(upload)
+        slide.version = upload['version']
+        slide.save()
+
+
+#End Brandon
 
 class PsychologistLookupResult:
     def __init__(self):

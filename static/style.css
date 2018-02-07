@@ -618,6 +618,15 @@ table {
   margin: 0 auto;
 }
 
+#slide {
+  width: 80%;
+  margin: 0 auto;
+}
+
+#slide img {
+  width: 100%;
+}
+
 /**********END ADMIN**********/
 /**********BEGIN QUESTION**********/
 .alert {
