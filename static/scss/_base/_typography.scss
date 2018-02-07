@@ -16,27 +16,27 @@
 
 /*TEXT*/
 
-main h1 {
+.content h1 {
     font-size: 2.4em;
 }
 
-main h2 {
+.content h2 {
     font-size: 2.2em;
 }
 
-main h3 {
+.content h3 {
     font-size: 2em;
 }
 
-main h4 {
+.content h4 {
     font-size: 1.8em;
 }
 
-main h5 {
+.content h5 {
     font-size: 1.6em;
 }
 
-main {
+.content {
   p,
   table,
   label,
@@ -53,8 +53,14 @@ a {
   transition: .3s ease-in-out;
 }
 
-main a:hover {
+.content a:hover {
   color: $hoverColor;
+}
+
+/*this is for errors on pages*/
+.help-block{
+  color: red !important;
+  margin-top: 0;
 }
 
 

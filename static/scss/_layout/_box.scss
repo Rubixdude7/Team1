@@ -17,6 +17,14 @@
   }
 }
 
+.flash{
+  @extend .box;
+  background-color: rgba(0, 179, 0, .5) !important;
+  p{
+    margin: 0;
+  }
+}
+
 input[type=submit]{
   -moz-appearance: none;
   -webkit-appearance: none;

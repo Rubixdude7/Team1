@@ -47,7 +47,6 @@
                             <li>
                                 <a href="{{ url_for('admin') }}">ADMIN</a>
                             </li>
-                            </li>
                             <li>
                                 <a href="{{ url_for('questions') }}">QUESTIONS</a>
                             </li>
@@ -80,6 +79,15 @@
 
         <div class="mobile-nav-spacer"></div>
         <div class="content">
+            {% with messages = get_flashed_messages() %}
+                 {% if messages %}
+                    <div class="flash">
+                       {% for message in messages %}
+                           <p class="title">{{ message }}</p>
+                       {% endfor %}
+                    </div>
+                 {% endif %}
+              {% endwith %}
             {% block content %}{% endblock %}
         </div>
 

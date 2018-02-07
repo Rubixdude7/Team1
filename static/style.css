@@ -29,31 +29,31 @@ body {
 }
 
 /*TEXT*/
-main h1 {
+.content h1 {
   font-size: 2.4em;
 }
 
-main h2 {
+.content h2 {
   font-size: 2.2em;
 }
 
-main h3 {
+.content h3 {
   font-size: 2em;
 }
 
-main h4 {
+.content h4 {
   font-size: 1.8em;
 }
 
-main h5 {
+.content h5 {
   font-size: 1.6em;
 }
 
-main p,
-main table,
-main label,
-main input,
-main select {
+.content p,
+.content table,
+.content label,
+.content input,
+.content select {
   font-size: 1.2em;
 }
 
@@ -64,8 +64,14 @@ a {
   transition: .3s ease-in-out;
 }
 
-main a:hover {
+.content a:hover {
   color: #0f0e9f;
+}
+
+/*this is for errors on pages*/
+.help-block {
+  color: red !important;
+  margin-top: 0;
 }
 
 /*fixes padding issue;
@@ -77,25 +83,29 @@ puts the page at the top of the screen*/
 
 /*SCREEN SIZE: WIDE  || SUB-PAGES*/
 @media only screen and (min-width: 750px) {
-  main {
+  .content {
     width: 70%;
   }
 }
 
 /*SCREEN SIZE: NARROW */
 @media only screen and (max-width: 749px) {
-  main {
+  .content {
     width: 90%;
   }
 }
 
-main {
+.content {
   margin-left: auto;
   margin-right: auto;
   display: block;
 }
 
-.box {
+main {
+  width: 100%;
+}
+
+.box, .flash {
   width: 100%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   transition: all 0.2s ease-in-out;
@@ -105,12 +115,20 @@ main {
   box-sizing: border-box;
 }
 
-.box:hover {
+.box:hover, .flash:hover {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
 }
 
-.box .title {
+.box .title, .flash .title {
   text-align: center;
+}
+
+.flash {
+  background-color: rgba(0, 179, 0, 0.5) !important;
+}
+
+.flash p {
+  margin: 0;
 }
 
 input[type=submit] {
@@ -722,23 +740,6 @@ table {
 
 /**********END USER MANAGEMENT PAGES**********/
 /**********BEGIN SLIDER**********/
-/*CSS RESET*/
-html,
-body {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 100%;
-  font: inherit;
-  vertical-align: baseline;
-}
-
-/*FONT IMPORT*/
-@font-face {
-  font-family: timeburner;
-  src: url(timeburner.ttf);
-}
-
 /*sizing*/
 /*for full screen calculate (desired height of slider in vh * width of img) / height of img with vh as units
 for normal slider just uncomment the second width*/
