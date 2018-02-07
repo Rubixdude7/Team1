@@ -76,8 +76,7 @@ class query(object):
 # Start Jason's code
 
     def getAllUsers(self):
-        users = db.user.select().where(
-            db.user.active == True)
+        users = db.user.select().where(db.user.active)
         return users
 
     def getAllRoles(self):
@@ -130,7 +129,7 @@ class query(object):
                                                 db.user.first_name,
                                                 db.user.last_name)\
                                          .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
-                                         .where(db.user.active == True)\
+                                         .where(db.user.active)\
                                          .tuples()[0]
             info = PsychologistLookupResult()
             info.photo = info_tuple[0]
@@ -150,8 +149,10 @@ class query(object):
                                 .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
                                 .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
                                 .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
-                                .where(db.user.active == True and db.role.role_nm == 'psyc')\
+                                .where(db.user.active & (db.role.role_nm == 'psyc'))\
                                 .tuples()
+
+        print(tuples)
         links = [PsychologistLink(t[0], '{2} {3}'.format(*t)) for t in tuples]
         return links
 

@@ -1,0 +1,57 @@
+.calendar {
+  padding: 0;
+}
+
+.cal-head {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  background-color: #ffcb05;
+}
+
+.cal-month-name {
+  margin: 0;
+  padding: 12px 0;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.6em;
+}
+
+.cal-column-title {
+  display: inline-block;
+  width: 14.286%;
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+  text-align: center;
+  background-color: #cc9900;
+  color: #fff;
+}
+
+.cal-week {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.cal-day {
+  display: inline-block;
+  width: 14.286%;
+  height: 100px;
+  margin: -1px 0 0 -1px;
+  padding: 0;
+  background-color: transparent;
+  border: 1px solid #999;
+}
+
+.cal-day-number {
+  font-size: 24pt;
+  padding-right: 10px;
+  text-align: right;
+}
+
+.cal-day[data-this-month="false"] {
+  background-color: #CCC;
+}
