@@ -231,9 +231,8 @@ class query(object):
     #End of Gabe's code
 
     def getVerifiedChildren(self):
+        consultation = db.consultation.select()
         children = []
-        for consult in db.consultation
-            children += consult
         return children
 
 # Begin Brandon
