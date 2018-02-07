@@ -350,6 +350,19 @@ def psikolog(id=None):
     # In both cases, show a list of psychologists.
     return render_template('list_psikolog.html', psychologist_links=querydb.psychologistLinks())
 
+@app.route('/psikolog/write_blog_post', methods=['GET', 'POST'])
+@roles_required('psyc')
+def write_blog_post():
+    if request.method == 'GET':
+        return render_template('write_blog_post.html')
+    elif request.method == 'POST':
+        text = request.form['text']
+        success, psyc_id = querydb.createBlogPost(current_user.id, text)
+        if success:
+            flash('Your blog post has been published.')
+        else:
+            flash('We could not publish your blog post.', 'error')
+        return redirect(url_for('psikolog', id=psyc_id))
 
 if __name__ == '__main__':
     app.run(debug=True)
