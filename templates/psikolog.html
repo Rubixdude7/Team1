@@ -14,7 +14,7 @@
             <div class="cal-head">
                 <div class="cal-month-name">
                     <i class="fa fa-calendar-alt" aria-hidden="true"></i> Februari 2018
-                    {% if current_user.is_authenticated and current_user.is_in_role('psyc') %}
+                    {% if can_edit %}
                         <a style="margin-left: 6ex;" href="/psikolog/revisi_jadwal"><i class="fa fa-edit" aria-hidden="true"></i> Revisi Jadwal</a>
                     {% endif %}
                 </div><div class="cal-column-title">
@@ -117,7 +117,9 @@
         </div>
     </div>
     <div class="box">
-        <a href="/psikolog/write_blog_post"><i class="fa fa-plus" aria-hidden="true"></i> Write New Post</a>
+        {% if can_edit %}
+            <a href="/psikolog/write_blog_post"><i class="fa fa-plus" aria-hidden="true"></i> Write New Post</a>
+        {% endif %}
         <div class="blog">
             {% for post in blog_posts %}
                 <article>

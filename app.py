@@ -344,7 +344,14 @@ def psikolog(id=None):
                 'date_posted': t[3],
                 'contents': t[2]
             } for t in tuples]
-            return render_template('psikolog.html', psyc_info=psyc_info, blog_posts=blog_posts)
+
+            can_edit = False
+            if current_user.is_authenticated:
+                logged_in_psyc = querydb.getUserPsycId(current_user.id)
+                if logged_in_psyc == id:
+                    can_edit = True
+
+            return render_template('psikolog.html', psyc_info=psyc_info, blog_posts=blog_posts, can_edit=can_edit)
 
     # Either no id was given or no psychologist was found.
     # In both cases, show a list of psychologists.
