@@ -111,6 +111,16 @@ class query(object):
 # End Jason's code
 
 # Begin Charlie's code
+    def getBlogPostsBy(self, psyc_id):
+        tuples = db.blog.select()\
+                        .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
+                        .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                        .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
+                        .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
+                        .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id))\
+                        .tuples()
+        return tuples
+
     def addPsychologistIfNotExist(self, u_id):
         # Check if user already has psychologist row
         tuples = db.psychologist.select().where(db.psychologist.user == u_id).tuples()
@@ -122,8 +132,6 @@ class query(object):
         psyc.save()
 
     def lookupPsychologist(self, ident):
-        print(type(ident))
-        print(ident)
         tuples = db.psychologist.select(db.psychologist.photo,
                                         db.psychologist.qualifications,
                                         db.user.first_name,

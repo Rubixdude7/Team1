@@ -336,7 +336,15 @@ def psikolog(id=None):
     if id is not None:
         psyc_info = querydb.lookupPsychologist(id)
         if psyc_info is not None:
-            return render_template('psikolog.html', psyc_info=psyc_info)
+            # Got their info.
+            # Now fetch their blog posts.
+            tuples = querydb.getBlogPostsBy(id).tuples()
+            blog_posts = [{
+                'title': t[2][:15] + '...',
+                'date_posted': t[3],
+                'contents': t[2]
+            } for t in tuples]
+            return render_template('psikolog.html', psyc_info=psyc_info, blog_posts=blog_posts)
 
     # Either no id was given or no psychologist was found.
     # In both cases, show a list of psychologists.

@@ -117,22 +117,15 @@
         </div>
     </div>
     <div class="box">
+        <a href="/psikolog/write_blog_post"><i class="fa fa-plus" aria-hidden="true"></i> Write New Post</a>
         <div class="blog">
-            <article style="padding: 0.25in; border-top: 1px solid black;">
-                <h3>Example blog post</h3>
-                <p class="blog-date" style="float: right; font-style: italic;">9 Aug 2011</p>
-                <p style="clear: both;">I am not pulled from the database</p>
-            </article>
-            <article style="padding: 0.25in; border-top: 1px solid black;">
-                <h3>Example blog post</h3>
-                <p class="blog-date" style="float: right; font-style: italic;">9 Aug 2011</p>
-                <p style="clear: both;">I am not pulled from the database</p>
-            </article>
-            <article style="padding: 0.25in; border-top: 1px solid black;">
-                <h3>Example blog post</h3>
-                <p class="blog-date" style="float: right; font-style: italic;">9 Aug 2011</p>
-                <p style="clear: both;">I am not pulled from the database</p>
-            </article>
+            {% for post in blog_posts %}
+                <article>
+                    <h3>{{ post['title'] }}</h3>
+                    <p class="blog-date">posted {{ post['date_posted'] }}</p>
+                    <p>{{ post['contents'] }}</p>
+                </article>
+            {% endfor %}
         </div>
     </div>
 </main>
