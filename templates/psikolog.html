@@ -4,9 +4,17 @@
 <main id="psyc-page">
     <div class="box">
         <div class="psyc-summary">
-            <img src="{{ psyc_info.photo }}" alt="[photograph of {{ psyc_info.full_name }}]" style="float:right" />
+            <div style="float:right">
+                <div style="font-size:80%;">
+                    <img style="display:block;padding: 3px;width:128px;height:128px;border:1px solid #999;" src="{{ psyc_info.photo }}" alt="[photograph of {{ psyc_info.full_name }}]" />
+                </div>
+                <div>
+                    <a href="/psikolog/change_avatar"><i class="fa fa-image" aria-hidden="true"></i> Change Avatar</a>
+                </div>
+            </div>
             <h2>{{ psyc_info.full_name }}</h2>
             <p class="psyc-qualifications">{{ psyc_info.qualifications }}</p>
+            <div style="clear:both;"></div>
         </div>
     </div>
     <div class="box">
