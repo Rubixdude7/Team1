@@ -30,12 +30,6 @@ app.config['CSRF_ENABLED'] = True
 app.config['USER_APP_NAME'] = 'Passion'
 app.config['USER_AFTER_REGISTER_ENDPOINT'] = 'user.login'
 app.config.from_pyfile('config.cfg')
-app.config['UPLOAD_FOLDER'] = '/uploads'
-
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Setup Flask-User
 
@@ -132,19 +126,21 @@ def _after_register_hook(sender, user, **extra):
 
 @app.route('/')
 def index():
-    return render_template("index.html")
+    slider = querydb.get_slider()
+    return render_template("index.html", slides=slider[0], desc=slider[1])
 
 
 @app.route('/slide-edit/<int:s_id>', methods=['GET', 'POST'])
 @roles_required('admin')
 def slide_edit(s_id):
-    file = request.files.get('image', None)
-    if file is None:
-        return render_template('slide_edit.html', slide=querydb.get_slide(s_id), s_id=s_id)
-    else:
-        if file and allowed_file(file.filename):
-            querydb.update_slide(s_id, file)
-            return redirect(url_for('admin'))
+    return render_template('slide_edit.html', slide=querydb.get_slide(s_id), s_id=s_id)
+
+
+@app.route('/slide-update/<int:s_id>', methods=['GET', 'POST'])
+@roles_required('admin')
+def slide_update(s_id):
+    querydb.update_slide(s_id, request.files.get('image', None), request.form.get('desc', None), request.form.get('alt', None))
+    return redirect(url_for('admin'))
 
 
 #           END BRANDON         #
@@ -293,7 +289,7 @@ def admin():
         roles.append(r)
         usersandroles[u.email] = r
 
-    return render_template('admin.html', users=users, roles=roles, usersandroles=usersandroles, slides=querydb.get_slider())
+    return render_template('admin.html', users=users, roles=roles, usersandroles=usersandroles, slides=querydb.get_slides())
 
 
 class RoleChangeForm(FlaskForm):

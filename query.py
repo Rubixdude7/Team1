@@ -179,7 +179,7 @@ class query(object):
     #End of Gabe's code
 
 # Begin Brandon
-    def get_slider(self):
+    def get_slides(self):
         slider_a = []
         for slide in db.slider.select():
             slider_a.append({
@@ -196,12 +196,29 @@ class query(object):
         url = cloudinary.CloudinaryImage(slide.img, version=slide.version).image()
         return url
 
-    def update_slide(self, s_id, img):
+    def allowed_file(self, filename):
+        return '.' in filename and \
+               filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
+
+    def update_slide(self, s_id, img, desc, alt):
         slide = db.slider.get(db.slider.slider_id == s_id)
-        upload = cloudinary.uploader.upload(img, public_id=slide.img)
-        print(upload)
-        slide.version = upload['version']
+        if img and self.allowed_file(img.filename):
+            upload = cloudinary.uploader.upload(img, public_id=slide.img)
+            slide.version = upload['version']
+        if desc is not None and desc != "":
+            slide.desc = desc
+        if alt is not None and alt != "":
+            slide.alt = alt
         slide.save()
+
+    def get_slider(self):
+        slider_tag = []
+        slider_desc = []
+        for slide in db.slider.select().order_by(db.slider.slider_id.asc()):
+            slider_tag.append(cloudinary.CloudinaryImage(slide.img, version=slide.version).image(alt=slide.alt))
+            slider_desc.append(slide.desc)
+        print(slider_tag)
+        return slider_tag, slider_desc
 
 
 #End Brandon

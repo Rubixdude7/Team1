@@ -14,20 +14,14 @@
             <input type="radio" name="slider" id="pause">
 
             <div id="sliderImages">
-                <div><img src="{{ url_for('static', filename='contents/slider/slide1.png') }}" alt="Passion"></div>
-                <div><img src="{{ url_for('static', filename='contents/slider/slide2.png') }}" alt="Passion"></div>
-                <div><img src="{{ url_for('static', filename='contents/slider/slide3.png') }}" alt="Passion"></div>
-                <div><img src="{{ url_for('static', filename='contents/slider/slide4.png') }}" alt="Passion"></div>
-                <div><img src="{{ url_for('static', filename='contents/slider/slide5.png') }}" alt="Passion"></div>
-                <div><img src="{{ url_for('static', filename='contents/slider/slide6.png') }}" alt="Passion"></div>
+                {% for slide in slides %}
+                    <div>{{ slide|safe }}</div>
+                {% endfor %}
             </div>
             <div id="slideDesc">
-                <span class="slideText" id="slideText1"><p>Pintu Depan</p></span>
-                <span class="slideText" id="slideText2"><p>Terapis dan Anak</p></span>
-                <span class="slideText" id="slideText3"><p>Resepsionis Melayani</p></span>
-                <span class="slideText" id="slideText4"><p>Terapis dan Anak</p></span>
-                <span class="slideText" id="slideText5"><p>Terapis dan Anak</p></span>
-                <span class="slideText" id="slideText6"><p>Terapis dan Anak</p></span>
+                {% for i in range(0, desc|length, 1) %}
+                    <span class="slideText" id="slideText{{ i + 1 }}"><p>{{ desc[i] }}</p></span>
+                {% endfor %}
             </div>
             <div id="pageNav">
                 <div id="previousArrow">

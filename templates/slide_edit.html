@@ -9,9 +9,21 @@
         <div id="slide">
             {{ slide|safe }}
         </div>
-        <form enctype="multipart/form-data" method="post" action={{ "/slide-edit/" ~ s_id}}>
-            <input type="file" name="image">
-            <input type="submit">
+        <form enctype="multipart/form-data" method="post" action={{ "/slide-update/" ~ s_id}}>
+            <div class="form-control-1">
+                <input type="file" name="image">
+            </div>
+            <div class="form-control-2">
+                <label for="desc">Image Description</label>
+                <input type="text" name="desc" id="desc">
+            </div>
+            <div class="form-control-2">
+                <label for="alt">Image Alt Test (Shown if image can't display)</label>
+                <input type="text" name="alt" id="alt">
+            </div>
+            <div class="form-control-2">
+                <input type="submit">
+            </div>
         </form>
     </div>
 
