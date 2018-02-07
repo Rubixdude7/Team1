@@ -2,5 +2,9 @@
 {% block title %}Staff{% endblock %}
 {% block content %}
 <main id="StaffPortal">
-
+    <ul class="list-group">
+        {% for child in children %}
+        <li class="list-group-item">{{ child.child_nm_fst }} {{ child.child_nm_lst }}</li>
+        {% endfor %}
+    </ul>
 </main>

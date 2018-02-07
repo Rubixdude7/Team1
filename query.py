@@ -230,6 +230,12 @@ class query(object):
 
     #End of Gabe's code
 
+    def getVerifiedChildren(self):
+        children = []
+        for consult in db.consultation
+            children += consult
+        return children
+
 # Begin Brandon
     def get_slides(self):
         slider_a = []

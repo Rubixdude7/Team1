@@ -377,6 +377,4 @@ if __name__ == '__main__':
 @app.route('/staff')
 roles_required('staff')
 def staff():
-
-    return
-"""
+    return render_template(staff.html, children = querydb.getVerifiedChildren())
