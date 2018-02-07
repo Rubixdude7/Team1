@@ -3,8 +3,68 @@
 {% block content %}
 <main id="mainHome">
     <div class="box">
-        <div id="circle">
-            <img src="{{ url_for('static', filename='contents/home/p.svg') }}"/>
+        <div id="cssSlider">
+            <input type="radio" name="slider" id="slide1">
+            <input type="radio" name="slider" id="slide2">
+            <input type="radio" name="slider" id="slide3">
+            <input type="radio" name="slider" id="slide4">
+            <input type="radio" name="slider" id="slide5">
+            <input type="radio" name="slider" id="slide6">
+            <input type="radio" name="slider" id="play" checked>
+            <input type="radio" name="slider" id="pause">
+
+            <div id="sliderImages">
+                <div><img src="{{ url_for('static', filename='contents/slider/slide1.png') }}" alt="Passion"></div>
+                <div><img src="{{ url_for('static', filename='contents/slider/slide2.png') }}" alt="Passion"></div>
+                <div><img src="{{ url_for('static', filename='contents/slider/slide3.png') }}" alt="Passion"></div>
+                <div><img src="{{ url_for('static', filename='contents/slider/slide4.png') }}" alt="Passion"></div>
+                <div><img src="{{ url_for('static', filename='contents/slider/slide5.png') }}" alt="Passion"></div>
+                <div><img src="{{ url_for('static', filename='contents/slider/slide6.png') }}" alt="Passion"></div>
+            </div>
+            <div id="slideDesc">
+                <span class="slideText" id="slideText1"><p>Pintu Depan</p></span>
+                <span class="slideText" id="slideText2"><p>Terapis dan Anak</p></span>
+                <span class="slideText" id="slideText3"><p>Resepsionis Melayani</p></span>
+                <span class="slideText" id="slideText4"><p>Terapis dan Anak</p></span>
+                <span class="slideText" id="slideText5"><p>Terapis dan Anak</p></span>
+                <span class="slideText" id="slideText6"><p>Terapis dan Anak</p></span>
+            </div>
+            <div id="pageNav">
+                <div id="previousArrow">
+                    <label for="slide6" class="slideL" id="slideL6"></label>
+                    <label for="slide1" class="slideL" id="slideL1"></label>
+                    <label for="slide2" class="slideL" id="slideL2"></label>
+                    <label for="slide3" class="slideL" id="slideL3"></label>
+                    <label for="slide4" class="slideL" id="slideL4"></label>
+                    <label for="slide5" class="slideL" id="slideL5"></label>
+                </div>
+                <div id="playPause">
+                    <label for="play" class="playPauseBtn" id="playBtn"></label>
+                    <label for="pause" class="playPauseBtn" id="pauseBtn"></label>
+                </div>
+                <div id="nextArrow">
+                    <label for="slide2" class="slideR" id="slideR2"></label>
+                    <label for="slide3" class="slideR" id="slideR3"></label>
+                    <label for="slide4" class="slideR" id="slideR4"></label>
+                    <label for="slide5" class="slideR" id="slideR5"></label>
+                    <label for="slide6" class="slideR" id="slideR6"></label>
+                    <label for="slide1" class="slideR" id="slideR1"></label>
+                </div>
+            </div>
+            <div id="pageIndicators">
+                <label for="slide1" class="indicator"><span class="hoverPoint"><span class="point" id="point1"></span></span>
+                </label>
+                <label for="slide2" class="indicator"><span class="hoverPoint"><span class="point" id="point2"></span></span>
+                </label>
+                <label for="slide3" class="indicator"><span class="hoverPoint"><span class="point" id="point3"></span></span>
+                </label>
+                <label for="slide4" class="indicator"><span class="hoverPoint"><span class="point" id="point4"></span></span>
+                </label>
+                <label for="slide5" class="indicator"><span class="hoverPoint"><span class="point" id="point5"></span></span>
+                </label>
+                <label for="slide6" class="indicator"><span class="hoverPoint"><span class="point" id="point6"></span></span>
+                </label>
+            </div>
         </div>
     </div>
     <div class="box">

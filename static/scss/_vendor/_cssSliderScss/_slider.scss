@@ -31,18 +31,23 @@
 
 @mixin off($width) {
     #cssSlider {
-        padding-bottom: (900/2048)*100%;
+        padding-bottom: (9/16)*100%;
         /*to find % aspect ratio, (height/width)100*/
         height: 0;
+        position: relative;
         #sliderImages {
             left: 0;
             width: $width * 6;
+            height: 100%;
             /*size of the images*/
-            img,
-            a>img {
-                width: $width;
+            div {
+                width: $width/6;
                 height: 100%;
                 float: left;
+                text-align: center;
+                img{
+                    height: 100%;
+                }
             }
         }
     }
@@ -85,7 +90,7 @@
 
 @else {
     /*normal display*/
-    @include off(100vw);
+    @include off(100%);
     @include animationMode('');
 }
 

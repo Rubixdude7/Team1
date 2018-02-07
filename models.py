@@ -44,7 +44,7 @@ class child(MySQLModel):
     child_id = PrimaryKeyField()
     user = ForeignKeyField(user, to_field="user_id")
     child_nm_fst = CharField()
-    child_nm_lst = CharField()
+    child_nm_lst = CharField(null=True)
 
     class Meta:
         db_table = "child"

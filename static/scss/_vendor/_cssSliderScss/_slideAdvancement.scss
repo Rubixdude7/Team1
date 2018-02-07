@@ -269,9 +269,9 @@
 
 @else {
     /*normal display*/
-    @include manualAdvancement(100vw);
-    @include automaticAdvancement(100vw);
-	@include automaticAdvancementIE(100vw, 0);
+    @include manualAdvancement(100%);
+    @include automaticAdvancement(100%/6);
+	@include automaticAdvancementIE(100%/6, 0);
 }
 
 
