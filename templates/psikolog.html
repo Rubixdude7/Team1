@@ -10,8 +10,110 @@
         </div>
     </div>
     <div class="box">
-        <div class="calendar" style="background-color: white; height: 5in; border: 1px solid #000033">
-            Calendar will go here
+        <div class="calendar">
+            <div class="cal-head">
+                <div class="cal-month-name">
+                    <i class="fa fa-calendar-alt" aria-hidden="true"></i> Februari 2018
+                    {% if current_user.is_authenticated and current_user.is_in_role('psyc') %}
+                        <a style="margin-left: 6ex;" href="/psikolog/revisi_jadwal"><i class="fa fa-edit" aria-hidden="true"></i> Revisi Jadwal</a>
+                    {% endif %}
+                </div><div class="cal-column-title">
+                    Minggu
+                </div><div class="cal-column-title">
+                    Senin
+                </div><div class="cal-column-title">
+                    Selasa
+                </div><div class="cal-column-title">
+                    Rabu
+                </div><div class="cal-column-title">
+                    Kamis
+                </div><div class="cal-column-title">
+                    Jumat
+                </div><div class="cal-column-title">
+                    Sabtu
+                </div>
+            </div>
+            <div class="cal-week">
+                <div class="cal-day" data-this-month="false">
+                    <div class="cal-day-number">28</div>
+                </div><div class="cal-day" data-this-month="false">
+                    <div class="cal-day-number">29</div>
+                </div><div class="cal-day" data-this-month="false">
+                    <div class="cal-day-number">30</div>
+                </div><div class="cal-day" data-this-month="false">
+                    <div class="cal-day-number">31</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">1</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">2</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">3</div>
+                </div>
+            </div><div class="cal-week">
+                <div class="cal-day">
+                    <div class="cal-day-number">4</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">5</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">6</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">7</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">8</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">9</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">10</div>
+                </div>
+            </div><div class="cal-week">
+                <div class="cal-day">
+                    <div class="cal-day-number">11</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">12</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">13</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">14</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">15</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">16</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">17</div>
+                </div>
+            </div><div class="cal-week">
+                <div class="cal-day">
+                    <div class="cal-day-number">18</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">19</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">20</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">21</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">22</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">23</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">24</div>
+                </div>
+            </div><div class="cal-week">
+                <div class="cal-day">
+                    <div class="cal-day-number">25</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">26</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">27</div>
+                </div><div class="cal-day">
+                    <div class="cal-day-number">28</div>
+                </div><div class="cal-day" data-this-month="false">
+                    <div class="cal-day-number">1</div>
+                </div><div class="cal-day" data-this-month="false">
+                    <div class="cal-day-number">2</div>
+                </div><div class="cal-day" data-this-month="false">
+                    <div class="cal-day-number">3</div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="box">
