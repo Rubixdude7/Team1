@@ -7,7 +7,7 @@
         <h1 class="title"> Update Slide</h1>
         <hr>
         <div id="slide">
-            {{ slide|safe }}
+            {{ slide.img|safe }}
         </div>
         <form enctype="multipart/form-data" method="post" action={{ "/slide-update/" ~ s_id}}>
             <div class="form-control-1">
@@ -15,11 +15,15 @@
             </div>
             <div class="form-control-2">
                 <label for="desc">Image Description</label>
-                <input type="text" name="desc" id="desc">
+                <div>
+                    <input type="text" name="desc" id="desc" value="{{ slide.desc }}">
+                </div>
             </div>
             <div class="form-control-2">
                 <label for="alt">Image Alt Test (Shown if image can't display)</label>
-                <input type="text" name="alt" id="alt">
+                <div>
+                    <input type="text" name="alt" id="alt" value="{{ slide.alt }}">
+                </div>
             </div>
             <div class="form-control-2">
                 <input type="submit">

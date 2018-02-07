@@ -200,7 +200,12 @@ class query(object):
     def get_slide(self, s_id):
         slide = db.slider.get(db.slider.slider_id == s_id)
         url = cloudinary.CloudinaryImage(slide.img, version=slide.version).image()
-        return url
+        slide = {
+            'desc': slide.desc,
+            'alt': slide.alt,
+            'img': url
+        }
+        return slide
 
     def allowed_file(self, filename):
         return '.' in filename and \
