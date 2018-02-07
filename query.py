@@ -114,25 +114,32 @@ class query(object):
         psyc = db.psychologist(user=u_id, photo='', qualifications='This psychologist has not listed their qualifications.')
         psyc.save()
 
-    def lookupPsychologist(self, id):
-        info = None
-        try:
-            info_tuple = db.psychologist.select(db.psychologist.photo,
-                                                db.psychologist.qualifications,
-                                                db.user.first_name,
-                                                db.user.last_name)\
-                                         .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
-                                         .where(db.user.active)\
-                                         .tuples()[0]
+    def lookupPsychologist(self, ident):
+        print(type(ident))
+        print(ident)
+        tuples = db.psychologist.select(db.psychologist.photo,
+                                        db.psychologist.qualifications,
+                                        db.user.first_name,
+                                        db.user.last_name)\
+                                .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                                .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
+                                .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
+                                .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == ident))\
+                                .tuples()
+        if len(tuples) > 0:
+            info_tuple = tuples[0]
+            print(list(info_tuple))
+
             info = PsychologistLookupResult()
             info.photo = info_tuple[0]
             info.qualifications = info_tuple[1]
             info.first_name = info_tuple[2]
             info.last_name = info_tuple[3]
             info.full_name = '{0} {1}'.format(info.first_name, info.last_name)
-        except IndexError:
-            pass
-        return info
+            return info
+
+        print('nope')
+        return None
 
     def psychologistLinks(self):
         tuples = db.psychologist.select(db.psychologist.psyc_id,
@@ -145,7 +152,6 @@ class query(object):
                                 .where(db.user.active & (db.role.role_nm == 'psyc'))\
                                 .tuples()
 
-        print(tuples)
         links = [PsychologistLink(t[0], '{2} {3}'.format(*t)) for t in tuples]
         return links
 
