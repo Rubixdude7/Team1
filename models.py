@@ -223,3 +223,14 @@ class user_roles(MySQLModel):
 
     class Meta:
         db_table = "user_roles"
+
+
+class slider(MySQLModel):
+    slider_id = PrimaryKeyField()
+    img = CharField()
+    version = CharField()
+    desc = CharField()
+    alt = CharField()
+
+    class Meta:
+        db_table = "slider"

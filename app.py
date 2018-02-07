@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for
 import datetime
 from flask_sqlalchemy import SQLAlchemy
@@ -11,7 +12,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, DateTimeField, Form, SelectField, SubmitField
 from wtforms.validators import DataRequired
 from flask import redirect, url_for
-
+from werkzeug.utils import secure_filename
 from wtforms import StringField, DateField
 from wtforms.validators import DataRequired, ValidationError
 import query
@@ -29,6 +30,12 @@ app.config['CSRF_ENABLED'] = True
 app.config['USER_APP_NAME'] = 'Passion'
 app.config['USER_AFTER_REGISTER_ENDPOINT'] = 'user.login'
 app.config.from_pyfile('config.cfg')
+app.config['UPLOAD_FOLDER'] = '/uploads'
+
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Setup Flask-User
 
@@ -126,6 +133,19 @@ def _after_register_hook(sender, user, **extra):
 @app.route('/')
 def index():
     return render_template("index.html")
+
+
+@app.route('/slide-edit/<int:s_id>', methods=['GET', 'POST'])
+@roles_required('admin')
+def slide_edit(s_id):
+    file = request.files.get('image', None)
+    if file is None:
+        return render_template('slide_edit.html', slide=querydb.get_slide(s_id), s_id=s_id)
+    else:
+        if file and allowed_file(file.filename):
+            querydb.update_slide(s_id, file)
+            return redirect(url_for('admin'))
+
 
 #           END BRANDON         #
 
@@ -272,7 +292,8 @@ def admin():
         r = querydb.role(u.user_id)
         roles.append(r)
         usersandroles[u.email] = r
-    return render_template('admin.html', users=users, roles=roles, usersandroles=usersandroles)
+
+    return render_template('admin.html', users=users, roles=roles, usersandroles=usersandroles, slides=querydb.get_slider())
 
 
 class RoleChangeForm(FlaskForm):
@@ -328,9 +349,10 @@ def psikolog(id=None):
 
 if __name__ == '__main__':
     app.run(debug=True)
-
+"""
 @app.route('/staff')
-@app.roles_required('staff')
+roles_required('staff')
 def staff():
 
     return
+"""

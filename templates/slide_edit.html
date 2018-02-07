@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Edit{% endblock %}
+{% block content %}
+<main id="slide-edit">
+
+    <div class="box">
+        <h1 class="title"> Update Slide</h1>
+        <hr>
+        <div id="slide">
+            {{ slide|safe }}
+        </div>
+        <form enctype="multipart/form-data" method="post" action={{ "/slide-edit/" ~ s_id}}>
+            <input type="file" name="image">
+            <input type="submit">
+        </form>
+    </div>
+
+</main>
+
+{% endblock %}

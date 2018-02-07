@@ -4,6 +4,9 @@
 <main id="mainHome">
     <div class="box">
         <h1 class="title">Admin Portal</h1>
+    </div>
+    <div class="box">
+        <h2 class="title">Roles</h2>
         <hr>
         <div class="table-wrapper">
             <table class="table">
@@ -24,6 +27,29 @@
                                 <td><a href="{{ url_for('edit', u_id=u.user_id) }}">Edit</a></td>
                                 <td><a href="{{ url_for('delete', u_id=u.user_id) }}" onclick="confirmAction()">Delete</a></td>
                             {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="box">
+        <h2 class="title">Image Slider</h2>
+        <hr>
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Slide</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in slides %}
+                        <tr>
+                            <td>{{ s.id }}</td>
+                            <td>{{ s.desc }}</td>
+                            <td><a href="{{ url_for('slide_edit', s_id=s.id) }}">Edit</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
