@@ -216,16 +216,22 @@ def post_questionAnswers():
 @login_required
 @roles_required('user')
 def parent():
-    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.id))
+    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.id), contact_info=querydb.getContact(current_user.id))
+
+@app.route('/parent/contact')
+@roles_required('user')
+def contact():
+    return render_template('contact.html')
 
 
 @app.route('/parent/contact', methods=['GET', 'POST'])
 @roles_required('user')
-def contact():
-    querydb.updateContact(current_user.id, request.form.get('phone_no'), request.form.get('address_1'),
-                          request.form.get('address_2'), request.form.get('city'),
-                          request.form.get('providence'), request.form.get('zip'))
-    return render_template('contact.html')
+def editContact():
+    contact_id=querydb.contactID(current_user.id)
+    querydb.updateContact(current_user.id, contact_id,request.form.get('phone_no'), request.form.get('address_1'),
+                          request.form.get('address_2'), request.form.get('city'), request.form.get('providence'),
+                          request.form.get('zip'))
+    return parent()
 #End Gabe
 
 
