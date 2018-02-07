@@ -31,8 +31,8 @@
 @mixin arrowStyle($bckImg) {
     width: 10vw;
     height: 10vw;
-    background: url(#{$bckImg + png});
-    background-image: url(#{$bckImg + svg}),
+    background: url('/static/contents/slider/#{$bckImg + png}');
+    background-image: url('/static/contents/slider/#{$bckImg + svg}'),
     none;
     background-repeat: no-repeat;
     background-size: 100%;

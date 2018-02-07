@@ -773,8 +773,8 @@ for normal slider just uncomment the second width*/
 #cssSlider > #pageNav > #previousArrow > .slideL {
   width: 10vw;
   height: 10vw;
-  background: url(icons/previous.png);
-  background-image: url(icons/previous.svg), none;
+  background: url("/static/contents/slider/icons/previous.png");
+  background-image: url("/static/contents/slider/icons/previous.svg"), none;
   background-repeat: no-repeat;
   background-size: 100%;
   z-index: -1;
@@ -783,8 +783,8 @@ for normal slider just uncomment the second width*/
 #cssSlider > #pageNav > #nextArrow > .slideR {
   width: 10vw;
   height: 10vw;
-  background: url(icons/next.png);
-  background-image: url(icons/next.svg), none;
+  background: url("/static/contents/slider/icons/next.png");
+  background-image: url("/static/contents/slider/icons/next.svg"), none;
   background-repeat: no-repeat;
   background-size: 100%;
   z-index: -1;
@@ -793,8 +793,8 @@ for normal slider just uncomment the second width*/
 #cssSlider > #pageNav > #playPause > #playBtn {
   width: 10vw;
   height: 10vw;
-  background: url(icons/play.png);
-  background-image: url(icons/play.svg), none;
+  background: url("/static/contents/slider/icons/play.png");
+  background-image: url("/static/contents/slider/icons/play.svg"), none;
   background-repeat: no-repeat;
   background-size: 100%;
   z-index: -1;
@@ -803,8 +803,8 @@ for normal slider just uncomment the second width*/
 #cssSlider > #pageNav > #playPause > #pauseBtn {
   width: 10vw;
   height: 10vw;
-  background: url(icons/pause.png);
-  background-image: url(icons/pause.svg), none;
+  background: url("/static/contents/slider/icons/pause.png");
+  background-image: url("/static/contents/slider/icons/pause.svg"), none;
   background-repeat: no-repeat;
   background-size: 100%;
   z-index: -1;
@@ -1093,7 +1093,6 @@ for normal slider just uncomment the second width*/
   color: black;
   /*color of blurb box text*/
   font-size: 2em;
-  font-family: timeburner;
 }
 
 /*BRING THE TEXT FORWARD ON ITS PAGE*/
