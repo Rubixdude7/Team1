@@ -8,12 +8,36 @@
 
 
         <p>
-        <!--Phone Number: {{ contact_info.phone_no }}<br>
-        Address 1: {{ contact_info.address_1 }}<br>
         {% if(contact_info.phone_no != null) %}
-            Address 2: {{ contact_info.address_2 }}
+            Phone Number: {{ contact_info.phone_no }}<br>
         {% endif %}
-        -->
+
+
+        {% if(contact_info.address_1 != null) %}
+            Address 1: {{ contact_info.address_1 }}<br>
+        {% endif %}
+
+
+        {% if(contact_info.phone_no != null) %}
+            Address 2: {{ contact_info.address_2 }}<br>
+        {% endif %}
+
+
+        {% if(contact_info.city != null) %}
+        City: {{ contact_info.city }}<br>
+        {% endif %}
+
+
+        {% if(contact_info.providence != null) %}
+            Providence: {{ contact_info.providence }}<br>
+        {% endif %}
+
+
+        {% if(contact_info.zip != null) %}
+            Zip: {{ contact_info.zip }}<br>
+        {% endif %}
+
+
 
         <form action="/parent/contact">
             <button type="submit">
