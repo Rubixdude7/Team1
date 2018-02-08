@@ -218,6 +218,11 @@ input[type=submit] {
   border-color: transparent;
   color: #fff; }
 
+.input-icon {
+  display: inline-block;
+  margin-right: 16px;
+  font-size: 80%; }
+
 .table {
   background-color: white;
   color: #363636;
