@@ -306,6 +306,46 @@ class QuestionEdit(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class ClientEditForm(FlaskForm):
+    fName = StringField('fName')
+    lName = StringField('lName')
+    phone = StringField('phone')
+    address_1 = StringField('address_1')
+    address_2 = StringField('address_2')
+    city = StringField('city')
+    province = StringField('province')
+    zip = StringField('zip')
+    role = SelectField('Role', coerce=str, validators=[DataRequired()], option_widget='Select')
+    submit = SubmitField('Submit')
+
+
+@app.route('/editClient', methods=['GET', 'POST'])
+@roles_required('admin')
+def editC():
+    u_id = request.args.get('u_id')
+    if int(u_id) == int(current_user.id):
+        return redirect(url_for('admin'))
+    form = ClientEditForm()
+    roles = querydb.getAllRoles()
+    current_role = querydb.role(u_id)
+    rolenames = [current_role]
+    for a in roles:
+        if a.role_nm != current_role:
+            rolenames.append(a.role_nm)
+    form.role.choices = [(r, r) for r in rolenames]
+    if form.validate_on_submit():
+        newRole = form.role.data
+        if newRole == 'psyc':
+            querydb.addPsychologistIfNotExist(u_id)
+        querydb.updateUserRole(u_id, newRole)
+        contact_id = querydb.contactID(u_id)
+        querydb.updateContact(u_id, contact_id, form.phone.data, form.address_1.data, form.address_2.data,
+                              form.city.data, form.province.data, form.zip.data)
+        flash('Your changes have been saved.')
+        return redirect(url_for('admin'))
+    return render_template('editClient.html', title='Edit Profile', form=form)
+
+
 @app.route('/edit', methods=['GET', 'POST'])
 @roles_required('admin')
 def edit():
@@ -321,14 +361,13 @@ def edit():
             rolenames.append(a.role_nm)
     form.role.choices = [(r, r) for r in rolenames]
     if form.validate_on_submit():
-        #u_id = request.args.get('u_id')
         newRole = form.role.data
         if newRole == 'psyc':
             querydb.addPsychologistIfNotExist(u_id)
         querydb.updateUserRole(u_id, newRole)
-        #flash('Your changes have been saved.')
+        flash('Your changes have been saved.')
         return redirect(url_for('admin'))
-    return render_template('edit.html', title='Edit Profile',form=form)
+    return render_template('edit.html', title='Edit Profile', form=form)
 
 @app.route('/delete')
 @roles_required('admin')

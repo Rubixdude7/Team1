@@ -95,11 +95,6 @@ class query(object):
         user.active = False
         user.save()
 
-    def bringHimBack(self):
-        user = db.user.get(db.user.user_id == 3)
-        user.void_ind = 'n'
-        user.save()
-
     def role(self, id):
         role = db.role.select(db.role.role_nm).join(db.user_roles, JOIN_INNER, db.role.role_id ==
                                                     db.user_roles.select(db.user_roles.role).where(
