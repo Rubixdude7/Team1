@@ -305,28 +305,41 @@ class QuestionEdit(FlaskForm):
 @app.route('/edit', methods=['GET', 'POST'])
 @roles_required('admin')
 def edit():
+    u_id = request.args.get('u_id')
+    if int(u_id) == int(current_user.id):
+        return redirect(url_for('admin'))
     form = RoleChangeForm()
     roles = querydb.getAllRoles()
-    rolenames = []
+    current_role = querydb.role(u_id)
+    rolenames = [current_role]
     for a in roles:
-        rolenames.append(a.role_nm)
+        if a.role_nm != current_role:
+            rolenames.append(a.role_nm)
     form.role.choices = [(r, r) for r in rolenames]
     if form.validate_on_submit():
-        u_id = request.args.get('u_id')
+        #u_id = request.args.get('u_id')
         newRole = form.role.data
         if newRole == 'psyc':
             querydb.addPsychologistIfNotExist(u_id)
         querydb.updateUserRole(u_id, newRole)
         #flash('Your changes have been saved.')
         return redirect(url_for('admin'))
-    return render_template('edit.html', title='Edit Profile',
-                           form=form)
+    return render_template('edit.html', title='Edit Profile',form=form)
 
 @app.route('/delete')
+@roles_required('admin')
 def delete():
     user_id = request.args.get('u_id')
+    if int(user_id) == int(current_user.id):
+        return redirect(url_for('admin'))
     querydb.softDeleteUser(user_id)
     return redirect(url_for('admin'))
+
+
+@app.route('/editClient')
+@roles_required('admin')
+def editClient():
+    2+4
 
 # End Jason's code
 
@@ -336,12 +349,40 @@ def psikolog(id=None):
     if id is not None:
         psyc_info = querydb.lookupPsychologist(id)
         if psyc_info is not None:
-            return render_template('psikolog.html', psyc_info=psyc_info)
+            # Got their info.
+            # Now fetch their blog posts.
+            tuples = querydb.getBlogPostsBy(id).tuples()
+            blog_posts = [{
+                'title': t[2][:15] + '...',
+                'date_posted': t[3],
+                'contents': t[2]
+            } for t in tuples]
+
+            can_edit = False
+            if current_user.is_authenticated:
+                logged_in_psyc = querydb.getUserPsycId(current_user.id)
+                if logged_in_psyc == id:
+                    can_edit = True
+
+            return render_template('psikolog.html', psyc_info=psyc_info, blog_posts=blog_posts, can_edit=can_edit)
 
     # Either no id was given or no psychologist was found.
     # In both cases, show a list of psychologists.
     return render_template('list_psikolog.html', psychologist_links=querydb.psychologistLinks())
 
+@app.route('/psikolog/write_blog_post', methods=['GET', 'POST'])
+@roles_required('psyc')
+def write_blog_post():
+    if request.method == 'GET':
+        return render_template('write_blog_post.html')
+    elif request.method == 'POST':
+        text = request.form['text']
+        success, psyc_id = querydb.createBlogPost(current_user.id, text)
+        if success:
+            flash('Your blog post has been published.')
+        else:
+            flash('We could not publish your blog post.', 'error')
+        return redirect(url_for('psikolog', id=psyc_id))
 
 if __name__ == '__main__':
     app.run(debug=True)

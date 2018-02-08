@@ -105,12 +105,57 @@ class query(object):
                                                     db.user_roles.select(db.user_roles.role).where(
                                                         db.user_roles.user == id)).tuples()
         role = list(role)[0][0]
-        print(role)
         return role
 
 # End Jason's code
 
 # Begin Charlie's code
+    def getUserPsycId(self, u_id):
+        tuples = db.user.select(db.psychologist.psyc_id)\
+                        .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
+                        .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
+                        .join(db.psychologist, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                        .where(db.user.active & (db.role.role_nm == 'psyc') & (db.user.user_id == u_id))\
+                        .tuples()
+        if len(tuples) == 0:
+            return -1
+        return tuples[0][0]
+
+    def getBlogPostsBy(self, psyc_id):
+        tuples = db.blog.select()\
+                        .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
+                        .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                        .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
+                        .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
+                        .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id))\
+                        .order_by(db.blog.updt_dtm.desc())\
+                        .tuples()
+        return tuples
+
+    def createBlogPost(self, u_id, text):
+        # First, make sure this user is REALLY a psychologist
+        tuples = db.user.select(db.psychologist.psyc_id)\
+                        .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
+                        .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
+                        .join(db.psychologist, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                        .where(db.user.active & (db.user.user_id == u_id) & (db.role.role_nm == 'psyc'))\
+                        .tuples()
+        if len(tuples) == 0:
+            return False, -1
+
+        psyc_id = list(tuples)[0][0]
+
+        now = datetime.datetime.now()
+        blog_post = db.blog(psyc=psyc_id,
+                            text=text,
+                            crea_dtm=now,
+                            user_id_upd=u_id,
+                            updt_dtm=now,
+                            void_ind='n')
+        blog_post.save()
+
+        return True, psyc_id
+
     def addPsychologistIfNotExist(self, u_id):
         # Check if user already has psychologist row
         tuples = db.psychologist.select().where(db.psychologist.user == u_id).tuples()
@@ -122,9 +167,8 @@ class query(object):
         psyc.save()
 
     def lookupPsychologist(self, ident):
-        print(type(ident))
-        print(ident)
-        tuples = db.psychologist.select(db.psychologist.photo,
+        tuples = db.psychologist.select(db.psychologist.psyc_id,
+                                        db.psychologist.photo,
                                         db.psychologist.qualifications,
                                         db.user.first_name,
                                         db.user.last_name)\
@@ -138,10 +182,11 @@ class query(object):
             print(list(info_tuple))
 
             info = PsychologistLookupResult()
-            info.photo = info_tuple[0]
-            info.qualifications = info_tuple[1]
-            info.first_name = info_tuple[2]
-            info.last_name = info_tuple[3]
+            info.psyc_id = info_tuple[0]
+            info.photo = info_tuple[1]
+            info.qualifications = info_tuple[2]
+            info.first_name = info_tuple[3]
+            info.last_name = info_tuple[4]
             info.full_name = '{0} {1}'.format(info.first_name, info.last_name)
             return info
 
@@ -236,6 +281,7 @@ class query(object):
 
 class PsychologistLookupResult:
     def __init__(self):
+        self.psyc_id = None
         self.photo = None
         self.qualifications = None
         self.first_name = None

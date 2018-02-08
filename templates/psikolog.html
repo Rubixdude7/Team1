@@ -4,9 +4,17 @@
 <main id="psyc-page">
     <div class="box">
         <div class="psyc-summary">
-            <img src="{{ psyc_info.photo }}" alt="[photograph of {{ psyc_info.full_name }}]" style="float:right" />
+            <div style="float:right">
+                <div style="font-size:80%;">
+                    <img style="display:block;padding: 3px;width:128px;height:128px;border:1px solid #999;" src="{{ psyc_info.photo }}" alt="[photograph of {{ psyc_info.full_name }}]" />
+                </div>
+                <div>
+                    <a href="/psikolog/change_avatar"><i class="fa fa-image" aria-hidden="true"></i> Change Avatar</a>
+                </div>
+            </div>
             <h2>{{ psyc_info.full_name }}</h2>
             <p class="psyc-qualifications">{{ psyc_info.qualifications }}</p>
+            <div style="clear:both;"></div>
         </div>
     </div>
     <div class="box">
@@ -14,7 +22,7 @@
             <div class="cal-head">
                 <div class="cal-month-name">
                     <i class="fa fa-calendar-alt" aria-hidden="true"></i> Februari 2018
-                    {% if current_user.is_authenticated and current_user.is_in_role('psyc') %}
+                    {% if can_edit %}
                         <a style="margin-left: 6ex;" href="/psikolog/revisi_jadwal"><i class="fa fa-edit" aria-hidden="true"></i> Revisi Jadwal</a>
                     {% endif %}
                 </div><div class="cal-column-title">
@@ -117,22 +125,17 @@
         </div>
     </div>
     <div class="box">
+        {% if can_edit %}
+            <a href="/psikolog/write_blog_post"><i class="fa fa-plus" aria-hidden="true"></i> Write New Post</a>
+        {% endif %}
         <div class="blog">
-            <article style="padding: 0.25in; border-top: 1px solid black;">
-                <h3>Example blog post</h3>
-                <p class="blog-date" style="float: right; font-style: italic;">9 Aug 2011</p>
-                <p style="clear: both;">I am not pulled from the database</p>
-            </article>
-            <article style="padding: 0.25in; border-top: 1px solid black;">
-                <h3>Example blog post</h3>
-                <p class="blog-date" style="float: right; font-style: italic;">9 Aug 2011</p>
-                <p style="clear: both;">I am not pulled from the database</p>
-            </article>
-            <article style="padding: 0.25in; border-top: 1px solid black;">
-                <h3>Example blog post</h3>
-                <p class="blog-date" style="float: right; font-style: italic;">9 Aug 2011</p>
-                <p style="clear: both;">I am not pulled from the database</p>
-            </article>
+            {% for post in blog_posts %}
+                <article>
+                    <h3>{{ post['title'] }}</h3>
+                    <p class="blog-date">posted {{ post['date_posted'] }}</p>
+                    <p>{{ post['contents'] }}</p>
+                </article>
+            {% endfor %}
         </div>
     </div>
 </main>
