@@ -385,14 +385,15 @@ def write_blog_post():
             flash('We could not publish your blog post.', 'error')
         return redirect(url_for('psikolog', id=psyc_id))
 
-if __name__ == '__main__':
-    app.run(debug=True)
 
 #Nolan's Code
 
 @app.route('/staff')
 @roles_required('staff')
 def staff():
-    return render_template(staff.html, children = querydb.getVerifiedChildren)
+    return render_template('staff.html', children = querydb.getVerifiedChildren)
 
 #End Nolan's Code
+
+if __name__ == '__main__':
+    app.run(debug=True)
