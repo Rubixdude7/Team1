@@ -4,8 +4,10 @@
 <main id="psyc-page">
     <div class="box">
         <form action="{{ url_for('write_blog_post') }}" method="post" enctype="multipart/form-data">
-            <label for="text">Text</label>
-            <textarea name="text" placeholder="The contents of your blog post go here."></textarea>
+            <div class="form-control-1">
+                <label for="text">Text</label><br />
+                <textarea name="text" placeholder="The contents of your blog post go here."></textarea>
+            </div>
             <button type="submit"><i class="fa fa-plus" aria-hidden="true"></i> Publish</button>
         </form>
     </div>

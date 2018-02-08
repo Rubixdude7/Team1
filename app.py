@@ -352,12 +352,12 @@ def psikolog(id=None):
         if psyc_info is not None:
             # Got their info.
             # Now fetch their blog posts.
-            tuples = querydb.getBlogPostsBy(id).tuples()
+            blg = querydb.getBlogPostsBy(id)
             blog_posts = [{
-                'title': t[2][:15] + '...',
-                'date_posted': t[3],
-                'contents': t[2]
-            } for t in tuples]
+                'title': post.text[:15] + '...',
+                'date_posted': post.updt_dtm,
+                'contents': post.text
+            } for post in blg]
 
             can_edit = False
             if current_user.is_authenticated:
@@ -385,12 +385,15 @@ def write_blog_post():
             flash('We could not publish your blog post.', 'error')
         return redirect(url_for('psikolog', id=psyc_id))
 
+
+#Nolan's Code
+
+@app.route('/staff')
+@roles_required('staff')
+def staff():
+    return render_template('staff.html', children = querydb.getVerifiedChildren())
+
+#End Nolan's Code
+
 if __name__ == '__main__':
     app.run(debug=True)
-"""
-@app.route('/staff')
-roles_required('staff')
-def staff():
-
-    return
-"""

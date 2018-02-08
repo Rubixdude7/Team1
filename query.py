@@ -122,15 +122,14 @@ class query(object):
         return tuples[0][0]
 
     def getBlogPostsBy(self, psyc_id):
-        tuples = db.blog.select()\
-                        .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
-                        .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
-                        .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
-                        .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
-                        .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id))\
-                        .order_by(db.blog.updt_dtm.desc())\
-                        .tuples()
-        return tuples
+        blg = db.blog.select()\
+                     .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
+                     .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                     .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
+                     .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
+                     .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id))\
+                     .order_by(db.blog.updt_dtm.desc())
+        return blg
 
     def createBlogPost(self, u_id, text):
         # First, make sure this user is REALLY a psychologist
@@ -261,6 +260,18 @@ class query(object):
 
     #End of Gabe's code
 
+    #Nolan's Code
+
+    def getVerifiedChildren(self):
+        children = []
+        for consultation in db.consultation.select():
+            if consultation.approved == "y" and consultation.paid == "n":
+                children += consultation.child
+
+        return children
+
+    #End Nolan's Code
+
 # Begin Brandon
     def get_slides(self):
         slider_a = []
@@ -305,7 +316,6 @@ class query(object):
         for slide in db.slider.select().order_by(db.slider.slider_id.asc()):
             slider_tag.append(cloudinary.CloudinaryImage(slide.img, version=slide.version).image(alt=slide.alt))
             slider_desc.append(slide.desc)
-        print(slider_tag)
         return slider_tag, slider_desc
 
 
