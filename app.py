@@ -352,12 +352,12 @@ def psikolog(id=None):
         if psyc_info is not None:
             # Got their info.
             # Now fetch their blog posts.
-            tuples = querydb.getBlogPostsBy(id).tuples()
+            blg = querydb.getBlogPostsBy(id)
             blog_posts = [{
-                'title': t[2][:15] + '...',
-                'date_posted': t[3],
-                'contents': t[2]
-            } for t in tuples]
+                'title': post.text[:15] + '...',
+                'date_posted': post.updt_dtm,
+                'contents': post.text
+            } for post in blg]
 
             can_edit = False
             if current_user.is_authenticated:
