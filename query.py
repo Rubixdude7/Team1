@@ -50,8 +50,9 @@ class query(object):
         q.save()
 
     def paginate(self, num):
-        count = db.questions.query.paginate(per_page=2, page=num, error_out=True)
-        return count;
+        num = db.questions.select()
+       # count = db.questions.paginate(per_page=2, page=num, error_out=True)
+        return num;
 
     def getAllQuestions(self):
         questions = db.questions.select()

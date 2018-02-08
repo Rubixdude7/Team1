@@ -6,6 +6,16 @@
 {% block content %}
 <!--TODO some formatting in here needs fixed, for some reason messes with year js on the footer -->
     <main>
+
+
+
+
+
+
+
+
+
+
         <div class="box">
             <h1 class="title">Question List</h1>
             <hr>
@@ -56,8 +66,17 @@
             {% endfor %}
             <br>
             <br>
+        {% if page > 1 %}
+    <a class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous</a>
+{% endif %}
+{% if pagination.get_page_count() > page %}
+
+    <a class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next</a>
+{% endif %}
             </div>
+
             </div>
         </div>
+
     </main>
 {% endblock %}

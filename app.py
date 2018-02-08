@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for
 import datetime
 from flask_sqlalchemy import SQLAlchemy
+from playhouse.flask_utils import object_list
 from flask import request
 from flask_user import login_required, roles_required, UserManager, UserMixin, SQLAlchemyAdapter, current_user
 from flask_user import login_required, roles_required, UserManager, UserMixin, SQLAlchemyAdapter, current_user, \
@@ -181,22 +182,24 @@ def questionDelete():
     return redirect(url_for('questions'))
 
 
-@app.route('/questions')
+@app.route('/questions/')
 @login_required
 def questions():
     questions = querydb.getAllQuestions()
-    #  count = querydb.paginate(page_num) --still working on pagination
-
-    return render_template("questions.html", questions=questions)
 
 
-@app.route('/questionsUserView')
+    return object_list("questions.html", paginate_by=3, query=questions, context_variable='questions')
+
+
+
+
+@app.route('/questionsUserView/')
 @login_required
 def questionsUserView():
     questions = querydb.getAllQuestions()
     #  count = querydb.paginate(page_num) --still working on pagination
+    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions')
 
-    return render_template("questionsUserView.html", questions=questions)
 
 
 
