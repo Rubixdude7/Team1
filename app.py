@@ -388,7 +388,11 @@ def write_blog_post():
 if __name__ == '__main__':
     app.run(debug=True)
 
+#Nolan's Code
+
 @app.route('/staff')
 @roles_required('staff')
 def staff():
     return render_template(staff.html, children = querydb.getVerifiedChildren)
+
+#End Nolan's Code

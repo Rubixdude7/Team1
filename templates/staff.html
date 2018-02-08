@@ -1,10 +1,13 @@
 {% extends "base.html" %}
-{% block title %}Staff{% endblock %}
+{% block title %}Staff Portal{% endblock %}
 {% block content %}
 <main id="StaffPortal">
+    <h1 class="title">Staff Portal</h1>
+    <hr>
     <ul class="list-group">
         {% for child in children %}
         <li class="list-group-item">{{ child.child_nm_fst }} {{ child.child_nm_lst }}</li>
         {% endfor %}
     </ul>
 </main>
+{% endblock %}

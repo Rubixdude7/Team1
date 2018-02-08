@@ -261,12 +261,16 @@ class query(object):
 
     #End of Gabe's code
 
+    #Nolan's Code
+
     def getVerifiedChildren(self):
         children = []
         for consultation in db.consultation.select():
-            if consultation.approved == "y":
+            if consultation.approved == "y" and consultation.paid == "n":
                 children += consultation.child
         return children
+
+    #End Nolan's Code
 
 # Begin Brandon
     def get_slides(self):
