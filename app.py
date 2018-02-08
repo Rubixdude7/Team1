@@ -232,12 +232,13 @@ def post_questionAnswers():
 @login_required
 @roles_required('user')
 def parent():
-    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.id), contact_info=querydb.getContact(current_user.id))
+    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.id), contact_info=querydb.contactID(current_user.id))
+
 
 @app.route('/parent/contact')
 @roles_required('user')
 def contact():
-    return render_template('contact.html')
+    return render_template('contact.html', contact_info=querydb.contactID(current_user.id))
 
 
 @app.route('/parent/contact', methods=['GET', 'POST'])
@@ -386,10 +387,12 @@ def write_blog_post():
 
 if __name__ == '__main__':
     app.run(debug=True)
-"""
-@app.route('/staff')
-roles_required('staff')
-def staff():
 
-    return
-"""
+#Nolan's Code
+
+@app.route('/staff')
+@roles_required('staff')
+def staff():
+    return render_template(staff.html, children = querydb.getVerifiedChildren)
+
+#End Nolan's Code
