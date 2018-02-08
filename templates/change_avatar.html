@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Change Your Avatar{% endblock %}
+{% block content %}
+<main id="psyc-page">
+    <div class="box">
+        <h1>Change Your Avatar</h1>
+        <form action="{{ url_for('write_blog_post') }}" method="post" enctype="multipart/form-data">
+            <div class="form-control-1">
+                <input type="file" name="avatar" />
+            </div>
+            <div class="form-control-2">
+                <button type="submit"><i class="fa fa-save" aria-hidden="true"></i> Save Avatar</button>
+                <a href="/psikolog/{{ psyc_id }}"><i class="fa fa-ban" aria-hidden="true"></i> Cancel</button>
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}

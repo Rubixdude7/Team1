@@ -127,14 +127,14 @@ class query(object):
         return blg
 
     def getPsycId(self, u_id):
-        results = db.psychologist.select()\
+        results = db.user.select(db.psychologist.psyc_id)\
                         .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
                         .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
-                        .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
-                        .where(db.user.active & (db.user.user_id == u_id) & (db.role.role_nm == 'psyc'))
+                        .join(db.psychologist, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                        .where(db.user.active & (db.user.user_id == u_id) & (db.role.role_nm == 'psyc')).tuples()
         if len(results) == 0:
             return -1
-        psyc_id = results[0].psyc_id
+        psyc_id = results[0][0]
         return psyc_id
 
     def createBlogPost(self, u_id, psyc_id, text):

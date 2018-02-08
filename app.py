@@ -428,6 +428,18 @@ def write_blog_post():
             flash('Your blog post has been published.')
         return redirect(url_for('psikolog', id=psyc_id))
 
+@app.route('/psikolog/change_avatar')
+def change_avatar():
+    if request.method == 'GET':
+        return render_template('change_avatar.html', psyc_id=querydb.getPsycId(current_user.id))
+    elif request.method == 'POST':
+        psyc_id = querydb.getPsycId(current_user.id)
+        if psyc_id == -1:
+            flash('Not allowed.', 'error')
+        else:
+            flash('Avatar changing is not implemented.', 'error')
+        return redirect(url_for('psikolog', id=psyc_id))
+
 #Nolan's Code
 
 @app.route('/staff')
