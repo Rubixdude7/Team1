@@ -122,15 +122,14 @@ class query(object):
         return tuples[0][0]
 
     def getBlogPostsBy(self, psyc_id):
-        tuples = db.blog.select()\
-                        .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
-                        .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
-                        .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
-                        .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
-                        .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id))\
-                        .order_by(db.blog.updt_dtm.desc())\
-                        .tuples()
-        return tuples
+        blg = db.blog.select()\
+                     .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
+                     .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                     .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
+                     .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
+                     .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id))\
+                     .order_by(db.blog.updt_dtm.desc())
+        return blg
 
     def createBlogPost(self, u_id, text):
         # First, make sure this user is REALLY a psychologist
