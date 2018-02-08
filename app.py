@@ -232,12 +232,13 @@ def post_questionAnswers():
 @login_required
 @roles_required('user')
 def parent():
-    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.id), contact_info=querydb.getContact(current_user.id))
+    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.id), contact_info=querydb.contactID(current_user.id))
+
 
 @app.route('/parent/contact')
 @roles_required('user')
 def contact():
-    return render_template('contact.html')
+    return render_template('contact.html', contact_info=querydb.contactID(current_user.id))
 
 
 @app.route('/parent/contact', methods=['GET', 'POST'])
@@ -305,28 +306,41 @@ class QuestionEdit(FlaskForm):
 @app.route('/edit', methods=['GET', 'POST'])
 @roles_required('admin')
 def edit():
+    u_id = request.args.get('u_id')
+    if int(u_id) == int(current_user.id):
+        return redirect(url_for('admin'))
     form = RoleChangeForm()
     roles = querydb.getAllRoles()
-    rolenames = []
+    current_role = querydb.role(u_id)
+    rolenames = [current_role]
     for a in roles:
-        rolenames.append(a.role_nm)
+        if a.role_nm != current_role:
+            rolenames.append(a.role_nm)
     form.role.choices = [(r, r) for r in rolenames]
     if form.validate_on_submit():
-        u_id = request.args.get('u_id')
+        #u_id = request.args.get('u_id')
         newRole = form.role.data
         if newRole == 'psyc':
             querydb.addPsychologistIfNotExist(u_id)
         querydb.updateUserRole(u_id, newRole)
         #flash('Your changes have been saved.')
         return redirect(url_for('admin'))
-    return render_template('edit.html', title='Edit Profile',
-                           form=form)
+    return render_template('edit.html', title='Edit Profile',form=form)
 
 @app.route('/delete')
+@roles_required('admin')
 def delete():
     user_id = request.args.get('u_id')
+    if int(user_id) == int(current_user.id):
+        return redirect(url_for('admin'))
     querydb.softDeleteUser(user_id)
     return redirect(url_for('admin'))
+
+
+@app.route('/editClient')
+@roles_required('admin')
+def editClient():
+    2+4
 
 # End Jason's code
 

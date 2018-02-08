@@ -105,7 +105,6 @@ class query(object):
                                                     db.user_roles.select(db.user_roles.role).where(
                                                         db.user_roles.user == id)).tuples()
         role = list(role)[0][0]
-        print(role)
         return role
 
 # End Jason's code
@@ -212,12 +211,32 @@ class query(object):
 
     #Beginnning of Gabe's code
 
-    def getChildren(self, user_id):
+    def getChildren(self, user_id): #ignore this for now, it is a bad attempt at something
         c = db.child.select().where(db.child.user == user_id)
         return c
 
+    def exists(self, contact_id, field):
+        c = db.contact.select().where(db.contact.contact_id == contact_id)
+        if field == 'phone_no' and c.phone_no.exists():
+            return True
+        elif field == 'address_1' and c.address_1.exists():
+            return True
+        elif field == 'address_2' and c.address_2.exists():
+            return True
+        elif field == 'city' and c.city.exists():
+            return True
+        elif field == 'providence' and c.providence.exists():
+            return True
+        elif field == 'zip' and c.zip.exists():
+            return True
+        else:
+            return False
+
     def contactID(self, user_id):
-        c = db.contact.select().where(db.contact.user_id == user_id).get()
+        try:
+            c = db.contact.select().where(db.contact.user_id == user_id).get()
+        except DoesNotExist:
+            c = None
         return c
 
     def getContact(self, user_id):
@@ -225,7 +244,19 @@ class query(object):
         return c
 
     def updateContact(self, user_id, contact_id, phone_no, address_1, address_2, city, providence, zip):
-        c = db.contact(user_id, contact_id=contact_id, phone_no=phone_no, address_1=address_1, address_2=address_2, city=city, providence=providence, zip=zip)
+        try:
+            c = db.contact.select().where(db.contact.user_id == user_id).get()
+            c.phone_no=phone_no
+            c.address_1=address_1
+            c.address_2=address_2
+            c.city=city
+            c.providence=providence
+            c.zip=zip
+
+        except DoesNotExist:
+            c = db.contact(user=user_id, contact_id=contact_id, phone_no=phone_no, address_1=address_1,
+                           address_2=address_2, city=city, providence=providence, zip=zip)
+
         c.save()
 
     #End of Gabe's code
