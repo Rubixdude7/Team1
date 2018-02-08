@@ -45,6 +45,7 @@ class child(MySQLModel):
     user = ForeignKeyField(user, to_field="user_id")
     child_nm_fst = CharField()
     child_nm_lst = CharField(null=True)
+    child_dob = DateTimeField()
 
     class Meta:
         db_table = "child"
@@ -166,6 +167,7 @@ class question_answers(MySQLModel):
 class blog(MySQLModel):
     blog_id = PrimaryKeyField()
     psyc = ForeignKeyField(psychologist, to_field="psyc_id")
+    subject = CharField()
     text = CharField()
     crea_dtm = DateTimeField()
     user_id_upd = BigIntegerField()

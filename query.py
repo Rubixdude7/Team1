@@ -273,7 +273,6 @@ class query(object):
         for slide in db.slider.select().order_by(db.slider.slider_id.asc()):
             slider_tag.append(cloudinary.CloudinaryImage(slide.img, version=slide.version).image(alt=slide.alt))
             slider_desc.append(slide.desc)
-        print(slider_tag)
         return slider_tag, slider_desc
 
 
