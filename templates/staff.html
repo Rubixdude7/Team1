@@ -5,9 +5,13 @@
     <h1 class="title">Staff Portal</h1>
     <hr>
     <ul class="list-group">
+        {% if len(children) == 0 %}
+        There are no children
+        {% endif %}
         {% for child in children %}
         <li class="list-group-item">{{ child.child_nm_fst }} {{ child.child_nm_lst }}</li>
         {% endfor %}
     </ul>
+
 </main>
 {% endblock %}
