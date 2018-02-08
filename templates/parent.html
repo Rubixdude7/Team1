@@ -8,32 +8,31 @@
 
 
         <p>
-        {% if(contact_info.phone_no != null) %}
+        {% if(contact_info.phone_no != None) %}
             Phone Number: {{ contact_info.phone_no }}<br>
         {% endif %}
 
 
-        {% if(contact_info.address_1 != null) %}
+        {% if(contact_info.address_1 != None) %}
             Address 1: {{ contact_info.address_1 }}<br>
         {% endif %}
 
 
-        {% if(contact_info.phone_no != null) %}
+        {% if(contact_info.address_2 != null) %}
             Address 2: {{ contact_info.address_2 }}<br>
         {% endif %}
 
 
-        {% if(contact_info.city != null) %}
+        {% if(contact_info) %}
         City: {{ contact_info.city }}<br>
         {% endif %}
 
-
-        {% if(contact_info.providence != null) %}
+        {% if(contact_info.providence != None) %}
             Providence: {{ contact_info.providence }}<br>
         {% endif %}
 
 
-        {% if(contact_info.zip != null) %}
+        {% if(contact_info.zip != None) %}
             Zip: {{ contact_info.zip }}<br>
         {% endif %}
 
@@ -46,6 +45,7 @@
         </form>
         </p>
 
+        <hr>
 
         <p>
         <form action="/childform">
