@@ -211,7 +211,7 @@ class query(object):
 
     #Beginnning of Gabe's code
 
-    def getChildren(self, user_id):
+    def getChildren(self, user_id): #ignore this for now, it is a bad attempt at something
         c = db.child.select().where(db.child.user == user_id)
         return c
 
@@ -231,10 +231,6 @@ class query(object):
             return True
         else:
             return False
-
-
-
-
 
     def contactID(self, user_id):
         try:
