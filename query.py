@@ -64,8 +64,8 @@ class query(object):
 
     # Brody's code
 
-    def addChild(self, user_id, first, last):
-        c = db.child(user_id=user_id, child_nm_fst=first, child_nm_lst=last)
+    def addChild(self, user_id, first, last, dob):
+        c = db.child(user_id=user_id, child_nm_fst=first, child_nm_lst=last, child_dob=dob)
         c.save()
 
     def findChild(self, child_id):

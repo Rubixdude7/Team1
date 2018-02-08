@@ -252,14 +252,17 @@ def editContact():
 #End Gabe
 
 
-# methods Brody added (may not work '-__- )
+# Start Brody's code
 @app.route('/child/<int:child_id>')
 @roles_required('user')
 def child(child_id=None):
     if child_id is not None:
         child_info = querydb.findChild(child_id)
+        born = datetime.datetime.strptime(child_info.child_dob.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
+        today = datetime.date.today()
+        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
         if child_info is not None:
-            return render_template('child.html', child_info=child_info)
+            return render_template('child.html', child_info=child_info, child_age=age)
     return render_template('parent.html')
 
 
@@ -272,10 +275,10 @@ def childform():
 @app.route('/childform', methods=['post'])
 @roles_required('user')
 def addChild():
-    querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'))
+    querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'), request.form.get('dateofbirth'))
     return parent()
 
-# End Brody's
+# End Brody
 
 
 # Start Jason's code
@@ -391,9 +394,10 @@ def write_blog_post():
 @app.route('/staff')
 @roles_required('staff')
 def staff():
-    return render_template('staff.html', children = querydb.getVerifiedChildren())
+    return render_template('staff.html', children=querydb.getVerifiedChildren)
 
 #End Nolan's Code
+
 
 if __name__ == '__main__':
     app.run(debug=True)
