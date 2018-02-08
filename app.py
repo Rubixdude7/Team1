@@ -420,13 +420,13 @@ def write_blog_post():
         return render_template('write_blog_post.html')
     elif request.method == 'POST':
         text = request.form['text']
-        success, psyc_id = querydb.createBlogPost(current_user.id, text)
-        if success:
-            flash('Your blog post has been published.')
+        psyc_id = querydb.getPsycId(current_user.id)
+        if psyc_id == -1:
+            flash('Not allowed.', 'error')
         else:
-            flash('We could not publish your blog post.', 'error')
+            querydb.createBlogPost(current_user.id, psyc_id, text)
+            flash('Your blog post has been published.')
         return redirect(url_for('psikolog', id=psyc_id))
-
 
 #Nolan's Code
 

@@ -126,19 +126,18 @@ class query(object):
                      .order_by(db.blog.updt_dtm.desc())
         return blg
 
-    def createBlogPost(self, u_id, text):
-        # First, make sure this user is REALLY a psychologist
-        tuples = db.user.select(db.psychologist.psyc_id)\
+    def getPsycId(self, u_id):
+        results = db.psychologist.select()\
                         .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
                         .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
-                        .join(db.psychologist, JOIN_INNER, db.psychologist.user == db.user.user_id)\
-                        .where(db.user.active & (db.user.user_id == u_id) & (db.role.role_nm == 'psyc'))\
-                        .tuples()
-        if len(tuples) == 0:
-            return False, -1
+                        .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                        .where(db.user.active & (db.user.user_id == u_id) & (db.role.role_nm == 'psyc'))
+        if len(results) == 0:
+            return -1
+        psyc_id = results[0].psyc_id
+        return psyc_id
 
-        psyc_id = list(tuples)[0][0]
-
+    def createBlogPost(self, u_id, psyc_id, text):
         now = datetime.datetime.now()
         blog_post = db.blog(psyc=psyc_id,
                             text=text,
@@ -147,8 +146,6 @@ class query(object):
                             updt_dtm=now,
                             void_ind='n')
         blog_post.save()
-
-        return True, psyc_id
 
     def addPsychologistIfNotExist(self, u_id):
         # Check if user already has psychologist row
