@@ -6,7 +6,7 @@
     <hr>
     <ul class="list-group">
         {% if children|length == 0 %}
-        There are no children
+        <li class="list-group-item">There are no children</li>
         {% endif %}
         {% for child in children %}
         <li class="list-group-item">{{ child.child_nm_fst }} {{ child.child_nm_lst }}</li>
