@@ -196,9 +196,25 @@ def questions():
 @app.route('/questionsUserView/')
 @login_required
 def questionsUserView():
+    child_id = request.args.get('child_id')
+    child_name = request.args.get('child_name')
+    print(child_id)
     questions = querydb.getAllQuestions()
+
+    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
+
+@app.route('/viewAnswers/')
+@login_required
+def viewAnswers():
+    child_id = request.args.get('child_id')
+    child_name = request.args.get('child_name')
+    print(child_name)
+    questions = querydb.getAllQuestionAnswers()
     #  count = querydb.paginate(page_num) --still working on pagination
-    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions')
+    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
+
+
+
 
 
 
@@ -227,13 +243,23 @@ def post_questionAnswers():
    #peewee.IntegrityError: (1452, 'Cannot add or update a child row: a foreign key constraint fails (`db42576e98688b4ab28226a87601334c89`.`question_answers`, CONSTRAINT `question_answers_fk0` FOREIGN KEY (`child_id`) REFERENCES `child` (`child_id`))')
    # question = request.form.get('questionAnswer')
 
-    question = request.form.getlist('fname')
 
 
-    for q in question:
+    questionAnswerList = request.form.getlist('fname')
+    questionIdList = request.form.getlist('qField')
+    childId = request.form.get('cField')
+    q_id = request.args.get('q_id')
+    print(childId)
+    print('TEST')
+    print(questionIdList)
+  #  q_idList = request.args.getList('q_id')
+  #  getQuestion = querydb.getQuestion(q_id)
+
+    for (q,q2) in zip (questionAnswerList, questionIdList):
       print(current_user.id)
-      print(question)
-      querydb.addQuestionAnswers(q, current_user.id)
+      print(questionAnswerList)
+      querydb.addQuestionAnswers(q, current_user.id, q2, childId)
+
 
     # question = request.args.get('question')
     # question=request.form.get('question')

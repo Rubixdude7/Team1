@@ -6,16 +6,6 @@
 {% block content %}
 <!--TODO some formatting in here needs fixed, for some reason messes with year js on the footer -->
     <main>
-
-
-
-
-
-
-
-
-
-
         <div class="box">
             <h1 class="title">Question List</h1>
             <hr>
@@ -56,6 +46,11 @@
                     {% endif %}
                     <br><br>
                 <button class="delete" type="button" onclick="location.href='{{ url_for('questionDelete', q_id=u.q_id) }}'"><i class="fa fa-trash"></i>Delete Question</button>
+             <br>
+             <br>
+             <i class="fa fa-angle-up"></i></button>
+             <br>
+              <i class="fa fa-angle-down"></i></button>
                 </div>
                 <!-- END -->
             </div>

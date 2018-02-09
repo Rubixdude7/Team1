@@ -1,40 +1,17 @@
 <!-- put these at top otherwise it doesn't show year for some reason-->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <script src="{{ url_for('static', filename='scripts/question.js') }}" type="text/jscript"></script>
-
 {% extends "base.html" %}
 {% block title %}Questions{% endblock %}
 {% block content %}
- <script>
-$(document).ready(function(){
-    $("#next").click(function(){
-        $.ajax({url: "./?page={{ page + 1 }}", success: function(result){
-            $("body").html(result);
-        }});
-    });
-});
-$(document).ready(function(){
-    $("#prev").click(function(){
-        $.ajax({url: "./?page={{ page - 1 }}", success: function(result){
-            $("body").html(result);
-        }});
-    });
-});
-</script>
-
     <main>
 
-        <div id = "box" class="box">
-        <p>Your Child: {{ child_name }}</p>
+        <div class="box">
+        <p>Your Child ID: {{ child_id }}</p>
 
-            <h1 class="title">Question List</h1>
+            <h1 class="title">Answer List for Child</h1>
             <hr>
-            {% if current_user.is_authenticated and current_user.is_in_role("admin") %}
-                <form action="{{ url_for('add_questions') }}">
-                    <button class="add"><i class="fa fa-plus"></i> Add Question</button>
-                </form>
-            {% endif %}
+
         <form method="post" action="/post_add_questionAnswers" onsubmit="return validateForm()">
          <input type="hidden" name="cField" value="{{ child_id }}")>
             {% for u in questions %}
@@ -62,17 +39,18 @@ $(document).ready(function(){
             <br>
         <!--Only show submit button if last page  -->
 
+
                 <input type="submit" value="Submit" onsubmit="return validateForm()">
             </form>
-            {% if page > 1 %}
-                <a class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous Link</a>
-                <button id="prev" style="width:100px;height:70px">Prev Button</button>
+
+                {% if page > 1 %}
+    <a class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous</a>
 {% endif %}
 {% if pagination.get_page_count() > page %}
 
-    <button id="next" style="width:100px;height:70px">Next Button</button>
-     <a class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next Link</a>
+    <a class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next</a>
 {% endif %}
+            </div>
         </div>
     </main>
 {% endblock %}

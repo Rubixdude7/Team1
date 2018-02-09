@@ -49,8 +49,8 @@ class query(object):
         q = db.questions(question=question2, user_id_crea=user, crea_dtm=datetime.datetime.now())
         q.save()
 
-    def addQuestionAnswers(self, question2, user):
-        q = db.question_answers(question=question2, user_id_crea=user, crea_dtm=datetime.datetime.now())
+    def addQuestionAnswers(self, questionAnswer, user, q_id, childId):
+        q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(), q=q_id, child=childId)
         q.save()
 
     def paginate(self, num):
@@ -61,6 +61,9 @@ class query(object):
     def getAllQuestions(self):
         questions = db.questions.select()
         return questions
+    def getAllQuestionAnswers(self):
+        questionsAnswers = db.question_answers.select()
+        return questionsAnswers
 
     def editQuestion(self, a, newQuestion):
         current = db.questions.get(db.questions.q_id == a)
