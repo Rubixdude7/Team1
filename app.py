@@ -391,9 +391,10 @@ def write_blog_post():
 @app.route('/staff')
 @roles_required('staff')
 def staff():
-    return render_template('staff.html', children = querydb.getVerifiedChildren)
+    return render_template('staff.html', children = querydb.getVerifiedChildren())
 
 #End Nolan's Code
+
 
 if __name__ == '__main__':
     app.run(debug=True)
