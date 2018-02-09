@@ -422,7 +422,10 @@ def psikolog(id=None):
                 if logged_in_psyc == id:
                     can_edit = True
 
-            return render_template('psikolog.html', psyc_info=psyc_info, blog_posts=blog_posts, can_edit=can_edit)
+            # Fetch the psychologist's avatar
+            avatar_url = querydb.getAvatar(id)
+
+            return render_template('psikolog.html', psyc_info=psyc_info, blog_posts=blog_posts, can_edit=can_edit, avatar_url=avatar_url)
 
     # Either no id was given or no psychologist was found.
     # In both cases, show a list of psychologists.
@@ -443,7 +446,7 @@ def write_blog_post():
             flash('Your blog post has been published.')
         return redirect(url_for('psikolog', id=psyc_id))
 
-@app.route('/psikolog/change_avatar')
+@app.route('/psikolog/change_avatar', methods=['GET', 'POST'])
 def change_avatar():
     if request.method == 'GET':
         return render_template('change_avatar.html', psyc_id=querydb.getPsycId(current_user.id))
@@ -451,8 +454,9 @@ def change_avatar():
         psyc_id = querydb.getPsycId(current_user.id)
         if psyc_id == -1:
             flash('Not allowed.', 'error')
-        else:
-            flash('Avatar changing is not implemented.', 'error')
+
+        querydb.updateAvatar(psyc_id, request.files['avatar'])
+        flash('Avatar updated.')
         return redirect(url_for('psikolog', id=psyc_id))
 
 #Nolan's Code

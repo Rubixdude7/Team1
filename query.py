@@ -131,6 +131,28 @@ class query(object):
                      .order_by(db.blog.updt_dtm.desc())
         return blg
 
+    def getAvatar(self, psyc_id):
+        psyc = db.psychologist.get(db.psychologist.psyc_id == psyc_id)
+        if psyc.photo is None or psyc.photo == '':
+            return '/static/noavatar.png'
+
+        public_id, version = psyc.photo.split('#')
+
+        return cloudinary.CloudinaryImage(public_id, version=version).build_url()
+
+    def updateAvatar(self, psyc_id, avatar_file):
+        if not self.allowed_file(avatar_file.filename):
+            return False
+
+        response = cloudinary.uploader.upload(avatar_file)
+        image_descriptor = response['public_id'] + '#' + str(response['version'])
+
+        p = db.psychologist.get(db.psychologist.psyc_id == psyc_id)
+        p.photo = image_descriptor
+        p.save()
+
+        return True
+
     def getPsycId(self, u_id):
         results = db.user.select(db.psychologist.psyc_id)\
                         .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
@@ -164,7 +186,6 @@ class query(object):
 
     def lookupPsychologist(self, ident):
         tuples = db.psychologist.select(db.psychologist.psyc_id,
-                                        db.psychologist.photo,
                                         db.psychologist.qualifications,
                                         db.user.first_name,
                                         db.user.last_name)\
@@ -179,10 +200,9 @@ class query(object):
 
             info = PsychologistLookupResult()
             info.psyc_id = info_tuple[0]
-            info.photo = info_tuple[1]
-            info.qualifications = info_tuple[2]
-            info.first_name = info_tuple[3]
-            info.last_name = info_tuple[4]
+            info.qualifications = info_tuple[1]
+            info.first_name = info_tuple[2]
+            info.last_name = info_tuple[3]
             info.full_name = '{0} {1}'.format(info.first_name, info.last_name)
             return info
 
@@ -321,7 +341,6 @@ class query(object):
 class PsychologistLookupResult:
     def __init__(self):
         self.psyc_id = None
-        self.photo = None
         self.qualifications = None
         self.first_name = None
         self.last_name = None
