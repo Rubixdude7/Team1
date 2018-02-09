@@ -285,8 +285,12 @@ class query(object):
     def getVerifiedChildren(self):
         children = []
         for consultation in db.consultation.select():
-            if consultation.approved == "y" and consultation.paid == "n":
-                children += consultation.child
+            if consultation.approved == "y" or consultation.paid == "n":
+                children.append({
+                    'firstName': consultation.child.child_nm_fst,
+                    'lastName': consultation.child.child_nm_lst,
+                    'childID':consultation.child.child_id
+                })
         if len(children) == 0:
             pass
         return children
