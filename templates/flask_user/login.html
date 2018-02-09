@@ -12,7 +12,10 @@
             {# Username or Email field #}
             {% set field = form.username if user_manager.enable_username else form.email %}
             <div class="form-group {% if field.errors %}has-error{% endif %}">
-                {{ field(class_='form-control-1', tabindex=110, placeholder="Username or Email") }}
+                <div class="input-box form-control-1">
+                    <label for="username"><i class="fa fa-user input-icon" aria-hidden="true"></i><span class="sr-only">Username or Email</span></label>
+                    {{ field(class_='noborder', tabindex=110, placeholder="Username or Email") }}
+                </div>
                 {% if field.errors %}
                     {% for e in field.errors %}
                         <p class="help-block">{{ e }}</p>
@@ -23,7 +26,10 @@
             {# Password field #}
             {% set field = form.password %}
             <div class="form-group {% if field.errors %}has-error{% endif %}">
-                {{ field(class_='form-control-2', tabindex=120, placeholder="Password") }}
+                <div class="input-box form-control-2">
+                    <label for="password"><i class="fa fa-key input-icon" aria-hidden="true"></i><span class="sr-only">Password</span></label>
+                    {{ field(class_='noborder', tabindex=120, placeholder="Password") }}
+                </div>
                 {% if field.errors %}
                     {% for e in field.errors %}
                         <p class="help-block">{{ e }}</p>
