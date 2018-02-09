@@ -587,19 +587,23 @@ footer {
   color: #fff; }
 
 .cal-week {
+  line-height: 0;
   margin: 0;
   padding: 0;
   overflow: hidden;
   white-space: nowrap; }
 
 .cal-day {
+  line-height: normal;
   display: inline-block;
   width: 14.286%;
   height: 100px;
   margin: -1px 0 0 -1px;
   padding: 0;
   background-color: transparent;
-  border: 1px solid #999; }
+  border: 1px solid #999;
+  overflow: hidden;
+  white-space: nowrap; }
 
 .cal-day-number {
   font-size: 24pt;
