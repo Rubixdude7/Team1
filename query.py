@@ -287,7 +287,8 @@ class query(object):
         for consultation in db.consultation.select():
             if consultation.approved == "y" and consultation.paid == "n":
                 children += consultation.child
-
+        if len(children) == 0:
+            pass
         return children
 
     #End Nolan's Code
