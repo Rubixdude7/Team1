@@ -3,13 +3,15 @@
 {% block content %}
 <main id="StaffPortal">
     <h1 class="title">Staff Portal</h1>
+    <br />
+    <p>Approved Children</p>
     <hr>
     <ul class="list-group">
         {% if children|length == 0 %}
         <li class="list-group-item">There are no children</li>
         {% endif %}
         {% for child in children %}
-        <li class="list-group-item"><a href="{{ url_for('child', child_id=child.child_id) }}">{{ child.child_nm_fst }} {{ child.child_nm_lst }}</a></li>
+        <li class="list-group-item"><a href="{{ url_for('child', child_id=child.child_id) }}">{{ child.child_nm_fst }} {{ child.child_nm_lst }} TIME:   </a></li>
         {% endfor %}
     </ul>
 
