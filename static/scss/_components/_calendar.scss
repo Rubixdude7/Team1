@@ -5,6 +5,13 @@
   border: 1px solid #000;
 }
 
+@media only screen and (max-width: 1000px) {
+  .calendar {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
 .cal-head {
   margin: 0;
   padding: 0;
@@ -63,4 +70,14 @@
 
 .cal-day[data-this-month="false"] {
   background-color: #CCC;
+}
+
+@media only screen and (max-width: 759px) {
+  .cal-day {
+    height: 40px;
+  }
+
+  .cal-day-number {
+    font-size: 12pt;
+  }
 }
