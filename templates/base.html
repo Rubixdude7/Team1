@@ -43,13 +43,18 @@
                         {% endif %}
                         <li>
                             <a href="{{ url_for('psikolog') }}">PSYCHOLOGISTS</a>
-
+                        </li>
                         {% if current_user.is_authenticated and current_user.is_in_role("admin") %}
                             <li>
                                 <a href="{{ url_for('admin') }}">ADMIN</a>
                             </li>
                             <li>
                                 <a href="{{ url_for('questions') }}">QUESTIONS</a>
+                            </li>
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.is_in_role("staff") %}
+                            <li>
+                                <a href="{{ url_for('staff') }}">STAFF</a>
                             </li>
                         {% endif %}
                         {% if current_user.is_authenticated %}
@@ -62,11 +67,6 @@
                         {% else %}
                             <li>
                                 <a href="{{ url_for('user.login') }}">LOG IN</a>
-                            </li>
-                        {% endif %}
-                        {% if current_user.is_authenticated and current_user.is_in_role("staff") %}
-                            <li>
-                                <a href="{{ url_for('staff') }}">STAFF</a>
                             </li>
                         {% endif %}
                     </ul>
