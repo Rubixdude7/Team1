@@ -13,6 +13,7 @@
                     <button class="add"><i class="fa fa-plus"></i> Add Question</button>
                 </form>
             {% endif %}
+        <form method="post" action="/post_add_questionAnswers" onsubmit="return validateForm()">
             {% for u in questions %}
                 <!-- question list -->
                 {% if u.void_ind == 'y' and current_user.is_authenticated and current_user.is_in_role("admin") %}
@@ -22,11 +23,10 @@
                 {% else %}
                     <div class="question">
                 {% endif %}
-            <form name="myForm" action="/action_page.php"
-                  onsubmit="return validateForm()" method="post">
+
                 <p id="questiontitle"><b>{{ u.question }}</b></p>
                 <input type="text" name="fname">
-            </form>
+
             <br>
             <!--Dropdown not needed for user view -->
             <!--
@@ -59,11 +59,12 @@
             {% endfor %}
             <br>
             <br>
-        {% if pagination.get_page_count() == page %} <!--Only show submit button if last page -->
-            <form method="post" action="/post_add_questionAnswers" onsubmit="return validateForm()">
-                <input type="submit" value="Submit">
+        <!--Only show submit button if last page  -->
+
+
+                <input type="submit" value="Submit" onsubmit="return validateForm()">
             </form>
-        {% endif %}
+
                 {% if page > 1 %}
     <a class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous</a>
 {% endif %}

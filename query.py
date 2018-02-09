@@ -49,6 +49,10 @@ class query(object):
         q = db.questions(question=question2, user_id_crea=user, crea_dtm=datetime.datetime.now())
         q.save()
 
+    def addQuestionAnswers(self, question2, user):
+        q = db.question_answers(question=question2, user_id_crea=user, crea_dtm=datetime.datetime.now())
+        q.save()
+
     def paginate(self, num):
         num = db.questions.select()
        # count = db.questions.paginate(per_page=2, page=num, error_out=True)

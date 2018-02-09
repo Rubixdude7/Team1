@@ -223,6 +223,18 @@ def post_questions():
 
 @app.route('/post_add_questionAnswers', methods=['GET', 'POST'])
 def post_questionAnswers():
+    #error with adding question answers
+   #peewee.IntegrityError: (1452, 'Cannot add or update a child row: a foreign key constraint fails (`db42576e98688b4ab28226a87601334c89`.`question_answers`, CONSTRAINT `question_answers_fk0` FOREIGN KEY (`child_id`) REFERENCES `child` (`child_id`))')
+   # question = request.form.get('questionAnswer')
+
+    question = request.form.getlist('fname')
+
+
+    for q in question:
+      print(current_user.id)
+      print(question)
+      querydb.addQuestionAnswers(q, current_user.id)
+
     # question = request.args.get('question')
     # question=request.form.get('question')
     # print(question);
