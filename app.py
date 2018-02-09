@@ -447,6 +447,7 @@ def write_blog_post():
         return redirect(url_for('psikolog', id=psyc_id))
 
 @app.route('/psikolog/change_avatar', methods=['GET', 'POST'])
+@roles_required('psyc')
 def change_avatar():
     if request.method == 'GET':
         return render_template('change_avatar.html', psyc_id=querydb.getPsycId(current_user.id))
