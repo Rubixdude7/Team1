@@ -11,7 +11,7 @@
         <li class="list-group-item">There are no children</li>
         {% endif %}
         {% for child in children %}
-        <li class="list-group-item"><a href="{{ url_for('child', child_id=child.childID) }}">{{ child['firstName'] }} {{ child['lastName'] }}</a></li>
+        <li class="list-group-item"><a href="{{ url_for('child', child_id=child.childID) }}">{{ child['firstName'] }} {{ child['lastName'] }}</a>, TIME: {{ child['time'] }}</li>
         {% endfor %}
     </ul>
 

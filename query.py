@@ -289,7 +289,8 @@ class query(object):
                 children.append({
                     'firstName': consultation.child.child_nm_fst,
                     'lastName': consultation.child.child_nm_lst,
-                    'childID':consultation.child.child_id
+                    'childID':consultation.child.child_id,
+                    'time':consultation.length
                 })
         if len(children) == 0:
             pass
