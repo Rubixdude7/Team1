@@ -220,8 +220,8 @@ input[type=submit] {
 
 .input-icon {
   display: inline-block;
-  margin-right: 16px;
-  font-size: 80%; }
+  margin-right: 8px;
+  font-size: 82%; }
 
 .table {
   background-color: white;
