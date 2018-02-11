@@ -427,6 +427,14 @@ def editClient():
 
 # End Jason's code
 
+# Begin Charlie's code
+
+@app.route('/my_psikolog_page')
+@roles_required('psyc')
+def my_psikolog_page():
+    psyc_id = querydb.getPsycId(current_user.id)
+    return redirect(url_for('psikolog', id=psyc_id))
+
 @app.route('/psikolog/')
 @app.route('/psikolog/<int:id>')
 def psikolog(id=None):
@@ -485,6 +493,8 @@ def change_avatar():
         querydb.updateAvatar(psyc_id, request.files['avatar'])
         flash('Avatar updated.')
         return redirect(url_for('psikolog', id=psyc_id))
+
+# End Charlie's code
 
 #Nolan's Code
 
