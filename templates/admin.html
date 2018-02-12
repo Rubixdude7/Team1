@@ -6,6 +6,13 @@
         <h1 class="title">Admin Portal</h1>
     </div>
     <div class="box">
+
+
+
+
+
+
+
         <h2 class="title">Roles</h2>
         <hr>
         <div class="table-wrapper">
@@ -24,6 +31,7 @@
                             {% if current_user.id == u.user_id %}
 
                             {% else %}
+                                <td><a href="{{ url_for('editClient', u_id=u.user_id) }}">Edit Client</a></td>
                                 <td><a href="{{ url_for('edit', u_id=u.user_id) }}">Edit</a></td>
                                 <td><a href="{{ url_for('delete', u_id=u.user_id) }}" onclick="confirmAction()">Delete</a></td>
                             {% endif %}

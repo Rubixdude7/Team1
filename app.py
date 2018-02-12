@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for
 import datetime
 from flask_sqlalchemy import SQLAlchemy
+from playhouse.flask_utils import object_list
 from flask import request
 from flask_user import login_required, roles_required, UserManager, UserMixin, SQLAlchemyAdapter, current_user
 from flask_user import login_required, roles_required, UserManager, UserMixin, SQLAlchemyAdapter, current_user, \
@@ -181,22 +182,40 @@ def questionDelete():
     return redirect(url_for('questions'))
 
 
-@app.route('/questions')
+@app.route('/questions/')
 @login_required
 def questions():
     questions = querydb.getAllQuestions()
-    #  count = querydb.paginate(page_num) --still working on pagination
-
-    return render_template("questions.html", questions=questions)
 
 
-@app.route('/questionsUserView')
+    return object_list("questions.html", paginate_by=3, query=questions, context_variable='questions')
+
+
+
+
+@app.route('/questionsUserView/')
 @login_required
 def questionsUserView():
+    child_id = request.args.get('child_id')
+    child_name = request.args.get('child_name')
+    print(child_id)
     questions = querydb.getAllQuestions()
-    #  count = querydb.paginate(page_num) --still working on pagination
 
-    return render_template("questionsUserView.html", questions=questions)
+    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
+
+@app.route('/viewAnswers/')
+@login_required
+def viewAnswers():
+    child_id = request.args.get('child_id')
+    child_name = request.args.get('child_name')
+    print(child_name)
+    questions = querydb.getAllQuestionAnswers()
+    #  count = querydb.paginate(page_num) --still working on pagination
+    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
+
+
+
+
 
 
 
@@ -220,6 +239,28 @@ def post_questions():
 
 @app.route('/post_add_questionAnswers', methods=['GET', 'POST'])
 def post_questionAnswers():
+    #error with adding question answers
+   #peewee.IntegrityError: (1452, 'Cannot add or update a child row: a foreign key constraint fails (`db42576e98688b4ab28226a87601334c89`.`question_answers`, CONSTRAINT `question_answers_fk0` FOREIGN KEY (`child_id`) REFERENCES `child` (`child_id`))')
+   # question = request.form.get('questionAnswer')
+
+
+
+    questionAnswerList = request.form.getlist('fname')
+    questionIdList = request.form.getlist('qField')
+    childId = request.form.get('cField')
+    q_id = request.args.get('q_id')
+    print(childId)
+    print('TEST')
+    print(questionIdList)
+  #  q_idList = request.args.getList('q_id')
+  #  getQuestion = querydb.getQuestion(q_id)
+
+    for (q,q2) in zip (questionAnswerList, questionIdList):
+      print(current_user.id)
+      print(questionAnswerList)
+      querydb.addQuestionAnswers(q, current_user.id, q2, childId)
+
+
     # question = request.args.get('question')
     # question=request.form.get('question')
     # print(question);
@@ -252,14 +293,17 @@ def editContact():
 #End Gabe
 
 
-# methods Brody added (may not work '-__- )
+# Start Brody's code
 @app.route('/child/<int:child_id>')
 @roles_required('user')
 def child(child_id=None):
     if child_id is not None:
         child_info = querydb.findChild(child_id)
+        born = datetime.datetime.strptime(child_info.child_dob.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
+        today = datetime.date.today()
+        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
         if child_info is not None:
-            return render_template('child.html', child_info=child_info)
+            return render_template('child.html', child_info=child_info, child_age=age)
     return render_template('parent.html')
 
 
@@ -272,10 +316,10 @@ def childform():
 @app.route('/childform', methods=['post'])
 @roles_required('user')
 def addChild():
-    querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'))
+    querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'), request.form.get('dateofbirth'))
     return parent()
 
-# End Brody's
+# End Brody
 
 
 # Start Jason's code
@@ -303,6 +347,46 @@ class QuestionEdit(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class ClientEditForm(FlaskForm):
+    fName = StringField('fName')
+    lName = StringField('lName')
+    phone = StringField('phone')
+    address_1 = StringField('address_1')
+    address_2 = StringField('address_2')
+    city = StringField('city')
+    province = StringField('province')
+    zip = StringField('zip')
+    role = SelectField('Role', coerce=str, validators=[DataRequired()], option_widget='Select')
+    submit = SubmitField('Submit')
+
+
+@app.route('/editClient', methods=['GET', 'POST'])
+@roles_required('admin')
+def editC():
+    u_id = request.args.get('u_id')
+    if int(u_id) == int(current_user.id):
+        return redirect(url_for('admin'))
+    form = ClientEditForm()
+    roles = querydb.getAllRoles()
+    current_role = querydb.role(u_id)
+    rolenames = [current_role]
+    for a in roles:
+        if a.role_nm != current_role:
+            rolenames.append(a.role_nm)
+    form.role.choices = [(r, r) for r in rolenames]
+    if form.validate_on_submit():
+        newRole = form.role.data
+        if newRole == 'psyc':
+            querydb.addPsychologistIfNotExist(u_id)
+        querydb.updateUserRole(u_id, newRole)
+        contact_id = querydb.contactID(u_id)
+        querydb.updateContact(u_id, contact_id, form.phone.data, form.address_1.data, form.address_2.data,
+                              form.city.data, form.province.data, form.zip.data)
+        flash('Your changes have been saved.')
+        return redirect(url_for('admin'))
+    return render_template('editClient.html', title='Edit Profile', form=form)
+
+
 @app.route('/edit', methods=['GET', 'POST'])
 @roles_required('admin')
 def edit():
@@ -318,14 +402,13 @@ def edit():
             rolenames.append(a.role_nm)
     form.role.choices = [(r, r) for r in rolenames]
     if form.validate_on_submit():
-        #u_id = request.args.get('u_id')
         newRole = form.role.data
         if newRole == 'psyc':
             querydb.addPsychologistIfNotExist(u_id)
         querydb.updateUserRole(u_id, newRole)
-        #flash('Your changes have been saved.')
+        flash('Your changes have been saved.')
         return redirect(url_for('admin'))
-    return render_template('edit.html', title='Edit Profile',form=form)
+    return render_template('edit.html', title='Edit Profile', form=form)
 
 @app.route('/delete')
 @roles_required('admin')
@@ -343,6 +426,14 @@ def editClient():
     2+4
 
 # End Jason's code
+
+# Begin Charlie's code
+
+@app.route('/my_psikolog_page')
+@roles_required('psyc')
+def my_psikolog_page():
+    psyc_id = querydb.getPsycId(current_user.id)
+    return redirect(url_for('psikolog', id=psyc_id))
 
 @app.route('/psikolog/')
 @app.route('/psikolog/<int:id>')
@@ -365,7 +456,10 @@ def psikolog(id=None):
                 if logged_in_psyc == id:
                     can_edit = True
 
-            return render_template('psikolog.html', psyc_info=psyc_info, blog_posts=blog_posts, can_edit=can_edit)
+            # Fetch the psychologist's avatar
+            avatar_url = querydb.getAvatar(id)
+
+            return render_template('psikolog.html', psyc_info=psyc_info, blog_posts=blog_posts, can_edit=can_edit, avatar_url=avatar_url)
 
     # Either no id was given or no psychologist was found.
     # In both cases, show a list of psychologists.
@@ -378,13 +472,29 @@ def write_blog_post():
         return render_template('write_blog_post.html')
     elif request.method == 'POST':
         text = request.form['text']
-        success, psyc_id = querydb.createBlogPost(current_user.id, text)
-        if success:
-            flash('Your blog post has been published.')
+        psyc_id = querydb.getPsycId(current_user.id)
+        if psyc_id == -1:
+            flash('Not allowed.', 'error')
         else:
-            flash('We could not publish your blog post.', 'error')
+            querydb.createBlogPost(current_user.id, psyc_id, text)
+            flash('Your blog post has been published.')
         return redirect(url_for('psikolog', id=psyc_id))
 
+@app.route('/psikolog/change_avatar', methods=['GET', 'POST'])
+@roles_required('psyc')
+def change_avatar():
+    if request.method == 'GET':
+        return render_template('change_avatar.html', psyc_id=querydb.getPsycId(current_user.id))
+    elif request.method == 'POST':
+        psyc_id = querydb.getPsycId(current_user.id)
+        if psyc_id == -1:
+            flash('Not allowed.', 'error')
+
+        querydb.updateAvatar(psyc_id, request.files['avatar'])
+        flash('Avatar updated.')
+        return redirect(url_for('psikolog', id=psyc_id))
+
+# End Charlie's code
 
 #Nolan's Code
 
@@ -395,5 +505,6 @@ def staff():
 
 #End Nolan's Code
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

@@ -3,127 +3,54 @@
 {% block content %}
 <main id="psyc-page">
     <div class="box">
-        <div class="psyc-summary">
-            <div style="float:right">
-                <div style="font-size:80%;">
-                    <img style="display:block;padding: 3px;width:128px;height:128px;border:1px solid #999;" src="{{ psyc_info.photo }}" alt="[photograph of {{ psyc_info.full_name }}]" />
-                </div>
-                <div>
-                    <a href="/psikolog/change_avatar"><i class="fa fa-image" aria-hidden="true"></i> Change Avatar</a>
-                </div>
+        <div style="float:right">
+            <div aria-hidden="true" style="font-size:80%;">
+                <img style="display:block;padding: 3px;width:128px;height:128px;border:1px solid #999;" src="{{ avatar_url }}" alt="[photograph of {{ psyc_info.full_name }}]" />
             </div>
-            <h2>{{ psyc_info.full_name }}</h2>
-            <p class="psyc-qualifications">{{ psyc_info.qualifications }}</p>
-            <div style="clear:both;"></div>
+            {% if can_edit %}
+            <div>
+                <a href="/psikolog/change_avatar"><i class="fa fa-image" aria-hidden="true"></i> Change Avatar</a>
+            </div>
+            {% endif %}
         </div>
-    </div>
-    <div class="box">
+        <h2>{{ psyc_info.full_name }}</h2>
+        <p class="psyc-qualifications">{{ psyc_info.qualifications }}</p>
+        <div style="clear:both;"></div>
         <div class="calendar">
             <div class="cal-head">
                 <div class="cal-month-name">
-                    <i class="fa fa-calendar-alt" aria-hidden="true"></i> Februari 2018
-                    {% if can_edit %}
-                        <a style="margin-left: 6ex;" href="/psikolog/revisi_jadwal"><i class="fa fa-edit" aria-hidden="true"></i> Revisi Jadwal</a>
-                    {% endif %}
-                </div><div class="cal-column-title">
+                    <div>
+                        <i class="fa fa-calendar-alt" aria-hidden="true"></i>
+                        <span id="cal-month-label" aria-live="polite" aria-relevant="text"></span>
+                    </div>
+                    <div>
+                        <button aria-controls="cal-month-label" onclick="prevMonth()"><i class="fa fa-arrow-left" aria-hidden="true"></i><span class="sr-only">Previous Month</span></button>
+                        <button aria-controls="cal-month-label" onclick="nextMonth()"><i class="fa fa-arrow-right" aria-hidden="true"></i><span class="sr-only">Next Month</span></button>
+                    </div>
+                </div><div class="cal-column-title" aria-hidden="true">
                     Minggu
-                </div><div class="cal-column-title">
+                </div><div class="cal-column-title" aria-hidden="true">
                     Senin
-                </div><div class="cal-column-title">
+                </div><div class="cal-column-title" aria-hidden="true">
                     Selasa
-                </div><div class="cal-column-title">
+                </div><div class="cal-column-title" aria-hidden="true">
                     Rabu
-                </div><div class="cal-column-title">
+                </div><div class="cal-column-title" aria-hidden="true">
                     Kamis
-                </div><div class="cal-column-title">
+                </div><div class="cal-column-title" aria-hidden="true">
                     Jumat
-                </div><div class="cal-column-title">
+                </div><div class="cal-column-title" aria-hidden="true">
                     Sabtu
                 </div>
             </div>
-            <div class="cal-week">
-                <div class="cal-day" data-this-month="false">
-                    <div class="cal-day-number">28</div>
-                </div><div class="cal-day" data-this-month="false">
-                    <div class="cal-day-number">29</div>
-                </div><div class="cal-day" data-this-month="false">
-                    <div class="cal-day-number">30</div>
-                </div><div class="cal-day" data-this-month="false">
-                    <div class="cal-day-number">31</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">1</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">2</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">3</div>
+            {% for week in range(6) %}
+                <div class="cal-week">
+                    {% for weekday in range(7) %}<div id="cal-day-{{ week*7 + weekday }}" class="cal-day">&nbsp;</div>{% endfor %}
                 </div>
-            </div><div class="cal-week">
-                <div class="cal-day">
-                    <div class="cal-day-number">4</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">5</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">6</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">7</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">8</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">9</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">10</div>
-                </div>
-            </div><div class="cal-week">
-                <div class="cal-day">
-                    <div class="cal-day-number">11</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">12</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">13</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">14</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">15</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">16</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">17</div>
-                </div>
-            </div><div class="cal-week">
-                <div class="cal-day">
-                    <div class="cal-day-number">18</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">19</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">20</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">21</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">22</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">23</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">24</div>
-                </div>
-            </div><div class="cal-week">
-                <div class="cal-day">
-                    <div class="cal-day-number">25</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">26</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">27</div>
-                </div><div class="cal-day">
-                    <div class="cal-day-number">28</div>
-                </div><div class="cal-day" data-this-month="false">
-                    <div class="cal-day-number">1</div>
-                </div><div class="cal-day" data-this-month="false">
-                    <div class="cal-day-number">2</div>
-                </div><div class="cal-day" data-this-month="false">
-                    <div class="cal-day-number">3</div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
+    <script type="text/javascript" src="/static/scripts/calendar.js"></script>
     <div class="box">
         {% if can_edit %}
             <a href="/psikolog/write_blog_post"><i class="fa fa-plus" aria-hidden="true"></i> Write New Post</a>

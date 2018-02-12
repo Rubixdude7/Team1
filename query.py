@@ -49,13 +49,21 @@ class query(object):
         q = db.questions(question=question2, user_id_crea=user, crea_dtm=datetime.datetime.now())
         q.save()
 
+    def addQuestionAnswers(self, questionAnswer, user, q_id, childId):
+        q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(), q=q_id, child=childId)
+        q.save()
+
     def paginate(self, num):
-        count = db.questions.query.paginate(per_page=2, page=num, error_out=True)
-        return count;
+        num = db.questions.select()
+       # count = db.questions.paginate(per_page=2, page=num, error_out=True)
+        return num;
 
     def getAllQuestions(self):
         questions = db.questions.select()
         return questions
+    def getAllQuestionAnswers(self):
+        questionsAnswers = db.question_answers.select()
+        return questionsAnswers
 
     def editQuestion(self, a, newQuestion):
         current = db.questions.get(db.questions.q_id == a)
@@ -64,8 +72,8 @@ class query(object):
 
     # Brody's code
 
-    def addChild(self, user_id, first, last):
-        c = db.child(user_id=user_id, child_nm_fst=first, child_nm_lst=last)
+    def addChild(self, user_id, first, last, dob):
+        c = db.child(user_id=user_id, child_nm_fst=first, child_nm_lst=last, child_dob=dob)
         c.save()
 
     def findChild(self, child_id):
@@ -93,11 +101,6 @@ class query(object):
     def softDeleteUser(self, u_id):
         user = db.user.get(db.user.user_id == u_id)
         user.active = False
-        user.save()
-
-    def bringHimBack(self):
-        user = db.user.get(db.user.user_id == 3)
-        user.void_ind = 'n'
         user.save()
 
     def role(self, id):
@@ -131,19 +134,40 @@ class query(object):
                      .order_by(db.blog.updt_dtm.desc())
         return blg
 
-    def createBlogPost(self, u_id, text):
-        # First, make sure this user is REALLY a psychologist
-        tuples = db.user.select(db.psychologist.psyc_id)\
+    def getAvatar(self, psyc_id):
+        psyc = db.psychologist.get(db.psychologist.psyc_id == psyc_id)
+        if psyc.photo is None or psyc.photo == '':
+            return '/static/noavatar.png'
+
+        public_id, version = psyc.photo.split('#')
+
+        return cloudinary.CloudinaryImage(public_id, version=version).build_url()
+
+    def updateAvatar(self, psyc_id, avatar_file):
+        if not self.allowed_file(avatar_file.filename):
+            return False
+
+        response = cloudinary.uploader.upload(avatar_file)
+        image_descriptor = response['public_id'] + '#' + str(response['version'])
+
+        p = db.psychologist.get(db.psychologist.psyc_id == psyc_id)
+        p.photo = image_descriptor
+        p.save()
+
+        return True
+
+    def getPsycId(self, u_id):
+        results = db.user.select(db.psychologist.psyc_id)\
                         .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
                         .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
                         .join(db.psychologist, JOIN_INNER, db.psychologist.user == db.user.user_id)\
-                        .where(db.user.active & (db.user.user_id == u_id) & (db.role.role_nm == 'psyc'))\
-                        .tuples()
-        if len(tuples) == 0:
-            return False, -1
+                        .where(db.user.active & (db.user.user_id == u_id) & (db.role.role_nm == 'psyc')).tuples()
+        if len(results) == 0:
+            return -1
+        psyc_id = results[0][0]
+        return psyc_id
 
-        psyc_id = list(tuples)[0][0]
-
+    def createBlogPost(self, u_id, psyc_id, text):
         now = datetime.datetime.now()
         blog_post = db.blog(psyc=psyc_id,
                             text=text,
@@ -152,8 +176,6 @@ class query(object):
                             updt_dtm=now,
                             void_ind='n')
         blog_post.save()
-
-        return True, psyc_id
 
     def addPsychologistIfNotExist(self, u_id):
         # Check if user already has psychologist row
@@ -167,7 +189,6 @@ class query(object):
 
     def lookupPsychologist(self, ident):
         tuples = db.psychologist.select(db.psychologist.psyc_id,
-                                        db.psychologist.photo,
                                         db.psychologist.qualifications,
                                         db.user.first_name,
                                         db.user.last_name)\
@@ -182,10 +203,9 @@ class query(object):
 
             info = PsychologistLookupResult()
             info.psyc_id = info_tuple[0]
-            info.photo = info_tuple[1]
-            info.qualifications = info_tuple[2]
-            info.first_name = info_tuple[3]
-            info.last_name = info_tuple[4]
+            info.qualifications = info_tuple[1]
+            info.first_name = info_tuple[2]
+            info.last_name = info_tuple[3]
             info.full_name = '{0} {1}'.format(info.first_name, info.last_name)
             return info
 
@@ -265,9 +285,15 @@ class query(object):
     def getVerifiedChildren(self):
         children = []
         for consultation in db.consultation.select():
-            if consultation.approved == "y" and consultation.paid == "n":
-                children += consultation.child
-
+            if consultation.approved == "y" or consultation.paid == "n":
+                children.append({
+                    'firstName': consultation.child.child_nm_fst,
+                    'lastName': consultation.child.child_nm_lst,
+                    'childID':consultation.child.child_id,
+                    'time':consultation.length
+                })
+        if len(children) == 0:
+            pass
         return children
 
     #End Nolan's Code
@@ -324,7 +350,6 @@ class query(object):
 class PsychologistLookupResult:
     def __init__(self):
         self.psyc_id = None
-        self.photo = None
         self.qualifications = None
         self.first_name = None
         self.last_name = None

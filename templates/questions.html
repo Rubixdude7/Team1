@@ -46,6 +46,11 @@
                     {% endif %}
                     <br><br>
                 <button class="delete" type="button" onclick="location.href='{{ url_for('questionDelete', q_id=u.q_id) }}'"><i class="fa fa-trash"></i>Delete Question</button>
+             <br>
+             <br>
+             <i class="fa fa-angle-up"></i></button>
+             <br>
+              <i class="fa fa-angle-down"></i></button>
                 </div>
                 <!-- END -->
             </div>
@@ -56,8 +61,17 @@
             {% endfor %}
             <br>
             <br>
+        {% if page > 1 %}
+    <a class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous</a>
+{% endif %}
+{% if pagination.get_page_count() > page %}
+
+    <a class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next</a>
+{% endif %}
             </div>
+
             </div>
         </div>
+
     </main>
 {% endblock %}

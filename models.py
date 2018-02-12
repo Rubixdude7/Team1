@@ -46,6 +46,7 @@ class child(MySQLModel):
     child_nm_fst = CharField()
     child_nm_lst = CharField(null=True)
     child_dob = DateTimeField()
+    q_comp_dtm = DateTimeField()
 
     class Meta:
         db_table = "child"
