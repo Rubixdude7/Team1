@@ -127,8 +127,12 @@ def _after_register_hook(sender, user, **extra):
 
 @app.route('/')
 def index():
-    slider = querydb.get_slider()
-    return render_template("index.html", slides=slider[0], desc=slider[1])
+    #slider = querydb.get_slider()
+    page_num = 1
+    if 'page_num' in request.args:
+        page_num = int(page_num)
+    return render_template("index.html", blog_posts=querydb.getAllBlogPosts(page_num, 10))
+    #return render_template("index.html", slides=slider[0], desc=slider[1])
 
 
 @app.route('/slide-edit/<int:s_id>', methods=['GET', 'POST'])

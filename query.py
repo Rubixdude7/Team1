@@ -133,6 +133,24 @@ class query(object):
                      .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id))\
                      .order_by(db.blog.updt_dtm.desc())
         return blg
+    
+    def getAllBlogPosts(self, page_num, items_per_page):
+        tuples = db.blog.select(db.blog.subject, db.blog.updt_dtm, db.blog.text, db.psychologist.psyc_id, db.user.first_name, db.user.last_name)\
+                        .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
+                        .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                        .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
+                        .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
+                        .where(db.user.active & (db.role.role_nm == 'psyc'))\
+                        .order_by(db.blog.updt_dtm.desc())\
+                        .paginate(page_num, items_per_page).tuples()
+        
+        return [{
+            'title': t[0],
+            'date_posted': t[1],
+            'contents': t[2], 
+            'psyc_id': t[3],
+            'author': '{0} {1}'.format(t[4], t[5])
+        } for t in tuples]
 
     def getAvatar(self, psyc_id):
         psyc = db.psychologist.get(db.psychologist.psyc_id == psyc_id)
