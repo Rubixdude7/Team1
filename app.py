@@ -474,11 +474,8 @@ def write_blog_post():
         subject = request.form['subject']
         text = request.form['text']
         psyc_id = querydb.getPsycId(current_user.id)
-        if psyc_id == -1:
-            flash('Not allowed.', 'error')
-        else:
-            querydb.createBlogPost(current_user.id, psyc_id, subject, text)
-            flash('Your blog post has been published.')
+        querydb.createBlogPost(current_user.id, psyc_id, subject, text)
+        flash('Your blog post has been published.')
         return redirect(url_for('psikolog', id=psyc_id))
 
 @app.route('/psikolog/change_avatar', methods=['GET', 'POST'])
@@ -488,11 +485,19 @@ def change_avatar():
         return render_template('change_avatar.html', psyc_id=querydb.getPsycId(current_user.id))
     elif request.method == 'POST':
         psyc_id = querydb.getPsycId(current_user.id)
-        if psyc_id == -1:
-            flash('Not allowed.', 'error')
-
         querydb.updateAvatar(psyc_id, request.files['avatar'])
         flash('Avatar updated.')
+        return redirect(url_for('psikolog', id=psyc_id))
+
+@app.route('/psikolog/edit_qualifications', methods=['GET', 'POST'])
+@roles_required('psyc')
+def edit_qualifications():
+    if request.method == 'GET':
+        return render_template('edit_qualifications.html', psyc_id=querydb.getPsycId(current_user.id))
+    elif request.method == 'POST':
+        psyc_id = querydb.getPsycId(current_user.id)
+        querydb.updateQualifications(psyc_id, request.form['qualifications'])
+        flash('Qualifications updated.')
         return redirect(url_for('psikolog', id=psyc_id))
 
 # End Charlie's code

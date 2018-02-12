@@ -178,6 +178,11 @@ class query(object):
                             void_ind='n')
         blog_post.save()
 
+    def updateQualifications(self, psyc_id, qualifications):
+        psyc = db.psychologist.select().where(db.psychologist.psyc_id == psyc_id).get()
+        psyc.qualifications = qualifications
+        psyc.save()
+
     def addPsychologistIfNotExist(self, u_id):
         # Check if user already has psychologist row
         tuples = db.psychologist.select().where(db.psychologist.user == u_id).tuples()

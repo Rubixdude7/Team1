@@ -15,7 +15,12 @@
         </div>
         <h2>{{ psyc_info.full_name }}</h2>
         <p><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="far fa-star" aria-hidden="true"></i> (1337)</p>
-        <p class="psyc-qualifications">{{ psyc_info.qualifications }}</p>
+        <p class="psyc-qualifications">
+            {{ psyc_info.qualifications }}
+            {% if can_edit %}
+            <a href="{{ url_for('edit_qualifications') }}"><span class="fa fa-edit" aria-hidden="true"></span> Edit Qualifications</a>
+            {% endif %}
+        </p>
         <div style="clear:both;"></div>
         <div class="calendar">
             <div class="cal-head">
