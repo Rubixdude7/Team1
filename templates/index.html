@@ -82,6 +82,15 @@
     -->
     
     <div class="box">
+        <p>
+            {% if page_num > 1 %}
+                <a href="{{ url_for('index', page_num=page_num - 1) }}">Previous Page</a>
+            {% else %}
+                Previous Page
+            {% endif %}
+            /
+            <a href="{{ url_for('index', page_num=page_num + 1) }}">Next Page</a>
+        </p>
         <div class="blog">
             {% for post in blog_posts %}
                 <article>

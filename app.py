@@ -130,8 +130,8 @@ def index():
     #slider = querydb.get_slider()
     page_num = 1
     if 'page_num' in request.args:
-        page_num = int(page_num)
-    return render_template("index.html", blog_posts=querydb.getAllBlogPosts(page_num, 10))
+        page_num = int(request.args['page_num'])
+    return render_template("index.html", blog_posts=querydb.getAllBlogPosts(page_num, 10), page_num=page_num)
     #return render_template("index.html", slides=slider[0], desc=slider[1])
 
 
