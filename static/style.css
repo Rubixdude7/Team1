@@ -561,8 +561,8 @@ footer {
 
 .calendar {
   padding: 0;
-  margin-left: 10em;
-  margin-right: 10em;
+  margin-left: 5em;
+  margin-right: 5em;
   border: 1px solid #000; }
 
 @media only screen and (max-width: 1000px) {
@@ -830,7 +830,7 @@ for normal slider just uncomment the second width*/
 
 #cssSlider > #pageNav:hover > #previousArrow > .slideL,
 #cssSlider > #pageNav:hover > #nextArrow > .slideR {
-  opacity: 0.1166666667; }
+  opacity: 0.11667; }
 
 /*DON'T SHOW PLAY AND PAUSE*/
 #cssSlider > #play:not(:checked) ~ #pageNav > #playPause > #pauseBtn {
@@ -862,13 +862,13 @@ for normal slider just uncomment the second width*/
 
 #cssSlider > #play:checked ~ #pageNav > #previousArrow > #slideL1,
 #cssSlider > #play:checked ~ #pageNav > #nextArrow > #slideR3 {
-  -webkit-animation: arrows 40000ms infinite 6666.6666666667ms;
-  animation: arrows 40000ms infinite 6666.6666666667ms; }
+  -webkit-animation: arrows 40000ms infinite 6666.66667ms;
+  animation: arrows 40000ms infinite 6666.66667ms; }
 
 #cssSlider > #play:checked ~ #pageNav > #previousArrow > #slideL2,
 #cssSlider > #play:checked ~ #pageNav > #nextArrow > #slideR4 {
-  -webkit-animation: arrows 40000ms infinite 13333.333333333ms;
-  animation: arrows 40000ms infinite 13333.333333333ms; }
+  -webkit-animation: arrows 40000ms infinite 13333.33333ms;
+  animation: arrows 40000ms infinite 13333.33333ms; }
 
 #cssSlider > #play:checked ~ #pageNav > #previousArrow > #slideL3,
 #cssSlider > #play:checked ~ #pageNav > #nextArrow > #slideR5 {
@@ -877,13 +877,13 @@ for normal slider just uncomment the second width*/
 
 #cssSlider > #play:checked ~ #pageNav > #previousArrow > #slideL4,
 #cssSlider > #play:checked ~ #pageNav > #nextArrow > #slideR6 {
-  -webkit-animation: arrows 40000ms infinite 26666.666666666ms;
-  animation: arrows 40000ms infinite 26666.666666666ms; }
+  -webkit-animation: arrows 40000ms infinite 26666.66667ms;
+  animation: arrows 40000ms infinite 26666.66667ms; }
 
 #cssSlider > #play:checked ~ #pageNav > #previousArrow > #slideL5,
 #cssSlider > #play:checked ~ #pageNav > #nextArrow > #slideR1 {
-  -webkit-animation: arrows 40000ms infinite 33333.333333333ms;
-  animation: arrows 40000ms infinite 33333.333333333ms; }
+  -webkit-animation: arrows 40000ms infinite 33333.33333ms;
+  animation: arrows 40000ms infinite 33333.33333ms; }
 
 /********** END NEXT SLIDE ARROW NAVIGATION **********/
 /********** SLIDE INDICATORS **********/
@@ -934,13 +934,13 @@ for normal slider just uncomment the second width*/
 
 #cssSlider > #play:checked ~ #pageIndicators > .indicator > .hoverPoint > #point2,
 #cssSlider > #pause:checked ~ #pageIndicators > .indicator > .hoverPoint > #point2 {
-  -webkit-animation: point 40000ms infinite 6666.6666666667ms;
-  animation: point 40000ms infinite 6666.6666666667ms; }
+  -webkit-animation: point 40000ms infinite 6666.66667ms;
+  animation: point 40000ms infinite 6666.66667ms; }
 
 #cssSlider > #play:checked ~ #pageIndicators > .indicator > .hoverPoint > #point3,
 #cssSlider > #pause:checked ~ #pageIndicators > .indicator > .hoverPoint > #point3 {
-  -webkit-animation: point 40000ms infinite 13333.333333333ms;
-  animation: point 40000ms infinite 13333.333333333ms; }
+  -webkit-animation: point 40000ms infinite 13333.33333ms;
+  animation: point 40000ms infinite 13333.33333ms; }
 
 #cssSlider > #play:checked ~ #pageIndicators > .indicator > .hoverPoint > #point4,
 #cssSlider > #pause:checked ~ #pageIndicators > .indicator > .hoverPoint > #point4 {
@@ -949,13 +949,13 @@ for normal slider just uncomment the second width*/
 
 #cssSlider > #play:checked ~ #pageIndicators > .indicator > .hoverPoint > #point5,
 #cssSlider > #pause:checked ~ #pageIndicators > .indicator > .hoverPoint > #point5 {
-  -webkit-animation: point 40000ms infinite 26666.666666666ms;
-  animation: point 40000ms infinite 26666.666666666ms; }
+  -webkit-animation: point 40000ms infinite 26666.66667ms;
+  animation: point 40000ms infinite 26666.66667ms; }
 
 #cssSlider > #play:checked ~ #pageIndicators > .indicator > .hoverPoint > #point6,
 #cssSlider > #pause:checked ~ #pageIndicators > .indicator > .hoverPoint > #point6 {
-  -webkit-animation: point 40000ms infinite 33333.333333333ms;
-  animation: point 40000ms infinite 33333.333333333ms; }
+  -webkit-animation: point 40000ms infinite 33333.33333ms;
+  animation: point 40000ms infinite 33333.33333ms; }
 
 /*WHICH INDICATOR SHOULD BE LIT*/
 #cssSlider > #slide1:checked ~ #pageIndicators > .indicator > .hoverPoint > #point1,
@@ -993,7 +993,7 @@ for normal slider just uncomment the second width*/
     height: 100%;
     /*size of the images*/ }
     #cssSlider #sliderImages div {
-      width: 16.6666666667%;
+      width: 16.66667%;
       height: 100%;
       float: left;
       text-align: center; }
@@ -1080,13 +1080,13 @@ for normal slider just uncomment the second width*/
 
 #cssSlider > #play:checked ~ #slideDesc > #slideText2,
 #cssSlider > #pause:checked ~ #slideDesc > #slideText2 {
-  -webkit-animation: textBoxBounce 40000ms infinite 6666.6666666667ms;
-  animation: textBoxBounce 40000ms infinite 6666.6666666667ms; }
+  -webkit-animation: textBoxBounce 40000ms infinite 6666.66667ms;
+  animation: textBoxBounce 40000ms infinite 6666.66667ms; }
 
 #cssSlider > #play:checked ~ #slideDesc > #slideText3,
 #cssSlider > #pause:checked ~ #slideDesc > #slideText3 {
-  -webkit-animation: textBoxBounce 40000ms infinite 13333.333333333ms;
-  animation: textBoxBounce 40000ms infinite 13333.333333333ms; }
+  -webkit-animation: textBoxBounce 40000ms infinite 13333.33333ms;
+  animation: textBoxBounce 40000ms infinite 13333.33333ms; }
 
 #cssSlider > #play:checked ~ #slideDesc > #slideText4,
 #cssSlider > #pause:checked ~ #slideDesc > #slideText4 {
@@ -1095,13 +1095,13 @@ for normal slider just uncomment the second width*/
 
 #cssSlider > #play:checked ~ #slideDesc > #slideText5,
 #cssSlider > #pause:checked ~ #slideDesc > #slideText5 {
-  -webkit-animation: textBoxBounce 40000ms infinite 26666.666666666ms;
-  animation: textBoxBounce 40000ms infinite 26666.666666666ms; }
+  -webkit-animation: textBoxBounce 40000ms infinite 26666.66667ms;
+  animation: textBoxBounce 40000ms infinite 26666.66667ms; }
 
 #cssSlider > #play:checked ~ #slideDesc > #slideText6,
 #cssSlider > #pause:checked ~ #slideDesc > #slideText6 {
-  -webkit-animation: textBoxBounce 40000ms infinite 33333.333333333ms;
-  animation: textBoxBounce 40000ms infinite 33333.333333333ms; }
+  -webkit-animation: textBoxBounce 40000ms infinite 33333.33333ms;
+  animation: textBoxBounce 40000ms infinite 33333.33333ms; }
 
 /********** END SLIDER TEXT **********/
 /********** PLAY PAUSE OF ALL ANIMATIONS **********/
@@ -1176,19 +1176,19 @@ for normal slider just uncomment the second width*/
     transform: translateX(0); }
   16.6666666667%,
         26.6666666667% {
-    transform: translateX(-16.6666666667%); }
+    transform: translateX(-16.66667%); }
   33.3333333333%,
         43.3333333333% {
-    transform: translateX(-33.3333333333%); }
+    transform: translateX(-33.33333%); }
   50%,
         60% {
     transform: translateX(-50%); }
   66.6666666667%,
         76.6666666667% {
-    transform: translateX(-66.6666666667%); }
+    transform: translateX(-66.66667%); }
   83.3333333333%,
         93.3333333333% {
-    transform: translateX(-83.3333333333%); }
+    transform: translateX(-83.33333%); }
   100% {
     transform: translateX(0); } }
 @-webkit-keyframes slider {
@@ -1197,19 +1197,19 @@ for normal slider just uncomment the second width*/
     transform: translateX(0); }
   16.6666666667%,
         26.6666666667% {
-    transform: translateX(-16.6666666667%); }
+    transform: translateX(-16.66667%); }
   33.3333333333%,
         43.3333333333% {
-    transform: translateX(-33.3333333333%); }
+    transform: translateX(-33.33333%); }
   50%,
         60% {
     transform: translateX(-50%); }
   66.6666666667%,
         76.6666666667% {
-    transform: translateX(-66.6666666667%); }
+    transform: translateX(-66.66667%); }
   83.3333333333%,
         93.3333333333% {
-    transform: translateX(-83.3333333333%); }
+    transform: translateX(-83.33333%); }
   100% {
     transform: translateX(0); } }
 /* AGAIN, PLEASE DIE IE */
@@ -1220,19 +1220,19 @@ for normal slider just uncomment the second width*/
     margin-left: 0; }
   16.6666666667%,
 			26.6666666667% {
-    margin-left: -16.6666666667%; }
+    margin-left: -16.66667%; }
   33.3333333333%,
 			43.3333333333% {
-    margin-left: -33.3333333333%; }
+    margin-left: -33.33333%; }
   50%,
 			60% {
     margin-left: -50%; }
   66.6666666667%,
 			76.6666666667% {
-    margin-left: -66.6666666667%; }
+    margin-left: -66.66667%; }
   83.3333333333%,
 			93.3333333333% {
-    margin-left: -83.3333333333%; }
+    margin-left: -83.33333%; }
   100% {
     margin-left: -.1vw;
     /*can't be 0, gives blank page*/ } }
