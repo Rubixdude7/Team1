@@ -5,6 +5,10 @@
     <div class="box">
         <form action="{{ url_for('write_blog_post') }}" method="post" enctype="multipart/form-data">
             <div class="form-control-1">
+                <label for="subject">Subject</label><br />
+                <input name="subject" type="text" />
+            </div>
+            <div class="form-control-2">
                 <label for="text">Text</label><br />
                 <textarea name="text" placeholder="The contents of your blog post go here."></textarea>
             </div>

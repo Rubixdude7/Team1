@@ -445,7 +445,7 @@ def psikolog(id=None):
             # Now fetch their blog posts.
             blg = querydb.getBlogPostsBy(id)
             blog_posts = [{
-                'title': post.text[:15] + '...',
+                'title': post.subject,
                 'date_posted': post.updt_dtm,
                 'contents': post.text
             } for post in blg]
@@ -471,12 +471,13 @@ def write_blog_post():
     if request.method == 'GET':
         return render_template('write_blog_post.html')
     elif request.method == 'POST':
+        subject = request.form['subject']
         text = request.form['text']
         psyc_id = querydb.getPsycId(current_user.id)
         if psyc_id == -1:
             flash('Not allowed.', 'error')
         else:
-            querydb.createBlogPost(current_user.id, psyc_id, text)
+            querydb.createBlogPost(current_user.id, psyc_id, subject, text)
             flash('Your blog post has been published.')
         return redirect(url_for('psikolog', id=psyc_id))
 

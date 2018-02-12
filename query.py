@@ -167,9 +167,10 @@ class query(object):
         psyc_id = results[0][0]
         return psyc_id
 
-    def createBlogPost(self, u_id, psyc_id, text):
+    def createBlogPost(self, u_id, psyc_id, subject, text):
         now = datetime.datetime.now()
         blog_post = db.blog(psyc=psyc_id,
+                            subject=subject,
                             text=text,
                             crea_dtm=now,
                             user_id_upd=u_id,
