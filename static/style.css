@@ -617,7 +617,9 @@ footer {
 .cal-day-number {
   font-size: 16pt;
   padding-right: 10px;
-  text-align: right; }
+  text-align: right;
+  overflow: hidden;
+  white-space: nowrap; }
 
 .cal-day[data-this-month="false"] {
   background-color: #CCC; }
@@ -628,6 +630,30 @@ footer {
 
   .cal-day-number {
     font-size: 12pt; } }
+.cal-space-slot {
+  display: inline-block;
+  margin: 4px 0;
+  height: 9px;
+  padding: 0;
+  line-height: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  border-width: 0;
+  border-radius: 0;
+  background-color: #BBB; }
+
+.cal-ok-slot {
+  display: inline-block;
+  margin: 4px 0;
+  height: 9px;
+  padding: 0;
+  line-height: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  border-width: 0;
+  border-radius: 0;
+  background-color: #00C; }
+
 /**********END GLOBAL CSS**********/
 /**********BEGIN HOME**********/
 #circle {
