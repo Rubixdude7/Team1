@@ -60,6 +60,16 @@
   border-width: 1px 0 0 1px;
   overflow: hidden;
   white-space: nowrap;
+  cursor: pointer;
+}
+
+.cal-day:not([data-this-month="false"]):hover {
+  box-shadow: inset 0 0 4px #66F;
+}
+
+.cal-day:not([data-this-month="false"]):active {
+  background-color: #CCC;
+  box-shadow: inset 0 0 4px #339;
 }
 
 .cal-day-number {
@@ -72,6 +82,7 @@
 
 .cal-day[data-this-month="false"] {
   background-color: #CCC;
+  cursor: auto;
 }
 
 @media only screen and (max-width: 759px) {

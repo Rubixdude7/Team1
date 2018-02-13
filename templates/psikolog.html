@@ -51,7 +51,7 @@
             </div>
             {% for week in range(6) %}
                 <div class="cal-week">
-                    {% for weekday in range(7) %}<div id="cal-day-{{ week*7 + weekday }}" class="cal-day">&nbsp;</div>{% endfor %}
+                    {% for weekday in range(7) %}<div id="cal-day-{{ week*7 + weekday }}" class="cal-day" onclick="viewDayDetails({{ week*7 + weekday }})">&nbsp;</div>{% endfor %}
                 </div>
             {% endfor %}
         </div>
