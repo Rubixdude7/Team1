@@ -516,6 +516,58 @@ def edit_qualifications():
         querydb.updateQualifications(psyc_id, request.form['qualifications'])
         flash('Qualifications updated.')
         return redirect(url_for('psikolog', id=psyc_id))
+        
+@app.route('/psikolog/edit_availability_list')
+@roles_required('psyc')
+def edit_availability_list():
+    psyc_id = querydb.getPsycId(current_user.id)
+    availabilities = querydb.getAvailabilities(psyc_id)
+    return render_template('edit_availability_list.html', psyc_id=psyc_id, availabilities=availabilities)
+
+@app.route('/psikolog/delete_availability', methods=['POST'])
+@roles_required('psyc')
+def delete_availability(avail_id):
+    psyc_id = querydb.getPsycId(current_user.id)
+    querydb.deleteAvailability(psyc_id, avail_id)
+    flash('Availability time #{0} has been deleted.'.format(avail_id))
+    return redirect(url_for('edit_availability_list'))
+
+@app.route('/psikolog/add_availability', methods=['GET', 'POST'])
+@roles_required('psyc')
+def add_availability():
+    if request.method == 'GET':
+        return render_template('add_availability.html')
+    elif request.method == 'POST':
+        psyc_id = querydb.getPsycId(current_user.id)
+        time_st = request.form['time_st']
+        time_end = request.form['time_end']
+        expires = request.form['expires']
+        weekly = request.form['weekly']
+        
+        querydb.addAvailability(psyc_id, time_st, time_end, expires, weekly)
+        
+        flash('Your new availability time has been created.')
+        
+        return redirect(url_for('edit_availability_list'))
+        
+@app.route('/psikolog/edit_availability/<int:avail_id>', methods=['GET', 'POST'])
+@roles_required('psyc')
+def edit_availability(avail_id):
+    if request.method == 'GET':
+        avail = querydb.getAvailability(avail_id)
+        return render_template('edit_availability.html', avail=avail)
+    elif request.method == 'POST':
+        psyc_id = querydb.getPsycId(current_user.id)
+        time_st = request.form['time_st']
+        time_end = request.form['time_end']
+        expires = request.form['expires']
+        weekly = request.form['weekly']
+        
+        querydb.updateAvailability(avail_id, psyc_id, time_st, time_end, expires, weekly)
+        
+        flash('Availability time #{0} has been updated.'.format(avail_id))
+        
+        return redirect(url_for('edit_availability_list'))
 
 # End Charlie's code
 
