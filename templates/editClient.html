@@ -7,54 +7,59 @@
         <hr>
         <form action="" method="post">
             {{ form.hidden_tag() }}
-                    <div class="form-control-1">
-                        {{ form.fName.label }}
-                        <br>
-                        {{ form.fName(size=20) }}
-                    </div>
-                    <div class="form-control-2">
-                        {{ form.lName.label }}
-                        <br>
-                        {{ form.lName(size=20) }}
-                    </div>
-                    <div class="form-control-2">
-                        {{ form.phone.label }}
-                        <br>
-                        {{ form.phone(size=20) }}
-                    </div>
-                    <div class="form-control-2">
-                        {{ form.address_1.label }}
-                        <br>
-                        {{ form.address_1(size=20) }}
-                    </div>
-                    <div class="form-control-2">
-                        {{ form.address_2.label }}
-                        <br>
-                        {{ form.address_2(size=20) }}
-                    </div>
-                    <div class="form-control-2">
-                        {{ form.city.label }}
-                        <br>
-                        {{ form.city(size=20) }}
-                    </div>
-                    <div class="form-control-2">
-                        {{ form.province.label }}
-                        <br>
-                        {{ form.province(size=20) }}
-                    </div>
-                    <div class="form-control-2">
-                        {{ form.zip.label }}
-                        <br>
-                        {{ form.zip(size=20) }}
-                    </div>
-                    <div class="form-control-2">
-                        {{ form.role.label }}
-                        <br>
-                        {{ form.role(size=1) }}
-                    </div>
-                    <div class="form-control-2">
-                        {{ form.submit() }}
-                    </div>
+            <div class = "form-control-1">
+                {{ form.email.label }}
+                <br>
+                {{ form.email(size=5000) }}
+            </div>
+            <div class="form-control-2">
+                {{ form.fName.label }}
+                <br>
+                {{ form.fName(size=20) }}
+            </div>
+            <div class="form-control-2">
+                {{ form.lName.label }}
+                <br>
+                {{ form.lName(size=20) }}
+            </div>
+            <div class="form-control-2">
+                {{ form.phone.label }}
+                <br>
+                {{ form.phone(size=20) }}
+            </div>
+            <div class="form-control-2">
+                {{ form.address_1.label }}
+                <br>
+                {{ form.address_1(size=20) }}
+            </div>
+            <div class="form-control-2">
+                {{ form.address_2.label }}
+                <br>
+                {{ form.address_2(size=20) }}
+            </div>
+            <div class="form-control-2">
+                {{ form.city.label }}
+                <br>
+                {{ form.city(size=20) }}
+            </div>
+            <div class="form-control-2">
+                {{ form.providence.label }}
+                <br>
+                {{ form.providence(size=20) }}
+            </div>
+            <div class="form-control-2">
+                {{ form.zip.label }}
+                <br>
+                {{ form.zip(size=20) }}
+            </div>
+            <div class="form-control-2">
+                {{ form.role.label }}
+                <br>
+                {{ form.role(size=1) }}
+            </div>
+            <div class="form-control-2">
+                {{ form.submit() }}
+            </div>
         </form>
     </div>
 </main>

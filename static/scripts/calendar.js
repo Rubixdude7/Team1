@@ -65,7 +65,13 @@ function resetCalendar() {
                 dayElems[index].setAttribute("data-this-month", "false");
             } else {
                 var dayNum = (index - daysFromPrevMonth) + 1;
-                dayElems[index].innerHTML = "<div class=\"cal-day-number\">" + dayNum.toString() + "</div>";
+                var html = "<div class=\"cal-day-number\">" + dayNum.toString() + "</div>";
+                html += "<div class=\"cal-space-slot\" aria-hidden=\"true\" style=\"width:25%;\"></div>";
+                html += "<div class=\"cal-ok-slot\" aria-hidden=\"true\" style=\"width:25%;\"></div>";
+                html += "<div class=\"cal-space-slot\" aria-hidden=\"true\" style=\"width:12.5%;\"></div>";
+                html += "<div class=\"cal-ok-slot\" aria-hidden=\"true\" style=\"width:12.5%;\"></div>";
+                html += "<div class=\"cal-space-slot\" aria-hidden=\"true\" style=\"width:25%;\"></div>";
+                dayElems[index].innerHTML = html;
                 dayElems[index].setAttribute("data-this-month", "true");
             }
         }

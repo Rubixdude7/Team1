@@ -2,6 +2,7 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 <main id="mainHome">
+        <!-- The tragedy that befell Brandon's slider
     <div class="box">
         <div id="cssSlider">
             <input type="radio" name="slider" id="slide1">
@@ -13,7 +14,7 @@
             <input type="radio" name="slider" id="play" checked>
             <input type="radio" name="slider" id="pause">
 
-            <div id="sliderImages"> <!--TODO set max widt on dov ad img-->
+            <div id="sliderImages">
                 {% for slide in slides %}
                     <div>{{ slide|safe }}</div>
                 {% endfor %}
@@ -61,9 +62,12 @@
             </div>
         </div>
     </div>
+
+    -->
     <div class="box">
         <h2>"Anda juga dapat menikmati layanan kami dan mendapatkan manfaat seperti klien-klien kami! "</h2>
     </div>
+    <!--
     <div class="box">
         <h2 class="title">Services</h2>
         <h5>Layanan kami mencakup di bidang Industri organisasi, klinis anak, dan pendidikan.</h5>
@@ -75,7 +79,28 @@
         <h4>Di Bidang Klinis Anak</h4>
         <p>Kami melayani terapi anak berkebutuhan khusus, terapi anak yang mengalami masalah, konseling, training untuk anak.</p>
     </div>
-
+    -->
+    
+    <div class="box">
+        <p>
+            {% if page_num > 1 %}
+                <a href="{{ url_for('index', page_num=page_num - 1) }}">Previous Page</a>
+            {% else %}
+                Previous Page
+            {% endif %}
+            /
+            <a href="{{ url_for('index', page_num=page_num + 1) }}">Next Page</a>
+        </p>
+        <div class="blog">
+            {% for post in blog_posts %}
+                <article>
+                    <h3>{{ post['title'] }}</h3>
+                    <p class="blog-date">posted {{ post['date_posted'] }} by <a href="{{ url_for('psikolog', id=post['psyc_id']) }}">{{ post['author'] }}</a></p>
+                    <p>{{ post['contents'] }}</p>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
 </main>
 
 {% endblock %}
