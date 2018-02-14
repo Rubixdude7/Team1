@@ -110,6 +110,42 @@ class query(object):
         role = list(role)[0][0]
         return role
 
+    def getEmail(self, u_id):
+        email = db.user.get(db.user.user_id == u_id)
+        return email.email
+
+    def getfName(self, u_id):
+        name = db.user.get(db.user.user_id == u_id)
+        return name.first_name
+
+    def getlName(self, u_id):
+        lName = db.user.get(db.user.user_id == u_id)
+        return lName.last_name
+
+    def getPhone(self, contact_id):
+        c = db.contact.get(db.contact.contact_id == contact_id)
+        return c.phone_no
+
+    def getAdd1(self, contact_id):
+        c = db.contact.get(db.contact.contact_id == contact_id)
+        return c.address_1
+
+    def getAdd2(self, contact_id):
+        c = db.contact.get(db.contact.contact_id == contact_id)
+        return c.address_2
+
+    def getCity(self, contact_id):
+        c = db.contact.get(db.contact.contact_id == contact_id)
+        return c.city
+
+    def getProvidence(self, contact_id):
+        c = db.contact.get(db.contact.contact_id == contact_id)
+        return c.providence
+
+    def getZip(self, contact_id):
+        c = db.contact.get(db.contact.contact_id == contact_id)
+        return c.zip
+
 # End Jason's code
 
 # Begin Charlie's code
@@ -277,7 +313,7 @@ class query(object):
 
     def contactID(self, user_id):
         try:
-            c = db.contact.select().where(db.contact.user_id == user_id).get()
+            c = db.contact.select().where(db.contact.user == user_id).get()
         except DoesNotExist:
             c = None
         return c
@@ -288,7 +324,7 @@ class query(object):
 
     def updateContact(self, user_id, contact_id, phone_no, address_1, address_2, city, providence, zip):
         try:
-            c = db.contact.select().where(db.contact.user_id == user_id).get()
+            c = db.contact.select().where(db.contact.user == user_id).get()
             c.phone_no=phone_no
             c.address_1=address_1
             c.address_2=address_2

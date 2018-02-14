@@ -352,13 +352,14 @@ class QuestionEdit(FlaskForm):
 
 
 class ClientEditForm(FlaskForm):
+    email = StringField('Email')
     fName = StringField('fName')
     lName = StringField('lName')
     phone = StringField('phone')
     address_1 = StringField('address_1')
     address_2 = StringField('address_2')
     city = StringField('city')
-    province = StringField('province')
+    providence = StringField('Providence')
     zip = StringField('zip')
     role = SelectField('Role', coerce=str, validators=[DataRequired()], option_widget='Select')
     submit = SubmitField('Submit')
@@ -371,6 +372,16 @@ def editC():
     if int(u_id) == int(current_user.id):
         return redirect(url_for('admin'))
     form = ClientEditForm()
+    form.email.default = querydb.getEmail(u_id)
+    form.fName.default = querydb.getfName(u_id)
+    form.lName.default = querydb.getlName(u_id)
+    c_id = querydb.contactID(u_id)
+    form.phone.default = querydb.getPhone(c_id)
+    form.address_1.default = querydb.getAdd1(c_id)
+    form.address_2.default = querydb.getAdd2(c_id)
+    form.city.default = querydb.getCity(c_id)
+    form.providence.default = querydb.getProvidence(c_id)
+    form.zip.default = querydb.getZip(c_id)
     roles = querydb.getAllRoles()
     current_role = querydb.role(u_id)
     rolenames = [current_role]
@@ -383,11 +394,13 @@ def editC():
         if newRole == 'psyc':
             querydb.addPsychologistIfNotExist(u_id)
         querydb.updateUserRole(u_id, newRole)
-        contact_id = querydb.contactID(u_id)
-        querydb.updateContact(u_id, contact_id, form.phone.data, form.address_1.data, form.address_2.data,
-                              form.city.data, form.province.data, form.zip.data)
+        #contact_id = querydb.contactID(u_id)
+        querydb.updateContact(u_id, c_id, form.phone.data, form.address_1.data, form.address_2.data,
+                              form.city.data, form.providence.data, form.zip.data)
         flash('Your changes have been saved.')
         return redirect(url_for('admin'))
+    else:
+        form.process()
     return render_template('editClient.html', title='Edit Profile', form=form)
 
 
