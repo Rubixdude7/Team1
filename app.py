@@ -125,6 +125,26 @@ def _after_register_hook(sender, user, **extra):
 #           BRANDON         #
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(403)
+def page_not_found(e):
+    return render_template('403.html'), 403
+
+
+@app.errorhandler(410)
+def page_not_found(e):
+    return render_template('410.html'), 410
+
+
+@app.errorhandler(500)
+def page_not_found(e):
+    return render_template('500.html'), 500
+
+
 @app.route('/')
 def index():
     slider = querydb.get_slider()
