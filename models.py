@@ -180,7 +180,7 @@ class blog(MySQLModel):
 
 
 class day_typ_cd(MySQLModel):
-    day_typ_cd = PrimaryKeyField()
+    day_typ_cd = CharField(primary_key=True, max_length=2, db_column='day_tp_cd')
     day = CharField()
 
     class Meta:
