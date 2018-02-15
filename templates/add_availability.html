@@ -17,13 +17,9 @@
             <div class="form-control-2">
                 <label for="weekday">Weekday</label><br />
                 <select name="weekday" required="required">
-                    <option value="su">Minggu</option>
-                    <option value="m" selected="selected">Senin</option>
-                    <option value="t">Selasa</option>
-                    <option value="w">Rabu</option>
-                    <option value="th">Kamis</option>
-                    <option value="f">Jumat</option>
-                    <option value="s">Sabtu</option>
+                    {% for wkd in ['su', 'm', 't', 'w', 'th', 'f', 's'] %}
+                        <option value="{{ wkd }}">{{ weekdays[wkd] }}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class="form-control-2">

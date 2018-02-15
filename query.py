@@ -278,17 +278,17 @@ class query(object):
         return None
         
     def getAvailability(self, avail_id, psyc_id):
-        tuples = db.calendar.select(db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day)\
-                            .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
-                            .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
-                            .where((db.psychologist.psyc_id == psyc_id) & (db.calendar.cal_id == avail_id) & (db.calendar.void_ind == 'n'))\
-                            .tuples()
-        return [{
+        t = db.calendar.select(db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day)\
+                       .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
+                       .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
+                       .where((db.psychologist.psyc_id == psyc_id) & (db.calendar.cal_id == avail_id) & (db.calendar.void_ind == 'n'))\
+                       .tuples()[0]
+        return {
             'avail_id': avail_id,
             'time_st': t[0],
             'time_end': t[1],
             'weekday': t[2]
-        } for t in tuples]
+        }
         
     def getAvailabilities(self, psyc_id):
         tuples = db.calendar.select(db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day)\
@@ -327,6 +327,13 @@ class query(object):
         avail.time_end = time_end
         avail.day_typ_cd = wkd
         avail.save()
+        
+    def getWeekDays(self):
+        wkds = db.day_typ_cd.select()
+        d = {}
+        for wkd in wkds:
+            d[wkd.day_typ_cd] = wkd.day
+        return d
 
     def psychologistLinks(self):
         tuples = db.psychologist.select(db.psychologist.psyc_id,

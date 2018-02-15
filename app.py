@@ -583,7 +583,8 @@ def delete_availability(avail_id):
 @roles_required('psyc')
 def add_availability():
     if request.method == 'GET':
-        return render_template('add_availability.html')
+        weekdays = querydb.getWeekDays()
+        return render_template('add_availability.html', weekdays=weekdays)
     elif request.method == 'POST':
         psyc_id = querydb.getPsycId(current_user.id)
         time_st = request.form['time_st']
@@ -602,7 +603,8 @@ def edit_availability(avail_id):
     psyc_id = querydb.getPsycId(current_user.id)
     if request.method == 'GET':
         avail = querydb.getAvailability(avail_id, psyc_id)
-        return render_template('edit_availability.html', avail=avail, avail_id=avail_id)
+        weekdays = querydb.getWeekDays()
+        return render_template('edit_availability.html', avail=avail, avail_id=avail_id, weekdays=weekdays)
     elif request.method == 'POST':
         time_st = request.form['time_st']
         time_end = request.form['time_end']

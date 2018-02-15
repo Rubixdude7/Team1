@@ -11,23 +11,23 @@
                 <input type="time" required="required" name="time_st" value="{{ avail['time_st'] }}" />
             </div>
             <div class="form-control-2">
-                <label for="time_st">End Time</label><br />
+                <label for="time_end">End Time</label><br />
                 <input type="time" required="required" name="time_end" value="{{ avail['time_end'] }}" />
             </div>
             <div class="form-control-2">
                 <label for="weekday">Weekday</label><br />
                 <select name="weekday" required="required">
-                    <option value="su">Minggu</option>
-                    <option value="m" selected="selected">Senin</option>
-                    <option value="t">Selasa</option>
-                    <option value="w">Rabu</option>
-                    <option value="th">Kamis</option>
-                    <option value="f">Jumat</option>
-                    <option value="s">Sabtu</option>
+                    {% for wkd in ['su', 'm', 't', 'w', 'th', 'f', 's'] %}
+                        {% if avail['weekday'] == wkd %}
+                            <option value="{{ wkd }}" selected="selected">{{ weekdays[wkd] }}</option>
+                        {% else %}
+                            <option value="{{ wkd }}">{{ weekdays[wkd] }}</option>
+                        {% endif %}
+                    {% endfor %}
                 </select>
             </div>
             <div class="form-control-2">
-                <button type="submit"><i class="fa fa-ok" aria-hidden="true"></i> Save Availability Time</button>
+                <button type="submit"><i class="fa fa-check" aria-hidden="true"></i> Save Availability Time</button>
             </div>
         </form>
     </div>
