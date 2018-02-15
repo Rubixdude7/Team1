@@ -522,8 +522,10 @@ def psikolog(id=None):
 
             # Fetch the psychologist's avatar
             avatar_url = querydb.getAvatar(id)
+            
+            availabilities = querydb.getAvailabilities(id)
 
-            return render_template('psikolog.html', psyc_info=psyc_info, blog_posts=blog_posts, can_edit=can_edit, avatar_url=avatar_url)
+            return render_template('psikolog.html', psyc_info=psyc_info, blog_posts=blog_posts, can_edit=can_edit, avatar_url=avatar_url, availabilities=availabilities)
 
     # Either no id was given or no psychologist was found.
     # In both cases, show a list of psychologists.
@@ -569,7 +571,8 @@ def edit_qualifications():
 def edit_availability_list():
     psyc_id = querydb.getPsycId(current_user.id)
     availabilities = querydb.getAvailabilities(psyc_id)
-    return render_template('edit_availability_list.html', psyc_id=psyc_id, availabilities=availabilities)
+    weekdays = querydb.getWeekDays()
+    return render_template('edit_availability_list.html', psyc_id=psyc_id, availabilities=availabilities, weekdays=weekdays)
 
 @app.route('/psikolog/delete_availability/<int:avail_id>')
 @roles_required('psyc')

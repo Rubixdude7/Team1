@@ -278,7 +278,7 @@ class query(object):
         return None
         
     def getAvailability(self, avail_id, psyc_id):
-        t = db.calendar.select(db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day)\
+        t = db.calendar.select(db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
                        .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
                        .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
                        .where((db.psychologist.psyc_id == psyc_id) & (db.calendar.cal_id == avail_id) & (db.calendar.void_ind == 'n'))\
@@ -291,7 +291,7 @@ class query(object):
         }
         
     def getAvailabilities(self, psyc_id):
-        tuples = db.calendar.select(db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day)\
+        tuples = db.calendar.select(db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
                             .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
                             .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
                             .where((db.psychologist.psyc_id == psyc_id) & (db.calendar.void_ind == 'n'))\
