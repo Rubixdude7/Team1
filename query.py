@@ -110,6 +110,47 @@ class query(object):
         role = list(role)[0][0]
         return role
 
+    def getEmail(self, u_id):
+        email = db.user.get(db.user.user_id == u_id)
+        return email.email
+
+    def getfName(self, u_id):
+        name = db.user.get(db.user.user_id == u_id)
+        return name.first_name
+
+    def getlName(self, u_id):
+        lName = db.user.get(db.user.user_id == u_id)
+        return lName.last_name
+
+    def getPhone(self, contact_id):
+        c = db.contact.get(db.contact.contact_id == contact_id)
+        return c.phone_no
+
+    def getAdd1(self, contact_id):
+        c = db.contact.get(db.contact.contact_id == contact_id)
+        return c.address_1
+
+    def getAdd2(self, contact_id):
+        c = db.contact.get(db.contact.contact_id == contact_id)
+        return c.address_2
+
+    def getCity(self, contact_id):
+        c = db.contact.get(db.contact.contact_id == contact_id)
+        return c.city
+
+    def getProvidence(self, contact_id):
+        c = db.contact.get(db.contact.contact_id == contact_id)
+        return c.providence
+
+    def getZip(self, contact_id):
+        c = db.contact.get(db.contact.contact_id == contact_id)
+        return c.zip
+
+    def updateEmail(self, u_id, email):
+        u = db.user.get(db.user.user_id == u_id)
+        u.email = email
+        u.save()
+
 # End Jason's code
 
 # Begin Charlie's code
@@ -133,6 +174,24 @@ class query(object):
                      .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id))\
                      .order_by(db.blog.updt_dtm.desc())
         return blg
+    
+    def getAllBlogPosts(self, page_num, items_per_page):
+        tuples = db.blog.select(db.blog.subject, db.blog.updt_dtm, db.blog.text, db.psychologist.psyc_id, db.user.first_name, db.user.last_name)\
+                        .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
+                        .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                        .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
+                        .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
+                        .where(db.user.active & (db.role.role_nm == 'psyc'))\
+                        .order_by(db.blog.updt_dtm.desc())\
+                        .paginate(page_num, items_per_page).tuples()
+        
+        return [{
+            'title': t[0],
+            'date_posted': t[1],
+            'contents': t[2], 
+            'psyc_id': t[3],
+            'author': '{0} {1}'.format(t[4], t[5])
+        } for t in tuples]
 
     def getAvatar(self, psyc_id):
         psyc = db.psychologist.get(db.psychologist.psyc_id == psyc_id)
@@ -167,15 +226,21 @@ class query(object):
         psyc_id = results[0][0]
         return psyc_id
 
-    def createBlogPost(self, u_id, psyc_id, text):
+    def createBlogPost(self, u_id, psyc_id, subject, text):
         now = datetime.datetime.now()
         blog_post = db.blog(psyc=psyc_id,
+                            subject=subject,
                             text=text,
                             crea_dtm=now,
                             user_id_upd=u_id,
                             updt_dtm=now,
                             void_ind='n')
         blog_post.save()
+
+    def updateQualifications(self, psyc_id, qualifications):
+        psyc = db.psychologist.select().where(db.psychologist.psyc_id == psyc_id).get()
+        psyc.qualifications = qualifications
+        psyc.save()
 
     def addPsychologistIfNotExist(self, u_id):
         # Check if user already has psychologist row
@@ -253,7 +318,7 @@ class query(object):
 
     def contactID(self, user_id):
         try:
-            c = db.contact.select().where(db.contact.user_id == user_id).get()
+            c = db.contact.select().where(db.contact.user == user_id).get()
         except DoesNotExist:
             c = None
         return c
@@ -264,7 +329,7 @@ class query(object):
 
     def updateContact(self, user_id, contact_id, phone_no, address_1, address_2, city, providence, zip):
         try:
-            c = db.contact.select().where(db.contact.user_id == user_id).get()
+            c = db.contact.select().where(db.contact.user == user_id).get()
             c.phone_no=phone_no
             c.address_1=address_1
             c.address_2=address_2

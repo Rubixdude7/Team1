@@ -125,10 +125,34 @@ def _after_register_hook(sender, user, **extra):
 #           BRANDON         #
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(403)
+def page_not_found(e):
+    return render_template('403.html'), 403
+
+
+@app.errorhandler(410)
+def page_not_found(e):
+    return render_template('410.html'), 410
+
+
+@app.errorhandler(500)
+def page_not_found(e):
+    return render_template('500.html'), 500
+
+
 @app.route('/')
 def index():
-    slider = querydb.get_slider()
-    return render_template("index.html", slides=slider[0], desc=slider[1])
+    #slider = querydb.get_slider()
+    page_num = 1
+    if 'page_num' in request.args:
+        page_num = int(request.args['page_num'])
+    return render_template("index.html", blog_posts=querydb.getAllBlogPosts(page_num, 10), page_num=page_num)
+    #return render_template("index.html", slides=slider[0], desc=slider[1])
 
 
 @app.route('/slide-edit/<int:s_id>', methods=['GET', 'POST'])
@@ -332,7 +356,14 @@ def admin():
     for u in users:
         r = querydb.role(u.user_id)
         roles.append(r)
-        usersandroles[u.email] = r
+        if r == 'user':
+            usersandroles[u.email] = 'User'
+        if r == 'psyc':
+            usersandroles[u.email] = 'Psychologist'
+        if r == 'admin':
+            usersandroles[u.email] = 'Admin'
+        if r == 'staff':
+            usersandroles[u.email] = 'Office Staff'
 
     return render_template('admin.html', users=users, roles=roles, usersandroles=usersandroles, slides=querydb.get_slides())
 
@@ -342,51 +373,87 @@ class RoleChangeForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class EditClientForm(FlaskForm):
+    role = SelectField('Role', coerce=str, validators=[DataRequired()], option_widget='Select')
+    firstName = StringField('firstName')
+    lastName = StringField('lastName')
+
+
 class QuestionEdit(FlaskForm):
     question = StringField('question')
     submit = SubmitField('Submit')
 
 
 class ClientEditForm(FlaskForm):
-    fName = StringField('fName')
-    lName = StringField('lName')
-    phone = StringField('phone')
-    address_1 = StringField('address_1')
-    address_2 = StringField('address_2')
-    city = StringField('city')
-    province = StringField('province')
-    zip = StringField('zip')
+    email = StringField('Email')
+    fName = StringField('First Name')
+    lName = StringField('Last Name')
+    phone = StringField('Phone Number')
+    address_1 = StringField('Address 1')
+    address_2 = StringField('Address 2')
+    city = StringField('City')
+    providence = StringField('Providence')
+    zip = StringField('Zip Code')
     role = SelectField('Role', coerce=str, validators=[DataRequired()], option_widget='Select')
     submit = SubmitField('Submit')
 
 
-@app.route('/editClient', methods=['GET', 'POST'])
+@app.route('/edit', methods=['GET', 'POST'])
 @roles_required('admin')
-def editC():
+def edit():
+    isUserOrPsyc = False
     u_id = request.args.get('u_id')
     if int(u_id) == int(current_user.id):
         return redirect(url_for('admin'))
-    form = ClientEditForm()
+    current_role = querydb.role(u_id)
+    c_id = querydb.contactID(u_id)
+    if current_role == 'user' or current_role == 'psyc':
+        form = ClientEditForm()
+        form.email.default = querydb.getEmail(u_id)
+        form.fName.default = querydb.getfName(u_id)
+        form.lName.default = querydb.getlName(u_id)
+        form.phone.default = querydb.getPhone(c_id)
+        form.address_1.default = querydb.getAdd1(c_id)
+        form.address_2.default = querydb.getAdd2(c_id)
+        form.city.default = querydb.getCity(c_id)
+        form.providence.default = querydb.getProvidence(c_id)
+        form.zip.default = querydb.getZip(c_id)
+        isUserOrPsyc = True
+    else:
+        form = RoleChangeForm()
     roles = querydb.getAllRoles()
     current_role = querydb.role(u_id)
     rolenames = [current_role]
+    roleplusbigbois = dict()
     for a in roles:
         if a.role_nm != current_role:
             rolenames.append(a.role_nm)
-    form.role.choices = [(r, r) for r in rolenames]
+    for name in rolenames:
+        if name == 'user':
+            roleplusbigbois['user'] = 'User'
+        elif name == 'psyc':
+            roleplusbigbois['psyc'] = 'Psychologist'
+        elif name == 'admin':
+            roleplusbigbois['Admin'] = 'Admin'
+        elif name == 'staff':
+            roleplusbigbois['staff'] = 'Office Staff'
+    form.role.choices = [(r, roleplusbigbois[r]) for r in roleplusbigbois]
     if form.validate_on_submit():
         newRole = form.role.data
         if newRole == 'psyc':
             querydb.addPsychologistIfNotExist(u_id)
         querydb.updateUserRole(u_id, newRole)
-        contact_id = querydb.contactID(u_id)
-        querydb.updateContact(u_id, contact_id, form.phone.data, form.address_1.data, form.address_2.data,
-                              form.city.data, form.province.data, form.zip.data)
+        if isUserOrPsyc:
+            querydb.updateEmail(u_id, form.email.data)
+            querydb.updateContact(u_id, c_id, form.phone.data, form.address_1.data, form.address_2.data,
+                                  form.city.data, form.providence.data, form.zip.data)
         flash('Your changes have been saved.')
         return redirect(url_for('admin'))
-    return render_template('editClient.html', title='Edit Profile', form=form)
+    else:
+        form.process()
+    return render_template('edit.html', title='Edit Profile', form=form, isUserOrPsyc=isUserOrPsyc)
 
-
+'''
 @app.route('/edit', methods=['GET', 'POST'])
 @roles_required('admin')
 def edit():
@@ -409,6 +476,8 @@ def edit():
         flash('Your changes have been saved.')
         return redirect(url_for('admin'))
     return render_template('edit.html', title='Edit Profile', form=form)
+'''
+
 
 @app.route('/delete')
 @roles_required('admin')
@@ -419,11 +488,6 @@ def delete():
     querydb.softDeleteUser(user_id)
     return redirect(url_for('admin'))
 
-
-@app.route('/editClient')
-@roles_required('admin')
-def editClient():
-    2+4
 
 # End Jason's code
 
@@ -445,7 +509,7 @@ def psikolog(id=None):
             # Now fetch their blog posts.
             blg = querydb.getBlogPostsBy(id)
             blog_posts = [{
-                'title': post.text[:15] + '...',
+                'title': post.subject,
                 'date_posted': post.updt_dtm,
                 'contents': post.text
             } for post in blg]
@@ -471,13 +535,11 @@ def write_blog_post():
     if request.method == 'GET':
         return render_template('write_blog_post.html')
     elif request.method == 'POST':
+        subject = request.form['subject']
         text = request.form['text']
         psyc_id = querydb.getPsycId(current_user.id)
-        if psyc_id == -1:
-            flash('Not allowed.', 'error')
-        else:
-            querydb.createBlogPost(current_user.id, psyc_id, text)
-            flash('Your blog post has been published.')
+        querydb.createBlogPost(current_user.id, psyc_id, subject, text)
+        flash('Your blog post has been published.')
         return redirect(url_for('psikolog', id=psyc_id))
 
 @app.route('/psikolog/change_avatar', methods=['GET', 'POST'])
@@ -487,12 +549,72 @@ def change_avatar():
         return render_template('change_avatar.html', psyc_id=querydb.getPsycId(current_user.id))
     elif request.method == 'POST':
         psyc_id = querydb.getPsycId(current_user.id)
-        if psyc_id == -1:
-            flash('Not allowed.', 'error')
-
         querydb.updateAvatar(psyc_id, request.files['avatar'])
         flash('Avatar updated.')
         return redirect(url_for('psikolog', id=psyc_id))
+
+@app.route('/psikolog/edit_qualifications', methods=['GET', 'POST'])
+@roles_required('psyc')
+def edit_qualifications():
+    if request.method == 'GET':
+        return render_template('edit_qualifications.html', psyc_id=querydb.getPsycId(current_user.id))
+    elif request.method == 'POST':
+        psyc_id = querydb.getPsycId(current_user.id)
+        querydb.updateQualifications(psyc_id, request.form['qualifications'])
+        flash('Qualifications updated.')
+        return redirect(url_for('psikolog', id=psyc_id))
+        
+@app.route('/psikolog/edit_availability_list')
+@roles_required('psyc')
+def edit_availability_list():
+    psyc_id = querydb.getPsycId(current_user.id)
+    availabilities = querydb.getAvailabilities(psyc_id)
+    return render_template('edit_availability_list.html', psyc_id=psyc_id, availabilities=availabilities)
+
+@app.route('/psikolog/delete_availability', methods=['POST'])
+@roles_required('psyc')
+def delete_availability(avail_id):
+    psyc_id = querydb.getPsycId(current_user.id)
+    querydb.deleteAvailability(psyc_id, avail_id)
+    flash('Availability time #{0} has been deleted.'.format(avail_id))
+    return redirect(url_for('edit_availability_list'))
+
+@app.route('/psikolog/add_availability', methods=['GET', 'POST'])
+@roles_required('psyc')
+def add_availability():
+    if request.method == 'GET':
+        return render_template('add_availability.html')
+    elif request.method == 'POST':
+        psyc_id = querydb.getPsycId(current_user.id)
+        time_st = request.form['time_st']
+        time_end = request.form['time_end']
+        expires = request.form['expires']
+        weekly = request.form['weekly']
+        
+        querydb.addAvailability(psyc_id, time_st, time_end, expires, weekly)
+        
+        flash('Your new availability time has been created.')
+        
+        return redirect(url_for('edit_availability_list'))
+        
+@app.route('/psikolog/edit_availability/<int:avail_id>', methods=['GET', 'POST'])
+@roles_required('psyc')
+def edit_availability(avail_id):
+    if request.method == 'GET':
+        avail = querydb.getAvailability(avail_id)
+        return render_template('edit_availability.html', avail=avail)
+    elif request.method == 'POST':
+        psyc_id = querydb.getPsycId(current_user.id)
+        time_st = request.form['time_st']
+        time_end = request.form['time_end']
+        expires = request.form['expires']
+        weekly = request.form['weekly']
+        
+        querydb.updateAvailability(avail_id, psyc_id, time_st, time_end, expires, weekly)
+        
+        flash('Availability time #{0} has been updated.'.format(avail_id))
+        
+        return redirect(url_for('edit_availability_list'))
 
 # End Charlie's code
 
@@ -507,4 +629,5 @@ def staff():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True#, host='0.0.0.0'
+            )
