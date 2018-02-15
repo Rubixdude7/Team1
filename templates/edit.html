@@ -3,12 +3,60 @@
 {% block content %}
 <main id="edit">
     <div class="box">
-        <h1 class="title">Choose new role</h1>
+        <h1 class="title">Edit Client</h1>
         <hr>
         <form action="" method="post">
             {{ form.hidden_tag() }}
-            <div class="form-control-1">
+            {% if isUserOrPsyc %}
+                <div class = "form-control-1">
+                    {{ form.email.label }}
+                    <br>
+                    {{ form.email(size=25) }}
+                </div>
+                <div class="form-control-2">
+                    {{ form.fName.label }}
+                    <br>
+                    {{ form.fName(size=25) }}
+                </div>
+                <div class="form-control-2">
+                    {{ form.lName.label }}
+                    <br>
+                    {{ form.lName(size=25) }}
+                </div>
+                <div class="form-control-2">
+                    {{ form.phone.label }}
+                    <br>
+                    {{ form.phone(size=25) }}
+                </div>
+                <div class="form-control-2">
+                    {{ form.address_1.label }}
+                    <br>
+                    {{ form.address_1(size=25) }}
+                </div>
+                <div class="form-control-2">
+                    {{ form.address_2.label }}
+                    <br>
+                    {{ form.address_2(size=25) }}
+                </div>
+                <div class="form-control-2">
+                    {{ form.city.label }}
+                    <br>
+                    {{ form.city(size=25) }}
+                </div>
+                <div class="form-control-2">
+                    {{ form.providence.label }}
+                    <br>
+                    {{ form.providence(size=25) }}
+                </div>
+                <div class="form-control-2">
+                    {{ form.zip.label }}
+                    <br>
+                    {{ form.zip(size=5) }}
+                </div>
+            {% endif %}
+            <div class="form-control-2">
                 {{ form.role.label }}
+                <br>
                 {{ form.role(size=1) }}
             </div>
             <div class="form-control-2">

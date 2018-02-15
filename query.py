@@ -146,6 +146,11 @@ class query(object):
         c = db.contact.get(db.contact.contact_id == contact_id)
         return c.zip
 
+    def updateEmail(self, u_id, email):
+        u = db.user.get(db.user.user_id == u_id)
+        u.email = email
+        u.save()
+
 # End Jason's code
 
 # Begin Charlie's code

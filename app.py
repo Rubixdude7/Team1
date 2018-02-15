@@ -125,6 +125,26 @@ def _after_register_hook(sender, user, **extra):
 #           BRANDON         #
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(403)
+def page_not_found(e):
+    return render_template('403.html'), 403
+
+
+@app.errorhandler(410)
+def page_not_found(e):
+    return render_template('410.html'), 410
+
+
+@app.errorhandler(500)
+def page_not_found(e):
+    return render_template('500.html'), 500
+
+
 @app.route('/')
 def index():
     #slider = querydb.get_slider()
@@ -336,7 +356,14 @@ def admin():
     for u in users:
         r = querydb.role(u.user_id)
         roles.append(r)
-        usersandroles[u.email] = r
+        if r == 'user':
+            usersandroles[u.email] = 'User'
+        if r == 'psyc':
+            usersandroles[u.email] = 'Psychologist'
+        if r == 'admin':
+            usersandroles[u.email] = 'Admin'
+        if r == 'staff':
+            usersandroles[u.email] = 'Office Staff'
 
     return render_template('admin.html', users=users, roles=roles, usersandroles=usersandroles, slides=querydb.get_slides())
 
@@ -346,6 +373,12 @@ class RoleChangeForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class EditClientForm(FlaskForm):
+    role = SelectField('Role', coerce=str, validators=[DataRequired()], option_widget='Select')
+    firstName = StringField('firstName')
+    lastName = StringField('lastName')
+
+
 class QuestionEdit(FlaskForm):
     question = StringField('question')
     submit = SubmitField('Submit')
@@ -353,57 +386,74 @@ class QuestionEdit(FlaskForm):
 
 class ClientEditForm(FlaskForm):
     email = StringField('Email')
-    fName = StringField('fName')
-    lName = StringField('lName')
-    phone = StringField('phone')
-    address_1 = StringField('address_1')
-    address_2 = StringField('address_2')
-    city = StringField('city')
+    fName = StringField('First Name')
+    lName = StringField('Last Name')
+    phone = StringField('Phone Number')
+    address_1 = StringField('Address 1')
+    address_2 = StringField('Address 2')
+    city = StringField('City')
     providence = StringField('Providence')
-    zip = StringField('zip')
+    zip = StringField('Zip Code')
     role = SelectField('Role', coerce=str, validators=[DataRequired()], option_widget='Select')
     submit = SubmitField('Submit')
 
 
-@app.route('/editClient', methods=['GET', 'POST'])
+@app.route('/edit', methods=['GET', 'POST'])
 @roles_required('admin')
-def editC():
+def edit():
+    isUserOrPsyc = False
     u_id = request.args.get('u_id')
     if int(u_id) == int(current_user.id):
         return redirect(url_for('admin'))
-    form = ClientEditForm()
-    form.email.default = querydb.getEmail(u_id)
-    form.fName.default = querydb.getfName(u_id)
-    form.lName.default = querydb.getlName(u_id)
+    current_role = querydb.role(u_id)
     c_id = querydb.contactID(u_id)
-    form.phone.default = querydb.getPhone(c_id)
-    form.address_1.default = querydb.getAdd1(c_id)
-    form.address_2.default = querydb.getAdd2(c_id)
-    form.city.default = querydb.getCity(c_id)
-    form.providence.default = querydb.getProvidence(c_id)
-    form.zip.default = querydb.getZip(c_id)
+    if current_role == 'user' or current_role == 'psyc':
+        form = ClientEditForm()
+        form.email.default = querydb.getEmail(u_id)
+        form.fName.default = querydb.getfName(u_id)
+        form.lName.default = querydb.getlName(u_id)
+        form.phone.default = querydb.getPhone(c_id)
+        form.address_1.default = querydb.getAdd1(c_id)
+        form.address_2.default = querydb.getAdd2(c_id)
+        form.city.default = querydb.getCity(c_id)
+        form.providence.default = querydb.getProvidence(c_id)
+        form.zip.default = querydb.getZip(c_id)
+        isUserOrPsyc = True
+    else:
+        form = RoleChangeForm()
     roles = querydb.getAllRoles()
     current_role = querydb.role(u_id)
     rolenames = [current_role]
+    roleplusbigbois = dict()
     for a in roles:
         if a.role_nm != current_role:
             rolenames.append(a.role_nm)
-    form.role.choices = [(r, r) for r in rolenames]
+    for name in rolenames:
+        if name == 'user':
+            roleplusbigbois['user'] = 'User'
+        elif name == 'psyc':
+            roleplusbigbois['psyc'] = 'Psychologist'
+        elif name == 'admin':
+            roleplusbigbois['Admin'] = 'Admin'
+        elif name == 'staff':
+            roleplusbigbois['staff'] = 'Office Staff'
+    form.role.choices = [(r, roleplusbigbois[r]) for r in roleplusbigbois]
     if form.validate_on_submit():
         newRole = form.role.data
         if newRole == 'psyc':
             querydb.addPsychologistIfNotExist(u_id)
         querydb.updateUserRole(u_id, newRole)
-        #contact_id = querydb.contactID(u_id)
-        querydb.updateContact(u_id, c_id, form.phone.data, form.address_1.data, form.address_2.data,
-                              form.city.data, form.providence.data, form.zip.data)
+        if isUserOrPsyc:
+            querydb.updateEmail(u_id, form.email.data)
+            querydb.updateContact(u_id, c_id, form.phone.data, form.address_1.data, form.address_2.data,
+                                  form.city.data, form.providence.data, form.zip.data)
         flash('Your changes have been saved.')
         return redirect(url_for('admin'))
     else:
         form.process()
-    return render_template('editClient.html', title='Edit Profile', form=form)
+    return render_template('edit.html', title='Edit Profile', form=form, isUserOrPsyc=isUserOrPsyc)
 
-
+'''
 @app.route('/edit', methods=['GET', 'POST'])
 @roles_required('admin')
 def edit():
@@ -426,6 +476,8 @@ def edit():
         flash('Your changes have been saved.')
         return redirect(url_for('admin'))
     return render_template('edit.html', title='Edit Profile', form=form)
+'''
+
 
 @app.route('/delete')
 @roles_required('admin')
@@ -436,11 +488,6 @@ def delete():
     querydb.softDeleteUser(user_id)
     return redirect(url_for('admin'))
 
-
-@app.route('/editClient')
-@roles_required('admin')
-def editClient():
-    2+4
 
 # End Jason's code
 
@@ -580,4 +627,5 @@ def staff():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True#, host='0.0.0.0'
+            )
