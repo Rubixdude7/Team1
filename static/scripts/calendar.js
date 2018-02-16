@@ -33,6 +33,53 @@ for (var week = 0; week < NUM_WEEKS_PER_PAGE; week++) {
     }
 }
 
+function Time(timespec) {
+    var parts = timespec.split(":");
+    
+    this.hours = parseInt(parts[0]);
+    this.minutes = parseInt(parts[1]);
+    
+    if (parts.length == 3)
+        this.seconds = parseInt(parts[2]);
+    else
+        this.seconds = 0;
+    
+}
+
+Time.prototype.toSeconds = function() {
+    return this.hours*60*60 + this.minutes*60 + this.seconds;
+}
+
+function Availability(time_st, time_end, weekday) {
+    this.time_st = time_st;
+    this.time_end = time_end;
+    this.weekday = weekday;
+}
+
+function TimeEvent(time, start_or_end) {
+    this.time = time;
+    this.start_or_end = start_or_end;
+}
+
+function compareTimeEvent(a, b) {
+    if (a.time.hours < b.time.hours)
+        return -1;
+    else if (a.time.hours > b.time.hours)
+        return 1;
+    
+    if (a.time.minutes < b.time.minutes)
+        return -1;
+    else if (a.time.minutes > b.time.minutes)
+        return 1;
+    
+    if (a.time.seconds < b.time.seconds)
+        return -1;
+    else if (a.time.seconds > b.time.seconds)
+        return 1;
+    
+    return 0;
+}
+
 function resetCalendar() {
     monthLabelElem.innerText = monthNames[currentMonth] + " " + currentYear.toString();
 
@@ -66,11 +113,56 @@ function resetCalendar() {
             } else {
                 var dayNum = (index - daysFromPrevMonth) + 1;
                 var html = "<div class=\"cal-day-number\">" + dayNum.toString() + "</div>";
-                html += "<div class=\"cal-space-slot\" aria-hidden=\"true\" style=\"width:25%;\"></div>";
-                html += "<div class=\"cal-ok-slot\" aria-hidden=\"true\" style=\"width:25%;\"></div>";
-                html += "<div class=\"cal-space-slot\" aria-hidden=\"true\" style=\"width:12.5%;\"></div>";
-                html += "<div class=\"cal-ok-slot\" aria-hidden=\"true\" style=\"width:12.5%;\"></div>";
-                html += "<div class=\"cal-space-slot\" aria-hidden=\"true\" style=\"width:25%;\"></div>";
+                
+                // We're creating a little stripe that shows availabilities
+                var eventArray = []; // Contains time STARTs and time ENDs
+                
+                // Add all STARTs and ENDs to an array
+                for (var a_i = 0; a_i < availabilities.length; a_i++) {
+                    if (availabilities[a_i].weekday == day) {
+                        eventArray[eventArray.length] = new TimeEvent(availabilities[a_i].time_st, "start");
+                        eventArray[eventArray.length] = new TimeEvent(availabilities[a_i].time_end, "end");
+                    }
+                }
+                
+                // Sort by time
+                eventArray.sort(compareTimeEvent);
+                
+                // Create the stripe
+                var SECONDS_IN_DAY = 24 * 60 * 60;
+                var in_avail_slot = false;
+                var depth = 0;
+                var currentSeconds = 0;
+                for (var ev_i = 0; ev_i < eventArray.length; ev_i++) {
+                    var event = eventArray[ev_i];
+                    
+                    if (event.start_or_end == "start")
+                        depth++;
+                    else
+                        depth--;
+                    
+                    if (in_avail_slot) {
+                        if (depth <= 0) {
+                            in_avail_slot = false;
+                            var s = event.time.toSeconds();
+                            var width = 100*(s - currentSeconds) / SECONDS_IN_DAY;
+                            html += "<div class=\"cal-ok-slot\" style=\"width:" + width.toString() + "%;\"></div>";
+                            currentSeconds = s;
+                        }
+                    } else {
+                        if (depth > 0) {
+                            in_avail_slot = true;
+                            var s = event.time.toSeconds();
+                            var width = 100*(s - currentSeconds) / SECONDS_IN_DAY;
+                            html += "<div class=\"cal-space-slot\" style=\"width:" + width.toString() + "%;\"></div>";
+                            currentSeconds = s;
+                        }
+                    }
+                }
+                
+                var leftoverWidth = 100*(SECONDS_IN_DAY - currentSeconds) / SECONDS_IN_DAY;
+                html += "<div class=\"cal-space-slot\" aria-hidden=\"true\" style=\"width:" + leftoverWidth.toString() + "%;\"></div>";
+                
                 dayElems[index].innerHTML = html;
                 dayElems[index].setAttribute("data-this-month", "true");
             }
@@ -97,5 +189,3 @@ function nextMonth() {
     currentMonth = newMonth;
     resetCalendar();
 }
-
-resetCalendar();
