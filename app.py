@@ -612,10 +612,12 @@ def edit_availability(avail_id):
         time_st = request.form['time_st']
         time_end = request.form['time_end']
         weekday = request.form['weekday']
-        
-        querydb.updateAvailability(avail_id, psyc_id, time_st, time_end, weekday)
-        
-        flash('Availability time has been updated.')
+
+        if time_st < time_end:
+            querydb.updateAvailability(avail_id, psyc_id, time_st, time_end, weekday)
+            flash('Availability time has been updated.')
+        else:
+            flash('Failed to add availability time.  "Time Start" must be earlier than "Time End".', category='error')
         
         return redirect(url_for('edit_availability_list'))
 

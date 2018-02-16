@@ -14,7 +14,9 @@
             {% endif %}
         </div>
         <h2>{{ psyc_info.full_name }}</h2>
+        <!-- Hide stars for end of sprint
         <p><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="far fa-star" aria-hidden="true"></i> (1337)</p>
+        -->
         <p class="psyc-qualifications">
             {{ psyc_info.qualifications }}
             {% if can_edit %}
@@ -51,7 +53,7 @@
             </div>
             {% for week in range(6) %}
                 <div class="cal-week">
-                    {% for weekday in range(7) %}<div id="cal-day-{{ week*7 + weekday }}" class="cal-day" onclick="viewDayDetails({{ week*7 + weekday }})">&nbsp;</div>{% endfor %}
+                    {% for weekday in range(7) %}<div id="cal-day-{{ week*7 + weekday }}" class="cal-day">&nbsp;</div>{% endfor %}
                 </div>
             {% endfor %}
         </div>

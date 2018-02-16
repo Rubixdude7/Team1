@@ -146,7 +146,7 @@ function resetCalendar() {
                             in_avail_slot = false;
                             var s = event.time.toSeconds();
                             var width = 100*(s - currentSeconds) / SECONDS_IN_DAY;
-                            html += "<div class=\"cal-ok-slot\" style=\"width:" + width.toString() + "%;\"></div>";
+                            html += "<div class=\"cal-ok-slot\" aria-hidden=\"true\" style=\"width:" + width.toString() + "%;\"></div>";
                             currentSeconds = s;
                         }
                     } else {
@@ -154,7 +154,7 @@ function resetCalendar() {
                             in_avail_slot = true;
                             var s = event.time.toSeconds();
                             var width = 100*(s - currentSeconds) / SECONDS_IN_DAY;
-                            html += "<div class=\"cal-space-slot\" style=\"width:" + width.toString() + "%;\"></div>";
+                            html += "<div class=\"cal-space-slot\" aria-hidden=\"true\" style=\"width:" + width.toString() + "%;\"></div>";
                             currentSeconds = s;
                         }
                     }
