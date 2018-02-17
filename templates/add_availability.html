@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Add Availability{% endblock %}
+{% block content %}
+<main id="edit">
+    <div class="box">
+        <h1 class="title">Add Availability Time</h1>
+        <hr>
+        <form action="{{ url_for('add_availability') }}" method="post">
+            <div class="form-control-1">
+                <label for="time_st">Start Time</label><br />
+                <input type="time" required="required" name="time_st" />
+            </div>
+            <div class="form-control-2">
+                <label for="time_st">End Time</label><br />
+                <input type="time" required="required" name="time_end" />
+            </div>
+            <div class="form-control-2">
+                <label for="weekday">Weekday</label><br />
+                <select name="weekday" required="required">
+                    {% for wkd in ['su', 'm', 't', 'w', 'th', 'f', 's'] %}
+                        <option value="{{ wkd }}">{{ weekdays[wkd] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-control-2">
+                <button type="submit"><i class="fa fa-plus" aria-hidden="true"></i> Add Availability Time</button>
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}
