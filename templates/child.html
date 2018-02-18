@@ -16,12 +16,19 @@
                 -->
                 <br>
                 <br>
-
+                {% if child_info.q_comp_dtm != None and not updatedQuestions %}
+                <p>questons completed!</p>
+                 {% elif child_info.q_comp_dtm == None %}
                 <input type="button" style="background-color:red; color: white;  padding: 15px 19px;" onclick="location.href='{{ url_for('questionsUserView', child_id=child_info.child_id, child_name=child_info.child_nm_fst) }}';" value="Questionnaire Needs Completed!" />
+                {% endif %}
+            {% if updatedQuestions %}
+                <input type="button" style="background-color:red; color: white;  padding: 15px 19px;" onclick="location.href='{{ url_for('questionsEditQuestions', child_id=child_info.child_id, child_name=child_info.child_nm_fst) }}';" value="Answer New Questions!" />
+            {% endif %}
+              {% if not updatedQuestions and child_info.q_comp_dtm != None %}
+                    <p>questions good as of {{ child_info.q_comp_dtm }}</p>
+            {% endif %}
 
 
-
-            </form>
         </div>
     </main>
 

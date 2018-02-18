@@ -7,6 +7,7 @@
 {% block title %}Questions{% endblock %}
 {% block content %}
  <script>
+
 $(document).ready(function(){
     $("#next").click(function(){
         $.ajax({url: "./?page={{ page + 1 }}", success: function(result){
@@ -21,6 +22,8 @@ $(document).ready(function(){
         }});
     });
 });
+
+
 </script>
 
     <main>
@@ -47,7 +50,7 @@ $(document).ready(function(){
                     <div class="question">
                 {% endif %}
 
-                <p id="questiontitle"><b>{{ u.question }}</b></p>
+                <p id="questiontitle"><b><u>{{ u.question }}</u></b></p>
                 <input type="text" name="fname")>
                 <input type="hidden" name="qField" value="{{ u.q_id }}")>
 

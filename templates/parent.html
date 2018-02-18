@@ -56,9 +56,16 @@
         </p>
 
 
+        </p>
+
+
         <ul class="list-group">
             {% for child in children %}
                 <li class="list-group-item"><a href="{{ url_for('child', child_id=child.child_id) }}">{{ child.child_nm_fst }}</a></li>
+                <br>
+          <a href="{{ url_for('parent_seeanswers', child_id=child.child_id) }}">View Question Answers</a>
+                <br>
+                <br>
             {% endfor %}
         </ul>
     </div>

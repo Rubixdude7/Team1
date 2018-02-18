@@ -227,6 +227,19 @@ def questionsUserView():
 
     return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
 
+@app.route('/questionsEditQuestions/')
+@login_required
+def questionsEditQuestions():
+    child_id = request.args.get('child_id')
+    child_name = request.args.get('child_name')
+    print(child_id)
+    questions = querydb.checkNewQuestions(child_id)
+
+    return object_list("questionsEditQuestions.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
+
+
+
+
 @app.route('/viewAnswers/')
 @login_required
 def viewAnswers():
@@ -242,7 +255,12 @@ def viewAnswers():
 
 
 
-
+@app.route('/parent_seeanswers')
+@login_required
+def parent_seeanswers():
+    child_id = request.args.get('child_id')
+    questionAnswers = querydb.getAllQuestionAnswers(child_id)
+    return render_template("parent_seeanswers.html", child_id=child_id, answers=questionAnswers)
 
 @app.route('/add_questions')
 @login_required
@@ -263,21 +281,13 @@ def post_questions():
 
 @app.route('/post_add_questionAnswers', methods=['GET', 'POST'])
 def post_questionAnswers():
-    #error with adding question answers
-   #peewee.IntegrityError: (1452, 'Cannot add or update a child row: a foreign key constraint fails (`db42576e98688b4ab28226a87601334c89`.`question_answers`, CONSTRAINT `question_answers_fk0` FOREIGN KEY (`child_id`) REFERENCES `child` (`child_id`))')
-   # question = request.form.get('questionAnswer')
-
-
 
     questionAnswerList = request.form.getlist('fname')
     questionIdList = request.form.getlist('qField')
     childId = request.form.get('cField')
     q_id = request.args.get('q_id')
-    print(childId)
-    print('TEST')
-    print(questionIdList)
-  #  q_idList = request.args.getList('q_id')
-  #  getQuestion = querydb.getQuestion(q_id)
+
+
 
     for (q,q2) in zip (questionAnswerList, questionIdList):
       print(current_user.id)
@@ -297,6 +307,7 @@ def post_questionAnswers():
 @login_required
 @roles_required('user')
 def parent():
+
     return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.id), contact_info=querydb.contactID(current_user.id))
 
 
@@ -327,8 +338,29 @@ def child(child_id=None):
         today = datetime.date.today()
         age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
         if child_info is not None:
-            return render_template('child.html', child_info=child_info, child_age=age)
+            updatedQuestions = querydb.checkNewQuestions(child_id)
+            return render_template('child.html', child_info=child_info, child_age=age, updatedQuestions=updatedQuestions)
     return render_template('parent.html')
+
+
+@app.route('/post_edit_questionAnswers', methods=['GET', 'POST'])
+def post_editQuestions():
+    questionAnswerList = request.form.getlist('fname')
+    questionIdList = request.form.getlist('qField')
+    childId = request.form.get('cField')
+    q_id = request.args.get('q_id')
+
+    for (q, q2) in zip(questionAnswerList, questionIdList):
+        print(current_user.id)
+        print(questionAnswerList)
+        querydb.addQuestionAnswers(q, current_user.id, q2, childId)
+
+    # question = request.args.get('question')
+    # question=request.form.get('question')
+    # print(question);
+    # querydb.addQuestion(question, current_user.id)
+
+    return redirect(url_for('parent'))
 
 
 @app.route('/childform')

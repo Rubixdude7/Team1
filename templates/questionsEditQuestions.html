@@ -1,0 +1,31 @@
+<!-- put these at top otherwise it doesn't show year for some reason-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="{{ url_for('static', filename='scripts/question.js') }}" type="text/jscript"></script>
+
+{% extends "base.html" %}
+{% block title %}Questions{% endblock %}
+{% block content %}
+
+    <main>
+    <h1>Please Answer These New Questions</h1>
+        <div id = "box" class="box">
+     <form method="post" action="/post_edit_questionAnswers">
+                {% for u in questions %}
+
+                    <input type="hidden" name="cField" value="{{ child_id }}")>
+          <b><u>   {{ u.question }} </u> </b>
+                    <br>
+                    <input id="question" name="fname" type="text"/>
+                    <input type="hidden" name="qField" value="{{ u.q_id }}")>
+            <br>
+        {% endfor %}
+     <br>
+             <input type="submit" value="Submit" onsubmit="return validateForm()">
+            </form>
+        </div>
+
+
+
+    </main>
+{% endblock %}

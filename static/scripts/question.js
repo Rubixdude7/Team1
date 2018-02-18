@@ -13,6 +13,9 @@ function pagination() {
     }
 }
 
+
+
+
 window.onload = pagination;
 
 function validateForm() {
