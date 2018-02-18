@@ -6,48 +6,26 @@
 {% extends "base.html" %}
 {% block title %}Questions{% endblock %}
 {% block content %}
- <script>
-
-$(document).ready(function(){
-    $("#next").click(function(){
-        $.ajax({url: "./?page={{ page + 1 }}", success: function(result){
-            $("body").html(result);
-        }});
-    });
-});
-$(document).ready(function(){
-    $("#prev").click(function(){
-        $.ajax({url: "./?page={{ page - 1 }}", success: function(result){
-            $("body").html(result);
-        }});
-    });
-});
-
-
-</script>
 
     <main>
-
+    <h1>Please Answer These New Questions</h1>
         <div id = "box" class="box">
      <form method="post" action="/post_edit_questionAnswers">
-                {% for u in updatedQuestions %}
+                {% for u in questions %}
 
                     <input type="hidden" name="cField" value="{{ child_id }}")>
-          <b>  {{ u.question }} </b>
+          <b><u>   {{ u.question }} </u> </b>
                     <br>
                     <input id="question" name="fname" type="text"/>
                     <input type="hidden" name="qField" value="{{ u.q_id }}")>
             <br>
         {% endfor %}
+     <br>
              <input type="submit" value="Submit" onsubmit="return validateForm()">
             </form>
         </div>
-    <a id="previous" class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous</a>
-{% endif %}
-{% if pagination.get_page_count() > page %}
 
-    <a id="next" class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next</a>
-{% endif %}
+
 
     </main>
 {% endblock %}

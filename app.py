@@ -235,7 +235,7 @@ def questionsEditQuestions():
     print(child_id)
     questions = querydb.checkNewQuestions(child_id)
 
-    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
+    return object_list("questionsEditQuestions.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
 
 
 
@@ -360,7 +360,7 @@ def post_editQuestions():
     # print(question);
     # querydb.addQuestion(question, current_user.id)
 
-    return redirect(url_for('index'))
+    return redirect(url_for('parent'))
 
 
 @app.route('/childform')
