@@ -48,7 +48,12 @@ class query(object):
     def addQuestion(self, question2, user):
         q = db.questions(question=question2, user_id_crea=user, crea_dtm=datetime.datetime.now())
         q.save()
+    def checkNewQuestions(self, child):
+        child = db.child.get(db.child.child_id == child)
+        x = child.q_comp_dtm
+        questionsUpdated = db.questions.select().where(db.questions.crea_dtm > x)
 
+        return questionsUpdated
     def addQuestionAnswers(self, questionAnswer, user, q_id, childId):
 
         current = db.child.get(db.child.child_id == childId)

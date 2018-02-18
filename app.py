@@ -302,6 +302,7 @@ def post_questionAnswers():
 @login_required
 @roles_required('user')
 def parent():
+
     return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.id), contact_info=querydb.contactID(current_user.id))
 
 
@@ -332,7 +333,8 @@ def child(child_id=None):
         today = datetime.date.today()
         age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
         if child_info is not None:
-            return render_template('child.html', child_info=child_info, child_age=age)
+            updatedQuestions = querydb.checkNewQuestions(child_id)
+            return render_template('child.html', child_info=child_info, child_age=age, updatedQuestions=updatedQuestions)
     return render_template('parent.html')
 
 
