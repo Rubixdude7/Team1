@@ -16,9 +16,11 @@
                 -->
                 <br>
                 <br>
-
+                {% if child_info.q_comp_dtm != None %}
+                <p>questons completed!</p>
+                 {% else %}
                 <input type="button" style="background-color:red; color: white;  padding: 15px 19px;" onclick="location.href='{{ url_for('questionsUserView', child_id=child_info.child_id, child_name=child_info.child_nm_fst) }}';" value="Questionnaire Needs Completed!" />
-
+                {% endif %}
 
 
             </form>
