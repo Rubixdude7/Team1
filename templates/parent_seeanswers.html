@@ -11,10 +11,11 @@
             {{ i.question}}
              <br>
              {% for j in answers %}
-                 {{ j.q_id }}
+
                  <br>
-                 {{ i.q_id }}
+
                  <br>
+
                  {% if j.q_id == i.q_id %}
                     {{ j.answer }}
                     <br>
