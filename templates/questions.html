@@ -4,10 +4,8 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block content %}
-
     <main>
         <div class="box" id="box">
-
             <h1 class="title">Question List</h1>
             <hr>
             {% if current_user.is_authenticated and current_user.is_in_role("admin") %}
@@ -17,63 +15,61 @@
             {% endif %}
             {% for u in questions %}
                 <!-- question list -->
-                {% if u.void_ind == 'y' and current_user.is_authenticated and current_user.is_in_role("admin") %}
-                    <div class="question">
-                {% elif u.void_ind == 'y' and current_user.is_authenticated and current_user.is_in_role("user") %}
-                    <div class="question" style="display:none; ">
-                {% else %}
-                    <div class="question">
-                {% endif %}
-            <form name="myForm" action="/action_page.php"
-                  onsubmit="return validateForm()" method="post">
-                <p id="questiontitle"><b><u>{{ u.question }}</u></b></p>
+                <div class="question">
+                    <form name="myForm" action="/action_page.php"
+                          onsubmit="return validateForm()" method="post">
+                        <p id="questiontitle"><b><u>{{ u.question }}</u></b></p>
+                        <input type="text" id="q" name="fname" class="stored" disabled>
+                    </form>
 
-
-             <input type="text" id="q" name="fname" class="stored" disabled>
-            </form>
-            <br>
-            <!--DROPDOWN CONTENT YOU CAN TEST ADMIN HERE!!! -->
-            <div class="dropdown">
-                {% if current_user.is_authenticated and current_user.is_in_role("admin") %}
-                    <span onclick="dropItDown()"><i class="fa fa-bars"
-                                                    style=" visibility:hidden"></i></span>
-                {% endif %}
-                <br>
-             <div class="dropdown-content">
-                    <button class="edit" type="button" onclick="location.href='{{ url_for('editQuestion', q_id=u.q_id) }}'"><i class="fa fa-edit"></i> Edit</button>
-                    <br><br>
-                    {% if u.void_ind == 'y' %}
-                        <button class="deactivate" type="button" onclick="location.href='{{ url_for('questionreactivate', q_id=u.q_id) }}'"><i class="fa fa-close"></i> Reactivate</button>
-                    {% else %}
-                        <button class="deactivate" type="button" onclick="location.href='{{ url_for('questiondeactivate', q_id=u.q_id) }}'"><i class="fa fa-close"></i> Deactivate</button>
-                    {% endif %}
-                    <br><br>
-                <button class="delete" type="button" onclick="location.href='{{ url_for('questionDelete', q_id=u.q_id) }}'"><i class="fa fa-trash"></i> Delete</button>
-             <br>
-             <br>
-
+                    <br>
+                    <!--DROPDOWN CONTENT YOU CAN TEST ADMIN HERE!!! -->
+                    <div class="dropdown">
+                        {% if current_user.is_authenticated and current_user.is_in_role("admin") %}
+                            <span onclick="dropItDown()"><i class="fa fa-bars"
+                                                            style=" visibility:hidden"></i></span>
+                        {% endif %}
+                        <br>
+                        <div class="dropdown-content">
+                            <button class="edit" type="button"
+                                    onclick="location.href='{{ url_for('editQuestion', q_id=u.q_id) }}'"><i
+                                    class="fa fa-edit"></i> Edit
+                            </button>
+                            <br><br>
+                            {% if u.void_ind == 'y' %}
+                                <button class="deactivate" type="button"
+                                        onclick="location.href='{{ url_for('questionreactivate', q_id=u.q_id) }}'"><i
+                                        class="fa fa-close"></i> Reactivate
+                                </button>
+                            {% else %}
+                                <button class="deactivate" type="button"
+                                        onclick="location.href='{{ url_for('questiondeactivate', q_id=u.q_id) }}'"><i
+                                        class="fa fa-close"></i> Deactivate
+                                </button>
+                            {% endif %}
+                            <br><br>
+                            <button class="delete" type="button"
+                                    onclick="location.href='{{ url_for('questionDelete', q_id=u.q_id) }}'"><i
+                                    class="fa fa-trash"></i> Delete
+                            </button>
+                            <br>
+                            <br>
+                        </div>
+                    </div>
+                    <!-- END -->
+                    <span id="error" style="color:red"></span>
+                    <!-- END QUESTION -->
                 </div>
-                <!-- END -->
-            </div>
-            <span id="error" style="color:red"></span>
-            <!-- END QUESTION -->
-            </div>
                 <br>
             {% endfor %}
             <br>
             <br>
-        {% if page > 1 %}
-    <a id="previous" class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous</a>
-{% endif %}
-{% if pagination.get_page_count() > page %}
-
-    <a id="next" class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next</a>
-{% endif %}
-            </div>
-
-            </div>
+            {% if page > 1 %}
+                <a id="previous" class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous</a>
+            {% endif %}
+            {% if pagination.get_page_count() > page %}
+                <a id="next" class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next</a>
+            {% endif %}
         </div>
-
-
     </main>
 {% endblock %}
