@@ -223,7 +223,7 @@ def questionsUserView():
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
     print(child_id)
-    questions = querydb.getAllQuestions()
+    questions = querydb.getAllQuestionsForUsers()
 
     return object_list("questionsUserView.html", paginate_by=5, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
 

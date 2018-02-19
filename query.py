@@ -71,12 +71,19 @@ class query(object):
     def getAllQuestions(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd')
         return questions
+
+    def getAllQuestionsForUsers(self):
+        questions = db.questions.select().where(db.questions.void_ind != 'd' and db.questions.void_ind == 'n')
+
+        return questions
     def getAllQuestionAnswers(self, child_id):
 
         questionAnswers = db.question_answers.select().where(db.question_answers.child == child_id)
-        q2 = db.questions.select()
+
+
 
         return questionAnswers
+
 
 
     def editQuestion(self, a, newQuestion):

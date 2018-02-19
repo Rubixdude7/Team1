@@ -33,22 +33,11 @@ $(document).ready(function(){
 
             <h1 class="title">Question List</h1>
             <hr>
-            {% if current_user.is_authenticated and current_user.is_in_role("admin") %}
-                <form action="{{ url_for('add_questions') }}">
-                    <button class="add"><i class="fa fa-plus"></i> Add Question</button>
-                </form>
-            {% endif %}
-        <form method="post" action="/post_add_questionAnswers" onsubmit="return validateForm()">
+        <form method="post" action="/post_add_questionAnswers" name="myForm">
          <input type="hidden" name="cField" value="{{ child_id }}")>
             {% for u in questions %}
                 <!-- question list -->
-                {% if u.void_ind == 'y' and current_user.is_authenticated and current_user.is_in_role("admin") %}
-                    <div class="question">
-                {% elif u.void_ind == 'y' and current_user.is_authenticated and current_user.is_in_role("user") %}
-                    <div class="question" style="display:none; ">
-                {% else %}
-                    <div class="question">
-                {% endif %}
+               <div class="question">
 
                 <p id="questiontitle"><b><u>{{ u.question }}</u></b></p>
                 <input type="text" name="fname")>
@@ -65,7 +54,7 @@ $(document).ready(function(){
             <br>
         <!--Only show submit button if last page  -->
 
-                <input type="submit" value="Submit" onsubmit="return validateForm()">
+                <input type="submit" value="Submit" onclick="return validateForm()">
             </form>
             {% if page > 1 %}
                 <a class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous Link</a>
