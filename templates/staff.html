@@ -2,18 +2,20 @@
 {% block title %}Staff Portal{% endblock %}
 {% block content %}
 <main id="StaffPortal">
-    <h1 class="title">Staff Portal</h1>
-    <br />
-    <p>Approved Children</p>
-    <hr>
-    <ul class="list-group">
-        {% if children|length == 0 %}
-        <li class="list-group-item">There are no children</li>
-        {% endif %}
-        {% for child in children %}
-        <li class="list-group-item"><a href="{{ url_for('child', child_id=child.childID) }}">{{ child['firstName'] }} {{ child['lastName'] }}</a>, TIME: {{ child['time'] }}</li>
-        {% endfor %}
-    </ul>
+    <div class="box">
+        <h1 class="title">Staff Portal</h1>
+        <hr>
+        <p>Approved Children</p>
+        <hr>
+        <ul class="list-group">
+            {% if children|length == 0 %}
+            <li class="list-group-item">There are no children</li>
+            {% endif %}
+            {% for child in children %}
+            <li class="list-group-item"><a href="{{ url_for('child', child_id=child.childID) }}">{{ child['firstName'] }} {{ child['lastName'] }}</a>, TIME: {{ child['time'] }}</li>
+            {% endfor %}
+        </ul>
+    </div>
 
 </main>
 {% endblock %}

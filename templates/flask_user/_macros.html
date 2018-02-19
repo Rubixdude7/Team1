@@ -3,6 +3,7 @@
         {% if field.type != 'HiddenField' and label_visible %}
             {% if not label %}{% set label=field.label.text %}{% endif %}
             <label for="{{ field.id }}" class="control-label">{{ label|safe }}</label>
+            <br>
         {% endif %}
         {{ field(class_='form-control', **kwargs) }}
         {% if field.errors %}

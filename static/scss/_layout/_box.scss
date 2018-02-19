@@ -25,7 +25,8 @@
   }
 }
 
-input[type=submit]{
+input[type=submit],
+button{
   -moz-appearance: none;
   -webkit-appearance: none;
   -webkit-box-align: center;
@@ -117,7 +118,8 @@ input.noborder {
   border-radius: 0;
 }
 
-input[type=submit]{
+input[type=submit],
+button{
   background-color: #23d160;
   border-color: transparent;
   color: #fff;

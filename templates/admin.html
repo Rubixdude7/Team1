@@ -40,30 +40,6 @@
             </table>
         </div>
     </div>
-    <div class="box">
-        <h2 class="title">Image Slider</h2>
-        <hr>
-        <div class="table-wrapper">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Slide</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for s in slides %}
-                        <tr>
-                            <td>{{ s.id }}</td>
-                            <td>{{ s.desc }}</td>
-                            <td><a href="{{ url_for('slide_edit', s_id=s.id) }}">Edit</a></td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
 <script>
 function confirmAction() {
     confirm("Are you sure you want to delete this user?");
