@@ -331,7 +331,6 @@ def editContact():
 
 # Start Brody's code
 @app.route('/child/<int:child_id>')
-@roles_required('user' or 'staff')
 def child(child_id=None):
     if child_id is not None:
         child_info = querydb.findChild(child_id)
