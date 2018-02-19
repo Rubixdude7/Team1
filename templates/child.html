@@ -16,6 +16,7 @@
                 -->
                 <br>
                 <br>
+                {% if current_user.is_authenticated and current_user.is_in_role("user") %}
                 {% if child_info.q_comp_dtm != None and not updatedQuestions %}
                 <p>questions completed!</p>
                  {% elif child_info.q_comp_dtm == None %}
@@ -27,6 +28,7 @@
               {% if not updatedQuestions and child_info.q_comp_dtm != None %}
                     <p>questions good as of {{ child_info.q_comp_dtm }}</p>
             {% endif %}
+             {% endif %}
             </form>
 
         </div>
