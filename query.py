@@ -74,7 +74,7 @@ class query(object):
     def getAllQuestionAnswers(self, child_id):
 
         questionAnswers = db.question_answers.select().where(db.question_answers.child == child_id)
-
+        q2 = db.questions.select()
 
         return questionAnswers
 
