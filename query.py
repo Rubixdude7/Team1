@@ -43,6 +43,7 @@ class query(object):
     def questionDelete(self, q_id):
         question = db.questions.get(db.questions.q_id == q_id)
         question.void_ind = 'd'
+
         question.save()
 
     def addQuestion(self, question2, user):
@@ -65,7 +66,6 @@ class query(object):
 
     def paginate(self, num):
         num = db.questions.select()
-       # count = db.questions.paginate(per_page=2, page=num, error_out=True)
         return num;
 
     def getAllQuestions(self):
@@ -82,8 +82,8 @@ class query(object):
 
 
 
-        return questionAnswers
 
+        return questionAnswers
 
 
     def editQuestion(self, a, newQuestion):

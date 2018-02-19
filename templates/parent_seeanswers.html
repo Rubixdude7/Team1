@@ -6,9 +6,16 @@
         <div class="box">
             <h1>Your Answers</h1>
             <hr>
-         {% for u in answers %}
+         {% for i in questions %}
 
-            {{ u.answer }}
+            {{ i.question}}
+             {% for j in answers %}
+                 {{ j.q }}
+                 {{ i.q_id }}
+                 {% if j.q == i.q_id %}
+                 {{ j.answer }}
+                 {% endif %}
+             {% endfor %}
             <br>
         {% endfor %}
 

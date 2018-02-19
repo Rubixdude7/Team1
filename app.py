@@ -260,7 +260,8 @@ def viewAnswers():
 def parent_seeanswers():
     child_id = request.args.get('child_id')
     questionAnswers = querydb.getAllQuestionAnswers(child_id)
-    return render_template("parent_seeanswers.html", child_id=child_id, answers=questionAnswers)
+    questions = querydb.getAllQuestionsForUsers()
+    return render_template("parent_seeanswers.html", child_id=child_id, answers=questionAnswers, questions=questions)
 
 @app.route('/add_questions')
 @login_required
