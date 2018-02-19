@@ -169,6 +169,12 @@ class query(object):
         u = db.user.get(db.user.user_id == u_id)
         u.email = email
         u.save()
+    def updateName(self, u_id, fname, lname):
+        u = db.user.get(db.user.user_id == u_id)
+
+        u.first_name = fname
+        u.last_name = lname
+        u.save()
 
 # End Jason's code
 

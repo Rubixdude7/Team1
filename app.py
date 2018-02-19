@@ -478,6 +478,7 @@ def edit():
         querydb.updateUserRole(u_id, newRole)
         if isUserOrPsyc:
             querydb.updateEmail(u_id, form.email.data)
+            querydb.updateName(u_id,form.fName.data,form.lName.data)
             querydb.updateContact(u_id, c_id, form.phone.data, form.address_1.data, form.address_2.data,
                                   form.city.data, form.providence.data, form.zip.data)
         flash('Your changes have been saved.')
