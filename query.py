@@ -58,7 +58,7 @@ class query(object):
     def addQuestionAnswers(self, questionAnswer, user, q_id, childId):
 
         current = db.child.get(db.child.child_id == childId)
-        current.q_comp_dtm = datetime.datetime.now();
+        current.q_comp_dtm = datetime.datetime.now()
         current.save()
 
         q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(), q=q_id, child=childId)
@@ -79,8 +79,6 @@ class query(object):
     def getAllQuestionAnswers(self, child_id):
 
         questionAnswers = db.question_answers.select().where(db.question_answers.child == child_id)
-
-
 
 
         return questionAnswers

@@ -9,11 +9,15 @@
          {% for i in questions %}
 
             {{ i.question}}
+             <br>
              {% for j in answers %}
-                 {{ j.q }}
+                 {{ j.q_id }}
+                 <br>
                  {{ i.q_id }}
-                 {% if j.q == i.q_id %}
-                 {{ j.answer }}
+                 <br>
+                 {% if j.q_id == i.q_id %}
+                    {{ j.answer }}
+                    <br>
                  {% endif %}
              {% endfor %}
             <br>
