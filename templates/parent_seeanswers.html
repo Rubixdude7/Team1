@@ -8,20 +8,17 @@
             <hr>
          {% for i in questions %}
 
-            {{ i.question}}
+          <p><b>Question:  {{ i.question}}</b></p>
              <br>
              {% for j in answers %}
 
-                 <br>
-
-                 <br>
 
                  {% if j.q_id == i.q_id %}
-                    {{ j.answer }}
+                   <p>Your Answer: {{ j.answer }} </p>
                     <br>
                  {% endif %}
              {% endfor %}
-            <br>
+
         {% endfor %}
 
         </div>

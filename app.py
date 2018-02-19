@@ -332,15 +332,19 @@ def editContact():
 # Start Brody's code
 @app.route('/child/<int:child_id>')
 def child(child_id=None):
-    if child_id is not None:
-        child_info = querydb.findChild(child_id)
-        born = datetime.datetime.strptime(child_info.child_dob.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
-        today = datetime.date.today()
-        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
-        if child_info is not None:
-            updatedQuestions = querydb.checkNewQuestions(child_id)
-            return render_template('child.html', child_info=child_info, child_age=age, updatedQuestions=updatedQuestions)
-    return render_template('parent.html')
+    r = querydb.role(current_user.id)
+    if r == 'user' or r == 'admin' or r == 'staff' or r == 'psyc':
+        if child_id is not None:
+            child_info = querydb.findChild(child_id)
+            born = datetime.datetime.strptime(child_info.child_dob.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
+            today = datetime.date.today()
+            age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+            if child_info is not None:
+                updatedQuestions = querydb.checkNewQuestions(child_id)
+                return render_template('child.html', child_info=child_info, child_age=age, updatedQuestions=updatedQuestions)
+        return render_template('parent.html')
+    else:
+        return render_template('index.html')
 
 
 @app.route('/post_edit_questionAnswers', methods=['GET', 'POST'])
