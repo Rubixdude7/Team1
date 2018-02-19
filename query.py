@@ -42,7 +42,7 @@ class query(object):
 
     def questionDelete(self, q_id):
         question = db.questions.get(db.questions.q_id == q_id)
-        question.delete_instance()
+        question.void_ind = 'd'
         question.save()
 
     def addQuestion(self, question2, user):
@@ -69,11 +69,12 @@ class query(object):
         return num;
 
     def getAllQuestions(self):
-        questions = db.questions.select()
+        questions = db.questions.select().where(db.questions.void_ind != 'd')
         return questions
     def getAllQuestionAnswers(self, child_id):
 
         questionAnswers = db.question_answers.select().where(db.question_answers.child == child_id)
+
 
         return questionAnswers
 

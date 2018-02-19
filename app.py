@@ -212,7 +212,7 @@ def questions():
     questions = querydb.getAllQuestions()
 
 
-    return object_list("questions.html", paginate_by=3, query=questions, context_variable='questions')
+    return object_list("questions.html", paginate_by=5, query=questions, context_variable='questions')
 
 
 
@@ -225,7 +225,7 @@ def questionsUserView():
     print(child_id)
     questions = querydb.getAllQuestions()
 
-    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
+    return object_list("questionsUserView.html", paginate_by=5, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
 
 @app.route('/questionsEditQuestions/')
 @login_required
@@ -235,7 +235,7 @@ def questionsEditQuestions():
     print(child_id)
     questions = querydb.checkNewQuestions(child_id)
 
-    return object_list("questionsEditQuestions.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
+    return object_list("questionsEditQuestions.html", paginate_by=5, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
 
 
 
@@ -248,7 +248,7 @@ def viewAnswers():
     print(child_name)
     questions = querydb.getAllQuestionAnswers()
     #  count = querydb.paginate(page_num) --still working on pagination
-    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
+    return object_list("questionsUserView.html", paginate_by=5, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
 
 
 
