@@ -142,28 +142,46 @@ class query(object):
         return lName.last_name
 
     def getPhone(self, contact_id):
-        c = db.contact.get(db.contact.contact_id == contact_id)
-        return c.phone_no
+        try:
+            c = db.contact.get(db.contact.contact_id == contact_id)
+            return c.phone_no
+        except DoesNotExist:
+            return None
 
     def getAdd1(self, contact_id):
-        c = db.contact.get(db.contact.contact_id == contact_id)
-        return c.address_1
+        try:
+            c = db.contact.get(db.contact.contact_id == contact_id)
+            return c.address_1
+        except DoesNotExist:
+            return None
 
     def getAdd2(self, contact_id):
-        c = db.contact.get(db.contact.contact_id == contact_id)
-        return c.address_2
+        try:
+            c = db.contact.get(db.contact.contact_id == contact_id)
+            return c.address_2
+        except DoesNotExist:
+            return None
 
     def getCity(self, contact_id):
-        c = db.contact.get(db.contact.contact_id == contact_id)
-        return c.city
+        try:
+            c = db.contact.get(db.contact.contact_id == contact_id)
+            return c.city
+        except DoesNotExist:
+            return None
 
     def getProvidence(self, contact_id):
-        c = db.contact.get(db.contact.contact_id == contact_id)
-        return c.providence
+        try:
+            c = db.contact.get(db.contact.contact_id == contact_id)
+            return c.providence
+        except DoesNotExist:
+            return None
 
     def getZip(self, contact_id):
-        c = db.contact.get(db.contact.contact_id == contact_id)
-        return c.zip
+        try:
+            c = db.contact.get(db.contact.contact_id == contact_id)
+            return c.zip
+        except DoesNotExist:
+            return None
 
     def updateEmail(self, u_id, email):
         u = db.user.get(db.user.user_id == u_id)
