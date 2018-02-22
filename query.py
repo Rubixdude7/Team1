@@ -476,6 +476,20 @@ class query(object):
             pass
         return children
 
+    def getUnverifiedChildren(self):
+        children = []
+        for consultation in db.consultation.select():
+            if consultation.approved == "n":
+                children.append({
+                    'firstName': consultation.child.child_nm_fst,
+                    'lastName': consultation.child.child_nm_lst,
+                    'childID': consultation.child.child_id,
+                    'time': consultation.length
+                })
+        if len(children) == 0:
+            pass
+        return children
+
     #End Nolan's Code
 
 # Begin Brandon
