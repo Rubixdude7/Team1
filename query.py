@@ -345,6 +345,20 @@ class query(object):
             'time_end': t[2],
             'weekday': t[3]
         } for t in tuples]
+
+    def getAvailabilitiesForDay(self, psyc_id, year, month, day):
+        wkd_index = datetime.date(year, month, day).weekday()
+        wkd_abbr = ['m', 't', 'w', 'th', 'f', 's', 'su'][wkd_index]
+
+        tuples = db.calendar.select(db.calendar.time_st, db.calendar.time_end)\
+                            .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
+                            .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
+                            .where((db.psychologist.psyc_id == psyc_id) & (db.calendar.void_ind == 'n') & (db.day_typ_cd.day_typ_cd == wkd_abbr))\
+                            .tuples()
+        return [{
+            'time_st': t[0],
+            'time_end': t[1]
+        } for t in tuples]
     
     def addAvailability(self, psyc_id, time_st, time_end, weekday):
         # Find the weekday in the db

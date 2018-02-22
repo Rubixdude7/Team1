@@ -568,6 +568,12 @@ def psikolog(id=None):
     # In both cases, show a list of psychologists.
     return render_template('list_psikolog.html', psychologist_links=querydb.psychologistLinks())
 
+@app.route('/psikolog/<int:psyc_id>/<int:year>/<int:month>/<int:day>')
+def view_day(psyc_id, year, month, day):
+    psyc = querydb.lookupPsychologist(psyc_id)
+    avails = querydb.getAvailabilitiesForDay(psyc_id, year, month, day)
+    return render_template('view_day.html', psyc=psyc, year=year, month=month, day=day, avails=avails)
+
 @app.route('/psikolog/write_blog_post', methods=['GET', 'POST'])
 @roles_required('psyc')
 def write_blog_post():
