@@ -665,7 +665,7 @@ def edit_availability(avail_id):
 @app.route('/staff')
 @roles_required('staff')
 def staff():
-    return render_template('staff.html', children = querydb.getVerifiedChildren())
+    return render_template('staff.html', children = querydb.getVerifiedChildren(), unverifiedChildren = querydb.getUnverifiedChildren())
 
 #End Nolan's Code
 
