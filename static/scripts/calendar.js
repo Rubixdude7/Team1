@@ -18,7 +18,7 @@ var NUM_WEEKS_PER_PAGE = 6;
 var monthLabelElem = document.getElementById("cal-month-label");
 var dayElems = new Array(7*NUM_WEEKS_PER_PAGE);
 
-var currentMonth, currentYear;
+var currentMonth, currentYear, daysFromPrevMonth;
 
 {
     var now = new Date();
@@ -86,7 +86,7 @@ function resetCalendar() {
     // On this page of the calendar, how many days from the previous month are visible?
     // And from next month?
     // Let's find out.
-    var daysFromPrevMonth, daysFromNextMonth;
+    var daysFromNextMonth;
 
     {
         var firstDayThisMonth = new Date(currentYear, currentMonth, 1);
@@ -193,4 +193,14 @@ function nextMonth() {
     }
     currentMonth = newMonth;
     resetCalendar();
+}
+
+function viewDay(index) {
+    var dayCell = document.getElementById("cal-day-" + index.toString());
+
+    if (dayCell.getAttribute("data-this-month") == "true") {
+        var month = currentMonth + 1;
+        var day = (index - daysFromPrevMonth) + 1;
+        window.location = "/psikolog/" + psyc_id.toString() + "/" + currentYear.toString() + "/" + month.toString() + "/" + day.toString();
+    }
 }
