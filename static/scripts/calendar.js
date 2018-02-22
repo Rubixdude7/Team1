@@ -90,7 +90,12 @@ function resetCalendar() {
 
     {
         var firstDayThisMonth = new Date(currentYear, currentMonth, 1);
-        daysFromPrevMonth = firstDayThisMonth.getDay();
+
+        // We need to decrement the weekday because the JavaScript standard
+        // starts weekdays at Sunday, but in Indonesia they start on Monday.
+        daysFromPrevMonth = firstDayThisMonth.getDay() - 1;
+        if (daysFromPrevMonth < 0)
+            daysFromPrevMonth += 7;
 
         var lastDayThisMonth = new Date(currentYear, currentMonth, 1);
         for (var i = 2; i <= 31; i++) {
