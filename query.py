@@ -556,9 +556,13 @@ class query(object):
             print(time_st)
             time_end = time_st + datetime.timedelta(hours=float(cnslt.get('len_fee', None)))
             print(time_end)
-            taken_times = db.consult_time.select().where((db.consult_time.time_st >= time_st) & (db.consult_time.time_end <= time_end)).tuples()
+            taken_times = db.consult_time.select()\
+                .where(((db.consult_time.time_st <= time_st) & (db.consult_time.time_end <= time_end) & (time_st <= db.consult_time.time_end))
+                       | ((db.consult_time.time_st >= time_st) & (db.consult_time.time_end >= time_end) & (time_end >= db.consult_time.time_st))
+                       | ((db.consult_time.time_st <= time_st) & (db.consult_time.time_end >= time_end))
+                       | ((db.consult_time.time_st >= time_st) & (db.consult_time.time_end <= time_end))).tuples()
 
-            print(taken_times)
+            print(list(taken_times))
 
         return None
 
