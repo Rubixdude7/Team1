@@ -135,6 +135,7 @@ class consultation_fee(MySQLModel):
 class consultation_length(MySQLModel):
     cnslt_len_id = PrimaryKeyField()
     length = DoubleField()
+    cnslt_fee = ForeignKeyField(consultation_fee, to_field="cnslt_fee_id")
     void_ind = CharField()
 
     class Meta:

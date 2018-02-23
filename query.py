@@ -538,7 +538,14 @@ class query(object):
             slider_desc.append(slide.desc)
         return slider_tag, slider_desc
 
+    def get_consultation(self):
+        psycs = db.psychologist.select(db.psychologist.psyc_id, db.user.first_name, db.user.last_name).join(db.user, JOIN_INNER, db.user.user_id == db.psychologist.user).tuples()
+        psycs = list(psycs)
 
+        len_fee = db.consultation_length.select(db.consultation_length.cnslt_len_id, db.consultation_length.length, db.consultation_fee.fee).where(db.consultation_length.void_ind == 'n').join(db.consultation_fee, JOIN_INNER, db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id).tuples()
+        len_fee = list(len_fee)
+
+        return psycs, len_fee
 #End Brandon
 
 class PsychologistLookupResult:
