@@ -168,6 +168,16 @@ def slide_update(s_id):
     return redirect(url_for('admin'))
 
 
+@app.route('/consultation')
+@login_required
+def consultation():
+    child_id = request.args.get('child_id')
+
+    params = querydb.get_consultation()
+
+    return render_template("consultation.html", psycs=params[0], len_fee=params[1])
+
+
 #           END BRANDON         #
 
 
@@ -401,7 +411,7 @@ def admin():
         if r == 'staff':
             usersandroles[u.email] = 'Office Staff'
 
-    return render_template('admin.html', users=users, roles=roles, usersandroles=usersandroles, slides=querydb.get_slides())
+    return render_template('admin.html', users=users, roles=roles, usersandroles=usersandroles)
 
 
 class RoleChangeForm(FlaskForm):
