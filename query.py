@@ -98,6 +98,24 @@ class query(object):
     def findChild(self, child_id):
         c = db.child.get(db.child.child_id == child_id)
         return c
+
+    def getAnswer(self, question_id, child_id):
+        try:
+            a = db.question_answers.get(db.question_answers.q == question_id, db.question_answers.child == child_id)
+            print(a.answer)
+            '''
+            HERE LIES PROOF THAT THE QUESTION ANSWERS ARE NOT BEING UPDATED
+            BUT RATHER, A NEW ROW IS PUT IN WITH WHATEVER ANSWER IS IN THE
+            TEXT FIELD ON THE QUESTIONNAIRE PAGE
+            - Brody Shepherd
+            
+            b = db.question_answers.select().where(db.question_answers.q == question_id, db.question_answers.child == child_id)
+            for c in b:
+                print(c.answer)
+            '''
+            return a.answer
+        except:
+            return None
     # End Brody's code
 
 # Start Jason's code
