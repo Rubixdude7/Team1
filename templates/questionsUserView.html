@@ -40,7 +40,13 @@ $(document).ready(function(){
                <div class="question">
 
                 <p id="questiontitle"><b><u>{{ u.question }}</u></b></p>
-                <input type="text" name="fname")>
+                    <!-- Brody code -->
+                   {% if answers[loop.index0] != None or '' %}
+                        <input type="text" name="fname" value="{{ answers[loop.index0] }}")>
+                   {% else %}
+                        <input type="text" name="fname")>
+                   {% endif %}
+                    <!-- end Brody Code -->
                 <input type="hidden" name="qField" value="{{ u.q_id }}")>
 
             <br>
