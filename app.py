@@ -168,13 +168,21 @@ def slide_update(s_id):
     return redirect(url_for('admin'))
 
 
-@app.route('/consultation')
+@app.route('/consultation', methods=['GET', 'POST'])
 @login_required
 def consultation():
     child_id = request.args.get('child_id')
 
-    params = querydb.get_consultation()
+    cnslt = dict()
+    cnslt['psyc'] = request.form.get('psyc', None)
+    cnslt['len_fee'] = request.form.get('length', None)
+    cnslt['date'] = request.form.get('date', None)
+    cnslt['hour'] = request.form.get('hour', None)
+    cnslt['min'] = request.form.get('min', None)
+    print(cnslt)
+    querydb.get_psyc_cnslt(cnslt)
 
+    params = querydb.get_consultation()
     return render_template("consultation.html", psycs=params[0], len_fee=params[1])
 
 

@@ -546,6 +546,27 @@ class query(object):
         len_fee = list(len_fee)
 
         return psycs, len_fee
+
+    def get_psyc_cnslt(self, cnslt):
+
+        if cnslt.get('psyc', None) == '-1':
+            time = cnslt.get('date', None) + " " + cnslt.get('hour', None) + ":" + cnslt.get('min', None)
+            print(time)
+            time_st = datetime.datetime.strptime(time, '%Y-%m-%d %H:%M')
+            print(time_st)
+            time_end = time_st + datetime.timedelta(hours=float(cnslt.get('len_fee', None)))
+            print(time_end)
+            taken_times = db.consult_time.select()\
+                .where(((db.consult_time.time_st <= time_st) & (db.consult_time.time_end <= time_end) & (time_st <= db.consult_time.time_end))
+                       | ((db.consult_time.time_st >= time_st) & (db.consult_time.time_end >= time_end) & (time_end >= db.consult_time.time_st))
+                       | ((db.consult_time.time_st <= time_st) & (db.consult_time.time_end >= time_end))
+                       | ((db.consult_time.time_st >= time_st) & (db.consult_time.time_end <= time_end))).tuples()
+
+            print(list(taken_times))
+
+        return None
+
+
 #End Brandon
 
 class PsychologistLookupResult:
