@@ -228,7 +228,7 @@ def questionDelete():
 @login_required
 def questions():
     questions = querydb.getAllQuestions()
-    return object_list("questions.html", paginate_by=5, query=questions, context_variable='questions')
+    return object_list("questions.html", paginate_by=3, query=questions, context_variable='questions')
 
 
 
@@ -246,7 +246,7 @@ def questionsUserView():
         print("Q_ID: ", q.q_id)
         answers.append(querydb.getAnswer(q.q_id, child_id))
     # end Brody code
-    return object_list("questionsUserView.html", paginate_by=5, query=questions, context_variable='questions', child_id=child_id, child_name=child_name, answers=answers)
+    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name, answers=answers)
 
 
 @app.route('/questionsEditQuestions/')
@@ -257,7 +257,7 @@ def questionsEditQuestions():
     print(child_id)
     questions = querydb.checkNewQuestions(child_id)
 
-    return object_list("questionsEditQuestions.html", paginate_by=5, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
+    return object_list("questionsEditQuestions.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
 
 
 
@@ -270,7 +270,7 @@ def viewAnswers():
     print(child_name)
     questions = querydb.getAllQuestionAnswers()
     #  count = querydb.paginate(page_num) --still working on pagination
-    return object_list("questionsUserView.html", paginate_by=5, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
+    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
 
 
 
@@ -281,9 +281,15 @@ def viewAnswers():
 @login_required
 def parent_seeanswers():
     child_id = request.args.get('child_id')
-    questionAnswers = querydb.getAllQuestionAnswers(child_id)
     questions = querydb.getAllQuestionsForUsers()
-    return render_template("parent_seeanswers.html", child_id=child_id, answers=questionAnswers, questions=questions)
+    # Brody code
+    answers = []
+    for q in questions:
+        print("Q_ID: ", q.q_id)
+        answers.append(querydb.getAnswer(q.q_id, child_id))
+    # end Brody code
+    return render_template("parent_seeanswers.html", child_id=child_id, answers=answers, questions=questions)
+
 
 @app.route('/add_questions')
 @login_required

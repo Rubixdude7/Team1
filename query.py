@@ -26,13 +26,12 @@ class query(object):
     def deactivateQuestion(self, q_id):
 
         question = db.questions.get(db.questions.q_id == q_id)
-        question
         question.void_ind = 'y'
         question.save()
 
     def getQuestion(selfs, q_id):
         question = db.questions.get(db.questions.q_id == q_id)
-        return question;
+        return question
 
     def reactivateQuestion(self, q_id):
         question = db.questions.get(db.questions.q_id == q_id)
@@ -66,7 +65,7 @@ class query(object):
 
     def paginate(self, num):
         num = db.questions.select()
-        return num;
+        return num
 
     def getAllQuestions(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd')
@@ -101,7 +100,8 @@ class query(object):
 
     def getAnswer(self, question_id, child_id):
         try:
-            a = db.question_answers.get(db.question_answers.q == question_id, db.question_answers.child == child_id)
+            a = db.question_answers.select().where(db.question_answers.q == question_id, db.question_answers.child == child_id)
+            a = a[len(a)-1]
             print(a.answer)
             '''
             HERE LIES PROOF THAT THE QUESTION ANSWERS ARE NOT BEING UPDATED
