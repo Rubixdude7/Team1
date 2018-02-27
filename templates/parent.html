@@ -6,15 +6,21 @@
         <h1 class="title">{{ user }}</h1>
         <hr>
         <p>
-            Phone Number: {{ contact_info.phone_no }}<br>
+            {% if(contact_info.phone_no) %}
+                Phone Number: {{ contact_info.phone_no }}<br>
+            {% endif %}
 
-            Address 1: {{ contact_info.address_1 }}<br>
+            {% if(contact_info.address_1) %}
+                Address 1: {{ contact_info.address_1 }}<br>
+            {% endif %}
 
             {% if(contact_info.address_2) %}
                 Address 2: {{ contact_info.address_2 }}<br>
             {% endif %}
 
-            City: {{ contact_info.city }}<br>
+            {% if(contact_info.city) %}
+                City: {{ contact_info.city }}<br>
+            {% endif %}
 
             {% if(contact_info.providence) %}
                 Province: {{ contact_info.providence }}<br>
@@ -22,13 +28,23 @@
 
             {% if(contact_info.zip) %}
                 Zip: {{ contact_info.zip }}<br>
+
+            {% elif(contact_info == None) %}
+                Please Click Below To Fill Out Your Contact Information
             {% endif %}
 
 
 
             <form action="/parent/contact">
                 <button type="submit">
-                    Update Contact Information
+                    {% if(contact_info) %}
+                        Update Contact Information
+
+                    {% elif(contact_info == None) %}
+                        Add Contact Information
+
+                    {% endif %}
+
                 </button>
             </form>
             <br>
@@ -79,13 +95,11 @@
                                 {% endif %}
                             {% endif %}
 
-
-                        <br>
-                        <form action="{{ url_for('consultation', child_id=child.child_id) }}">
+                        <!--<form action="{{ url_for('consultation', child_id=child.child_id) }}">
                             <button type="submit">
                                 Schedule Consultation
                             </button>
-                        </form>
+                        </form>-->
                         </p>
                     </div>
                 </li>
