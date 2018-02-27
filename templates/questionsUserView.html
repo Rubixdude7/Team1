@@ -40,7 +40,13 @@ $(document).ready(function(){
                <div class="question">
 
                 <p id="questiontitle"><b><u>{{ u.question }}</u></b></p>
-                <input type="text" name="fname")>
+                    <!-- Brody code -->
+                   {% if answers[loop.index0] != None or '' %}
+                        <input type="text" name="fname" value="{{ answers[loop.index0] }}")>
+                   {% else %}
+                        <input type="text" name="fname")>
+                   {% endif %}
+                    <!-- end Brody Code -->
                 <input type="hidden" name="qField" value="{{ u.q_id }}")>
 
             <br>
@@ -52,19 +58,25 @@ $(document).ready(function(){
             {% endfor %}
             <br>
             <br>
-        <!--Only show submit button if last page  -->
 
-                <input type="submit" value="Submit" onclick="">
-            </form>
             {% if page > 1 %}
-                <a class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous Link</a>
-                <button id="prev" style="width:100px;height:70px">Prev Button</button>
-{% endif %}
-{% if pagination.get_page_count() > page %}
+                <a class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous</a>
+            {% endif %}
+            {% if pagination.get_page_count() > page %}
+                 <a class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next</a>
+            {% endif %}
+        <!--Only show submit button if last page  -->
+            {% if pagination.get_page_count() == page %}
+                <br>
+                <br>
+                <input type="submit" value="Submit Answers" onclick="">
+            {% else %}
+                <br>
+                <br>
+                <input type="submit" value="Save Answers" onclick="">
+            {% endif %}
 
-    <button id="next" style="width:100px;height:70px">Next Button</button>
-     <a class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next Link</a>
-{% endif %}
+        </form>
         </div>
     </main>
 {% endblock %}

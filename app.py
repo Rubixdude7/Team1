@@ -227,9 +227,7 @@ def questionDelete():
 @login_required
 def questions():
     questions = querydb.getAllQuestions()
-
-
-    return object_list("questions.html", paginate_by=5, query=questions, context_variable='questions')
+    return object_list("questions.html", paginate_by=3, query=questions, context_variable='questions')
 
 
 
@@ -240,9 +238,15 @@ def questionsUserView():
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
     print(child_id)
-    questions = querydb.getAllQuestionsForUsers()
+    questions = querydb.getAllQuestions()
+    # Brody code
+    answers = []
+    for q in questions:
+        print("Q_ID: ", q.q_id)
+        answers.append(querydb.getAnswer(q.q_id, child_id))
+    # end Brody code
+    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name, answers=answers)
 
-    return object_list("questionsUserView.html", paginate_by=5, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
 
 @app.route('/questionsEditQuestions/')
 @login_required
@@ -252,7 +256,7 @@ def questionsEditQuestions():
     print(child_id)
     questions = querydb.checkNewQuestions(child_id)
 
-    return object_list("questionsEditQuestions.html", paginate_by=5, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
+    return object_list("questionsEditQuestions.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
 
 
 
@@ -265,7 +269,7 @@ def viewAnswers():
     print(child_name)
     questions = querydb.getAllQuestionAnswers()
     #  count = querydb.paginate(page_num) --still working on pagination
-    return object_list("questionsUserView.html", paginate_by=5, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
+    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
 
 
 
@@ -276,9 +280,15 @@ def viewAnswers():
 @login_required
 def parent_seeanswers():
     child_id = request.args.get('child_id')
-    questionAnswers = querydb.getAllQuestionAnswers(child_id)
     questions = querydb.getAllQuestionsForUsers()
-    return render_template("parent_seeanswers.html", child_id=child_id, answers=questionAnswers, questions=questions)
+    # Brody code
+    answers = []
+    for q in questions:
+        print("Q_ID: ", q.q_id)
+        answers.append(querydb.getAnswer(q.q_id, child_id))
+    # end Brody code
+    return render_template("parent_seeanswers.html", child_id=child_id, answers=answers, questions=questions)
+
 
 @app.route('/add_questions')
 @login_required
@@ -306,11 +316,15 @@ def post_questionAnswers():
     q_id = request.args.get('q_id')
 
 
-
+    # Brody says: q = answer, q2 = questionId
     for (q,q2) in zip (questionAnswerList, questionIdList):
       print(current_user.id)
       print(questionAnswerList)
-      querydb.addQuestionAnswers(q, current_user.id, q2, childId)
+      print("Q", q)
+      print("Q2", q2)
+      # lack of this if was causing false "completed" question forms
+      if q is not '':
+          querydb.addQuestionAnswers(q, current_user.id, q2, childId)
 
 
     # question = request.args.get('question')
@@ -326,7 +340,9 @@ def post_questionAnswers():
 @roles_required('user')
 def parent():
 
-    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name, children = querydb.getChildren(current_user.id), contact_info=querydb.contactID(current_user.id))
+    return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name,
+                           children = querydb.getChildren(current_user.id),
+                           contact_info=querydb.contactID(current_user.id), querydb=querydb)
 
 
 @app.route('/parent/contact')

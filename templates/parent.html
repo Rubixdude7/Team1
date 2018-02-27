@@ -5,60 +5,113 @@
     <div class="box">
         <h1 class="title">{{ user }}</h1>
         <hr>
-
-        <!--this part is fucked rn -->
         <p>
-            Phone Number: {{ contact_info.phone_no }}<br>
+            {% if(contact_info.phone_no) %}
+                Phone Number: {{ contact_info.phone_no }}<br>
+            {% endif %}
 
-            Address 1: {{ contact_info.address_1 }}<br>
+            {% if(contact_info.address_1) %}
+                Address 1: {{ contact_info.address_1 }}<br>
+            {% endif %}
 
             {% if(contact_info.address_2) %}
                 Address 2: {{ contact_info.address_2 }}<br>
             {% endif %}
 
-            City: {{ contact_info.city }}<br>
+            {% if(contact_info.city) %}
+                City: {{ contact_info.city }}<br>
+            {% endif %}
 
             {% if(contact_info.providence) %}
-                Providence: {{ contact_info.providence }}<br>
+                Province: {{ contact_info.providence }}<br>
             {% endif %}
 
             {% if(contact_info.zip) %}
                 Zip: {{ contact_info.zip }}<br>
+
+            {% elif(contact_info == None) %}
+                Please Click Below To Fill Out Your Contact Information
             {% endif %}
 
 
 
             <form action="/parent/contact">
                 <button type="submit">
-                    Update Contact Information
+                    {% if(contact_info) %}
+                        Update Contact Information
+
+                    {% elif(contact_info == None) %}
+                        Add Contact Information
+
+                    {% endif %}
+
                 </button>
             </form>
+            <br>
+             <form action="/childform">
+                <button type="submit">
+                    Add Child
+                </button>
+             </form>
         </p>
 
     </div>
 
-    <div class="box">
-        <p>
-        <form action="/childform">
-            <button type="submit">
-                Add Child
-            </button>
-        </form>
-        </p>
-
-
-
-        <ul class="list-group">
             {% for child in children %}
-                <li class="list-group-item"><a href="{{ url_for('child', child_id=child.child_id) }}">{{ child.child_nm_fst }}</a></li>
-                <br>
-                <a href="{{ url_for('parent_seeanswers', child_id=child.child_id) }}">View Question Answers</a>
-                <br>
-                <br>
-                <a href="{{ url_for('consultation', child_id=child.child_id) }}">Schedule Consultation</a>
+                <li class="list-group-item" style="list-style: none">
+                    <div class="box">
+                        <p>
+
+
+                            First name: {{ child.child_nm_fst }}<br>
+                            Last name: {{ child.child_nm_lst }}<br>
+                            Age: {{ querydb.getAge(child) }}<br>
+
+
+
+                            {% if current_user.is_authenticated and current_user.is_in_role("user") %}
+                                {% if child.q_comp_dtm != None and not updatedQuestions %}
+                                    <form>
+                                        <button onclick="location.href='{{ url_for('parent_seeanswers', child_id=child.child_id) }}'" type="button">
+                                            View Question Answers
+                                        </button>
+                                    </form>
+                                    <form>
+                                        <br>
+                                        <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button">
+                                            Edit Answers!
+                                        </button>
+                                    </form>
+                                {% elif child.q_comp_dtm == None %}
+                                    <form>
+                                        <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button">
+                                            Questionnaire Needs Completed!
+                                        </button>
+                                    </form>
+                                {% endif %}
+
+                                {% if updatedQuestions %}
+                                    <button style="background-color: red" onclick="location.href='{{ url_for('questionsEditQuestions', child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button">
+                                        Answer New Questions!
+                                    </button>
+                                {% endif %}
+
+                                {% if not updatedQuestions and child.q_comp_dtm != None %}
+                                        <br>Questions completed on: {{ child.q_comp_dtm }}<br>
+                                {% endif %}
+                            {% endif %}
+
+                        <!--<form action="{{ url_for('consultation', child_id=child.child_id) }}">
+                            <button type="submit">
+                                Schedule Consultation
+                            </button>
+                        </form>-->
+                        </p>
+                    </div>
+                </li>
+
+
             {% endfor %}
-        </ul>
-    </div>
 </main>
 
 

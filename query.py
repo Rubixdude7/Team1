@@ -28,13 +28,12 @@ class query(object):
     def deactivateQuestion(self, q_id):
 
         question = db.questions.get(db.questions.q_id == q_id)
-        question
         question.void_ind = 'y'
         question.save()
 
     def getQuestion(selfs, q_id):
         question = db.questions.get(db.questions.q_id == q_id)
-        return question;
+        return question
 
     def reactivateQuestion(self, q_id):
         question = db.questions.get(db.questions.q_id == q_id)
@@ -51,24 +50,50 @@ class query(object):
     def addQuestion(self, question2, user):
         q = db.questions(question=question2, user_id_crea=user, crea_dtm=datetime.datetime.now())
         q.save()
+
     def checkNewQuestions(self, child):
         child = db.child.get(db.child.child_id == child)
         x = child.q_comp_dtm
         questionsUpdated = db.questions.select().where(db.questions.crea_dtm > x)
 
         return questionsUpdated
+
     def addQuestionAnswers(self, questionAnswer, user, q_id, childId):
+        # Begin Brody
+        '''
+            This should now prevent additional rows from being
+            added unnecessarily, i.e., the answer didn't change for this kid, for this question
+        '''
+        alreadyExists = query.getAnswer(self, q_id, childId)
+        if alreadyExists is None:
+            # Begin Jared
+            current = db.child.get(db.child.child_id == childId)
+            current.q_comp_dtm = datetime.datetime.now()
+            current.save()
 
-        current = db.child.get(db.child.child_id == childId)
-        current.q_comp_dtm = datetime.datetime.now()
-        current.save()
+            q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(), q=q_id,
+                                    child=childId)
+            q.save()
+            # End Jared
+        elif alreadyExists == questionAnswer:
+            print("Answer already exists and didn't change!")
+        else:
+            print("Updating answer")
+            # Begin Jared
+            current = db.child.get(db.child.child_id == childId)
+            current.q_comp_dtm = datetime.datetime.now()
+            current.save()
 
-        q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(), q=q_id, child=childId)
-        q.save()
+            q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(),
+                                    q=q_id,
+                                    child=childId)
+            q.save()
+            # End Jared
+        # End Brody
 
     def paginate(self, num):
         num = db.questions.select()
-        return num;
+        return num
 
     def getAllQuestions(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd')
@@ -100,6 +125,15 @@ class query(object):
     def findChild(self, child_id):
         c = db.child.get(db.child.child_id == child_id)
         return c
+
+    def getAnswer(self, question_id, child_id):
+        try:
+            a = db.question_answers.select().where(db.question_answers.q == question_id, db.question_answers.child == child_id)
+            a = a[len(a)-1]
+            print(a.answer)
+            return a.answer
+        except:
+            return None
     # End Brody's code
 
 # Start Jason's code
@@ -412,26 +446,15 @@ class query(object):
 
     #Beginnning of Gabe's code
 
-    def getChildren(self, user_id): #ignore this for now, it is a bad attempt at something
+    def getChildren(self, user_id):
         c = db.child.select().where(db.child.user == user_id)
         return c
 
-    def exists(self, contact_id, field):
-        c = db.contact.select().where(db.contact.contact_id == contact_id)
-        if field == 'phone_no' and c.phone_no.exists():
-            return True
-        elif field == 'address_1' and c.address_1.exists():
-            return True
-        elif field == 'address_2' and c.address_2.exists():
-            return True
-        elif field == 'city' and c.city.exists():
-            return True
-        elif field == 'providence' and c.providence.exists():
-            return True
-        elif field == 'zip' and c.zip.exists():
-            return True
-        else:
-            return False
+    def getAge(self, child):
+        born = datetime.datetime.strptime(child.child_dob.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
+        today = datetime.date.today()
+        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+        return age
 
     def contactID(self, user_id):
         try:
