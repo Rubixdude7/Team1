@@ -428,26 +428,15 @@ class query(object):
 
     #Beginnning of Gabe's code
 
-    def getChildren(self, user_id): #ignore this for now, it is a bad attempt at something
+    def getChildren(self, user_id):
         c = db.child.select().where(db.child.user == user_id)
         return c
 
-    def exists(self, contact_id, field):
-        c = db.contact.select().where(db.contact.contact_id == contact_id)
-        if field == 'phone_no' and c.phone_no.exists():
-            return True
-        elif field == 'address_1' and c.address_1.exists():
-            return True
-        elif field == 'address_2' and c.address_2.exists():
-            return True
-        elif field == 'city' and c.city.exists():
-            return True
-        elif field == 'providence' and c.providence.exists():
-            return True
-        elif field == 'zip' and c.zip.exists():
-            return True
-        else:
-            return False
+    def getAge(self, child):
+        born = datetime.datetime.strptime(child.child_dob.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
+        today = datetime.date.today()
+        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+        return age
 
     def contactID(self, user_id):
         try:
