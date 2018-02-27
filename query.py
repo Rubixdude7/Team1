@@ -48,20 +48,46 @@ class query(object):
     def addQuestion(self, question2, user):
         q = db.questions(question=question2, user_id_crea=user, crea_dtm=datetime.datetime.now())
         q.save()
+
     def checkNewQuestions(self, child):
         child = db.child.get(db.child.child_id == child)
         x = child.q_comp_dtm
         questionsUpdated = db.questions.select().where(db.questions.crea_dtm > x)
 
         return questionsUpdated
+
     def addQuestionAnswers(self, questionAnswer, user, q_id, childId):
+        # Begin Brody
+        '''
+            This should now prevent additional rows from being
+            added unnecessarily, i.e., the answer didn't change for this kid, for this question
+        '''
+        alreadyExists = query.getAnswer(self, q_id, childId)
+        if alreadyExists is None:
+            # Begin Jared
+            current = db.child.get(db.child.child_id == childId)
+            current.q_comp_dtm = datetime.datetime.now()
+            current.save()
 
-        current = db.child.get(db.child.child_id == childId)
-        current.q_comp_dtm = datetime.datetime.now()
-        current.save()
+            q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(), q=q_id,
+                                    child=childId)
+            q.save()
+            # End Jared
+        elif alreadyExists == questionAnswer:
+            print("Answer already exists and didn't change!")
+        else:
+            print("Updating answer")
+            # Begin Jared
+            current = db.child.get(db.child.child_id == childId)
+            current.q_comp_dtm = datetime.datetime.now()
+            current.save()
 
-        q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(), q=q_id, child=childId)
-        q.save()
+            q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(),
+                                    q=q_id,
+                                    child=childId)
+            q.save()
+            # End Jared
+        # End Brody
 
     def paginate(self, num):
         num = db.questions.select()
@@ -103,16 +129,6 @@ class query(object):
             a = db.question_answers.select().where(db.question_answers.q == question_id, db.question_answers.child == child_id)
             a = a[len(a)-1]
             print(a.answer)
-            '''
-            HERE LIES PROOF THAT THE QUESTION ANSWERS ARE NOT BEING UPDATED
-            BUT RATHER, A NEW ROW IS PUT IN WITH WHATEVER ANSWER IS IN THE
-            TEXT FIELD ON THE QUESTIONNAIRE PAGE
-            - Brody Shepherd
-            
-            b = db.question_answers.select().where(db.question_answers.q == question_id, db.question_answers.child == child_id)
-            for c in b:
-                print(c.answer)
-            '''
             return a.answer
         except:
             return None
