@@ -161,6 +161,9 @@ class question_answers(MySQLModel):
     child = ForeignKeyField(child, to_field="child_id")
     q = ForeignKeyField(questions, to_field="q_id")
     answer = CharField()
+    qa_crea_dtm = DateTimeField()
+    qa_upd_dtm = DateTimeField(null=True)
+    void_ind = CharField()
 
     class Meta:
         db_table = "question_answers"

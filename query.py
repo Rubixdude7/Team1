@@ -1,3 +1,5 @@
+import calendar
+
 import models as db
 import datetime
 from peewee import *
@@ -551,18 +553,46 @@ class query(object):
 
         if cnslt.get('psyc', None) == '-1':
             time = cnslt.get('date', None) + " " + cnslt.get('hour', None) + ":" + cnslt.get('min', None)
-            print(time)
             time_st = datetime.datetime.strptime(time, '%Y-%m-%d %H:%M')
-            print(time_st)
             time_end = time_st + datetime.timedelta(hours=float(cnslt.get('len_fee', None)))
-            print(time_end)
             taken_times = db.consult_time.select()\
                 .where(((db.consult_time.time_st <= time_st) & (db.consult_time.time_end <= time_end) & (time_st <= db.consult_time.time_end))
                        | ((db.consult_time.time_st >= time_st) & (db.consult_time.time_end >= time_end) & (time_end >= db.consult_time.time_st))
                        | ((db.consult_time.time_st <= time_st) & (db.consult_time.time_end >= time_end))
                        | ((db.consult_time.time_st >= time_st) & (db.consult_time.time_end <= time_end))).tuples()
 
-            print(list(taken_times))
+            taken_times = list(taken_times)
+
+            #if no conflicts
+            if len(taken_times) == 0:
+                day_of_week = calendar.day_name[time_st.weekday()]
+                cal = db.calendar.select().where((db.calendar.time_st <= time_st.time()) & (db.calendar.time_end >= time_end.time()) & (db.calendar.void_ind == 'n'))\
+                    .join(db.day_typ_cd, JOIN_INNER, (db.day_typ_cd.day == day_of_week) & (db.day_typ_cd.day_typ_cd == db.calendar.day_typ_cd)).tuples()
+                cal = list(cal)
+
+                psycs = []
+                for c in cal:
+                    psyc = db.psychologist.select(db.psychologist.psyc_id, db.psychologist.photo, db.user.first_name, db.user.last_name).where(db.psychologist.psyc_id == c[1]).join(db.user, JOIN_INNER, db.user.user_id == db.psychologist.user).tuples()
+                    print(list(psyc[0]))
+                    psyc = list(psyc[0])
+                    public_id, version = psyc[1].split('#')
+                    link = cloudinary.CloudinaryImage(public_id, version=version).build_url()
+                    print(psyc)
+                    psyc[1] = link
+
+                    book = dict()
+                    book['child_id'] = cnslt.get('child_id', None)
+                    fee = db.consultation_fee.select(db.consultation_fee.fee).where(db.consultation_fee.void_ind == 'n').join(db.consultation_length, JOIN_INNER, (db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id) & (db.consultation_length == cnslt.get('len_fee', None))).tuples()
+                    print(fee)
+                    book['fee'] = fee
+                    book['len'] = cnslt.get('len_fee', None)
+                    book['psyc_id'] = psyc[0]
+                    book['time_st'] = time_st
+                    book['time_end'] = time_end
+                    psyc.append(book)
+
+                    psycs.append(psyc)
+                print(psycs)
 
         return None
 
