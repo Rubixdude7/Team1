@@ -23,6 +23,18 @@ $(document).ready(function(){
     });
 });
 
+ function validateFormMultiple() {
+var x = document.getElementsByName('fname');
+		for (i=0; i<x.length; i++)
+			{
+			 if (x[i].value == "")
+				{
+			 	 alert('All fields must be filled');
+			 	 return false;
+				}
+
+			}
+  }
 
 </script>
 
@@ -33,7 +45,7 @@ $(document).ready(function(){
 
             <h1 class="title">Question List</h1>
             <hr>
-        <form method="post" action="/post_add_questionAnswers" name="myForm">
+        <form method="post" action="/post_add_questionAnswers" name="myForm" onsubmit="return validateFormMultiple()">>
          <input type="hidden" name="cField" value="{{ child_id }}")>
             {% for u in questions %}
                 <!-- question list -->
@@ -69,11 +81,11 @@ $(document).ready(function(){
             {% if pagination.get_page_count() == page %}
                 <br>
                 <br>
-                <input type="submit" value="Submit Answers" onclick="">
+                <input type="submit" value="Submit Answers" onsubmit="return validateFormMultiple()">
             {% else %}
                 <br>
                 <br>
-                <input type="submit" value="Save Answers" onclick="">
+                <input type="submit" value="Save Answers" onsubmit="return validateFormMultiple()">
             {% endif %}
 
         </form>
