@@ -416,27 +416,8 @@ def addChild():
 
 
 # Start Jason's code
-@app.route('/admin')
-@roles_required('admin')
-def admin():
-    users = querydb.getAllUsers()
-    roles = list()
-    usersandroles = dict()
-    for u in users:
-        r = querydb.role(u.user_id)
-        roles.append(r)
-        if r == 'user':
-            usersandroles[u.email] = 'User'
-        if r == 'psyc':
-            usersandroles[u.email] = 'Psychologist'
-        if r == 'admin':
-            usersandroles[u.email] = 'Admin'
-        if r == 'staff':
-            usersandroles[u.email] = 'Office Staff'
 
-    return render_template('admin.html', users=users, roles=roles, usersandroles=usersandroles)
-
-
+#Forms
 class RoleChangeForm(FlaskForm):
     role = SelectField('Role', coerce=str, validators=[DataRequired()], option_widget='Select')
     submit = SubmitField('Submit')
@@ -461,10 +442,53 @@ class ClientEditForm(FlaskForm):
     address_1 = StringField('Address 1')
     address_2 = StringField('Address 2')
     city = StringField('City')
-    providence = StringField('Providence')
+    province = StringField('Province')
     zip = StringField('Zip Code')
     role = SelectField('Role', coerce=str, validators=[DataRequired()], option_widget='Select')
     submit = SubmitField('Submit')
+
+
+class SearchBar(FlaskForm):
+    search = StringField('Search')
+    submit = SubmitField('Submit')
+
+
+#Routes
+@app.route('/admin', methods=['GET', 'POST'])
+@roles_required('admin')
+def admin():
+    form = SearchBar()
+    users = querydb.getAllUsers()
+    roles = list()
+    usersandroles = dict()
+    for u in users:
+        r = querydb.role(u.user_id)
+        roles.append(r)
+        if r == 'admin':
+            usersandroles[u.email] = 'Admin'
+        if r == 'user':
+            usersandroles[u.email] = 'User'
+        if r == 'psyc':
+            usersandroles[u.email] = 'Psychologist'
+        if r == 'staff':
+            usersandroles[u.email] = 'Office Staff'
+    if form.validate_on_submit():
+        users = querydb.getSearchedUsers(form.search.data)
+        print(users)
+        roles = list()
+        usersandroles = dict()
+        for u in users:
+            r = querydb.role(u.user_id)
+            roles.append(r)
+            if r == 'admin':
+                usersandroles[u.email] = 'Admin'
+            if r == 'user':
+                usersandroles[u.email] = 'User'
+            if r == 'psyc':
+                usersandroles[u.email] = 'Psychologist'
+            if r == 'staff':
+                usersandroles[u.email] = 'Office Staff'
+    return render_template('admin.html', users=users, roles=roles, usersandroles=usersandroles, form=form)
 
 
 @app.route('/edit', methods=['GET', 'POST'])
@@ -485,7 +509,7 @@ def edit():
         form.address_1.default = querydb.getAdd1(c_id)
         form.address_2.default = querydb.getAdd2(c_id)
         form.city.default = querydb.getCity(c_id)
-        form.providence.default = querydb.getProvidence(c_id)
+        form.province.default = querydb.getProvince(c_id)
         form.zip.default = querydb.getZip(c_id)
         isUserOrPsyc = True
     else:
@@ -516,7 +540,7 @@ def edit():
             querydb.updateEmail(u_id, form.email.data)
             querydb.updateName(u_id,form.fName.data,form.lName.data)
             querydb.updateContact(u_id, c_id, form.phone.data, form.address_1.data, form.address_2.data,
-                                  form.city.data, form.providence.data, form.zip.data)
+                                  form.city.data, form.province.data, form.zip.data)
         flash('Your changes have been saved.')
         return redirect(url_for('admin'))
     else:

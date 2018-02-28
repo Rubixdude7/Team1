@@ -142,6 +142,10 @@ class query(object):
         users = db.user.select().where(db.user.active)
         return users
 
+    def getSearchedUsers(self, search):
+        users = db.user.select().where(db.user.active & db.user.email.contains(search))
+        return users
+
     def getAllRoles(self):
         roles = db.role.select(db.role.role_nm)
         return roles
@@ -205,7 +209,7 @@ class query(object):
         except DoesNotExist:
             return None
 
-    def getProvidence(self, contact_id):
+    def getProvince(self, contact_id):
         try:
             c = db.contact.get(db.contact.contact_id == contact_id)
             return c.providence
