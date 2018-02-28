@@ -72,13 +72,14 @@ class query(object):
             current.save()
 
             q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(), q=q_id,
-                                    child=childId)
+                                    child=childId, void_ind='n')
             q.save()
             # End Jared
         elif alreadyExists == questionAnswer:
             print("Answer already exists and didn't change!")
         else:
             print("Updating answer")
+            query.voidAnswer(self, q_id, childId)
             # Begin Jared
             current = db.child.get(db.child.child_id == childId)
             current.q_comp_dtm = datetime.datetime.now()
@@ -86,7 +87,7 @@ class query(object):
 
             q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(),
                                     q=q_id,
-                                    child=childId)
+                                    child=childId, void_ind='n')
             q.save()
             # End Jared
         # End Brody
@@ -118,6 +119,11 @@ class query(object):
 
     # Brody's code
 
+    def voidAnswer(self, q_id, child_id):
+        q = db.question_answers.get(db.question_answers.q == q_id, db.question_answers.child == child_id, db.question_answers.void_ind == 'n')
+        q.void_ind = 'y'
+        q.aave()
+
     def addChild(self, user_id, first, last, dob):
         c = db.child(user_id=user_id, child_nm_fst=first, child_nm_lst=last, child_dob=dob)
         c.save()
@@ -128,8 +134,7 @@ class query(object):
 
     def getAnswer(self, question_id, child_id):
         try:
-            a = db.question_answers.select().where(db.question_answers.q == question_id, db.question_answers.child == child_id)
-            a = a[len(a)-1]
+            a = db.question_answers.get(db.question_answers.q == question_id, db.question_answers.child == child_id, db.question_answers.void_ind == 'n')
             print(a.answer)
             return a.answer
         except:
