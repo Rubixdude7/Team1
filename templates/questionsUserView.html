@@ -35,20 +35,38 @@ var x = document.getElementsByName('fname');
 
 			}
   }
+  function progress() {
+    var x = document.getElementById('progress');
+    x.value = {{  ((100/pagination.get_page_count()) *(page - 1)) |round|int }};
+}
+ function keepChildName() {
+    var x = document.getElementById('childName');
+
+    x.value = {{  ((100/pagination.get_page_count()) *(page - 1)) |round|int }};
+}
+
+window.onload = progress;
 
 </script>
 
     <main>
 
         <div id = "box" class="box">
-        <p>Your Child: {{ child_name }}</p>
 
+        <p id="childName">Your Child: {{ child_name }}</p>
+    <progress id ="progress" value=" ((100/pagination.get_page_count()) *(page - 1)) |round|int }}" max="100"> </progress>
+              <p> Progress: {{  ((100/pagination.get_page_count()) *(page - 1)) |round|int }} % </p>
             <h1 class="title">Question List</h1>
             <hr>
-        <form method="post" action="/post_add_questionAnswers" name="myForm" onsubmit="return validateFormMultiple()">>
+        <form method="post" action="/post_add_questionAnswers" name="myForm" onsubmit="return validateFormMultiple()" onload="pagination()">
          <input type="hidden" name="cField" value="{{ child_id }}")>
             {% for u in questions %}
                 <!-- question list -->
+
+             {% if page > 1 %}
+
+
+            {% endif %}
                <div class="question">
 
                 <p id="questiontitle"><b><u>{{ u.question }}</u></b></p>

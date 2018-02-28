@@ -11,6 +11,7 @@ function pagination() {
         if (divs[i].id.indexOf('tab') != -1)
             numTabs++;
     }
+    alert(numTabs);
 }
 
 
