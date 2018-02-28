@@ -332,7 +332,7 @@ def post_questionAnswers():
     # print(question);
     # querydb.addQuestion(question, current_user.id)
 
-    return redirect(url_for('index'))
+    return redirect(url_for('parent'))
 
 #Gabe
 @app.route('/parent')
