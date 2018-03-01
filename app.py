@@ -238,8 +238,6 @@ def questionsUserView():
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
     c = querydb.findChild(child_id)
-    print(c.child_nm_fst)
-    print(child_name)
     if c is None:
         return redirect(url_for('index'))
     elif c.user.user_id is not current_user.id:
@@ -377,23 +375,6 @@ def editContact():
 
 
 # Start Brody's code
-@app.route('/child/<int:child_id>')
-def child(child_id=None):
-    r = querydb.role(current_user.id)
-    if r == 'user' or r == 'admin' or r == 'staff' or r == 'psyc':
-        child_info = querydb.findChild(child_id)
-        if child_info is None:
-            return redirect(url_for('index'))
-        born = datetime.datetime.strptime(child_info.child_dob.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
-        today = datetime.date.today()
-        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
-        if age < 0:
-            return redirect(url_for('index'))
-        else:
-            updatedQuestions = querydb.checkNewQuestions(child_id)
-            return render_template('child.html', child_info=child_info, child_age=age, updatedQuestions=updatedQuestions)
-    else:
-        return redirect(url_for('index'))
 
 @app.route('/childform')
 @roles_required('user')
@@ -412,6 +393,19 @@ def addChild():
     querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'), request.form.get('dateofbirth'))
     return parent()
 
+@app.route('/post_add_questionAnswers', methods=['GET', 'POST'])
+def saveAnswersPaginated():
+    # Jared's and Brody's code
+    questionAnswerList = request.form.getlist('fname')
+    questionIdList = request.form.getlist('qField')
+    childId = request.form.get('cField')
+    q_id = request.args.get('q_id')
+
+    # q = answer, q2 = questionId
+    for (q, q2) in zip(questionAnswerList, questionIdList):
+        # lack of this if was causing false "completed" question forms
+        if q is not '':
+            querydb.addQuestionAnswers(q, current_user.id, q2, childId)
 # End Brody
 
 @app.route('/post_edit_questionAnswers', methods=['GET', 'POST'])

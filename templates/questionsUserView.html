@@ -93,7 +93,7 @@ window.onload = progress;
                 <a class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous</a>
             {% endif %}
             {% if pagination.get_page_count() > page %}
-                 <a class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next</a>
+                <a class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next</a>
             {% endif %}
         <!--Only show submit button if last page  -->
             {% if pagination.get_page_count() == page %}
