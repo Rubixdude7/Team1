@@ -146,12 +146,12 @@ class query(object):
 
 # Start Jason's code
 
-    def getAllUsers(self):
-        users = db.user.select().where(db.user.active)
+    def getAllUsers(self, page_num, num_of_pages):
+        users = db.user.select().where(db.user.active).paginate(page_num, num_of_pages)
         return users
 
-    def getSearchedUsers(self, search):
-        users = db.user.select().where(db.user.active & db.user.email.contains(search))
+    def getSearchedUsers(self, search, page_num, num_of_pages):
+        users = db.user.select().where(db.user.active & db.user.email.contains(search)).paginate(page_num, num_of_pages)
         return users
 
     def getAllRoles(self):

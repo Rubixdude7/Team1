@@ -435,7 +435,7 @@ def post_editQuestions():
 
 # Start Jason's code
 
-#Forms
+# Forms
 class RoleChangeForm(FlaskForm):
     role = SelectField('Role', coerce=str, validators=[DataRequired()], option_widget='Select')
     submit = SubmitField('Submit')
@@ -467,16 +467,22 @@ class ClientEditForm(FlaskForm):
 
 
 class SearchBar(FlaskForm):
-    search = StringField('Search')
+    search = StringField('Search', default='Search')
     submit = SubmitField('Submit')
 
 
-#Routes
+# Routes
 @app.route('/admin', methods=['GET', 'POST'])
 @roles_required('admin')
 def admin():
+    page_num = 1
+    if 'page_num' in request.args:
+        page_num = int(request.args['page_num'])
     form = SearchBar()
-    users = querydb.getAllUsers()
+    if form.validate_on_submit():
+        users = querydb.getSearchedUsers(form.search.data, page_num, 5)
+    else:
+        users = querydb.getAllUsers(page_num, 5)
     roles = list()
     usersandroles = dict()
     for u in users:
@@ -490,23 +496,7 @@ def admin():
             usersandroles[u.email] = 'Psychologist'
         if r == 'staff':
             usersandroles[u.email] = 'Office Staff'
-    if form.validate_on_submit():
-        users = querydb.getSearchedUsers(form.search.data)
-        print(users)
-        roles = list()
-        usersandroles = dict()
-        for u in users:
-            r = querydb.role(u.user_id)
-            roles.append(r)
-            if r == 'admin':
-                usersandroles[u.email] = 'Admin'
-            if r == 'user':
-                usersandroles[u.email] = 'User'
-            if r == 'psyc':
-                usersandroles[u.email] = 'Psychologist'
-            if r == 'staff':
-                usersandroles[u.email] = 'Office Staff'
-    return render_template('admin.html', users=users, roles=roles, usersandroles=usersandroles, form=form)
+    return render_template('admin/admin.html', users=users, roles=roles, usersandroles=usersandroles, form=form, page_num=page_num)
 
 
 @app.route('/edit', methods=['GET', 'POST'])
@@ -563,32 +553,7 @@ def edit():
         return redirect(url_for('admin'))
     else:
         form.process()
-    return render_template('edit.html', title='Edit Profile', form=form, isUserOrPsyc=isUserOrPsyc)
-
-'''
-@app.route('/edit', methods=['GET', 'POST'])
-@roles_required('admin')
-def edit():
-    u_id = request.args.get('u_id')
-    if int(u_id) == int(current_user.id):
-        return redirect(url_for('admin'))
-    form = RoleChangeForm()
-    roles = querydb.getAllRoles()
-    current_role = querydb.role(u_id)
-    rolenames = [current_role]
-    for a in roles:
-        if a.role_nm != current_role:
-            rolenames.append(a.role_nm)
-    form.role.choices = [(r, r) for r in rolenames]
-    if form.validate_on_submit():
-        newRole = form.role.data
-        if newRole == 'psyc':
-            querydb.addPsychologistIfNotExist(u_id)
-        querydb.updateUserRole(u_id, newRole)
-        flash('Your changes have been saved.')
-        return redirect(url_for('admin'))
-    return render_template('edit.html', title='Edit Profile', form=form)
-'''
+    return render_template('admin/edit.html', title='Edit Profile', form=form, isUserOrPsyc=isUserOrPsyc)
 
 
 @app.route('/delete')

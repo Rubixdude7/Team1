@@ -7,12 +7,12 @@
     </div>
 
     <div class="box">
-        <h2 class="title">Roles</h2>
+        <h2 class="title">Users</h2>
         <hr>
         <form action="" method="post">
             {{ form.hidden_tag() }}
-            <div class = form-control-1>{{ form.search }}</div>
-            <div class = form-control-2>{{ form.submit() }}</div>
+            <div class = form-control-1>{{ form.search(size=85) }} {{ form.submit() }} </div>
+
         </form>
         <div class="table-wrapper">
             <table class="table">
@@ -83,6 +83,15 @@
                 </tbody>
             </table>
         </div>
+        <p>
+            {% if page_num > 1 %}
+                <a href="{{ url_for('admin', page_num=page_num - 1) }}">Previous Page</a>
+            {% else %}
+                Previous Page
+            {% endif %}
+            /
+            <a href="{{ url_for('admin', page_num=page_num + 1) }}">Next Page</a>
+        </p>
     </div>
 <script>
 function confirmAction() {
