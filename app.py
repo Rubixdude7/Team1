@@ -280,6 +280,11 @@ def viewAnswers():
 @login_required
 def parent_seeanswers():
     child_id = request.args.get('child_id')
+    c = querydb.findChild(child_id)
+    if c is None:
+        return redirect(url_for('index'))
+    elif current_user.id is not c.user.user_id:
+        return redirect(url_for('index'))
     questions = querydb.getAllQuestionsForUsers()
     # Brody code
     answers = []
@@ -367,18 +372,38 @@ def editContact():
 def child(child_id=None):
     r = querydb.role(current_user.id)
     if r == 'user' or r == 'admin' or r == 'staff' or r == 'psyc':
-        if child_id is not None:
-            child_info = querydb.findChild(child_id)
-            born = datetime.datetime.strptime(child_info.child_dob.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
-            today = datetime.date.today()
-            age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
-            if child_info is not None:
-                updatedQuestions = querydb.checkNewQuestions(child_id)
-                return render_template('child.html', child_info=child_info, child_age=age, updatedQuestions=updatedQuestions)
-        return render_template('parent.html')
+        child_info = querydb.findChild(child_id)
+        if child_info is None:
+            return redirect(url_for('index'))
+        born = datetime.datetime.strptime(child_info.child_dob.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
+        today = datetime.date.today()
+        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+        if age < 0:
+            return redirect(url_for('index'))
+        else:
+            updatedQuestions = querydb.checkNewQuestions(child_id)
+            return render_template('child.html', child_info=child_info, child_age=age, updatedQuestions=updatedQuestions)
     else:
-        return render_template('index.html')
+        return redirect(url_for('index'))
 
+@app.route('/childform')
+@roles_required('user')
+def childform():
+    return render_template('childform.html')
+
+
+@app.route('/childform', methods=['post'])
+@roles_required('user')
+def addChild():
+    born = datetime.datetime.strptime(request.form.get('dateofbirth'), "%Y-%m-%d")
+    today = datetime.date.today()
+    age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+    if age < 0:
+        return parent()
+    querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'), request.form.get('dateofbirth'))
+    return parent()
+
+# End Brody
 
 @app.route('/post_edit_questionAnswers', methods=['GET', 'POST'])
 def post_editQuestions():
@@ -398,22 +423,6 @@ def post_editQuestions():
     # querydb.addQuestion(question, current_user.id)
 
     return redirect(url_for('parent'))
-
-
-@app.route('/childform')
-@roles_required('user')
-def childform():
-    return render_template('childform.html')
-
-
-@app.route('/childform', methods=['post'])
-@roles_required('user')
-def addChild():
-    querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'), request.form.get('dateofbirth'))
-    return parent()
-
-# End Brody
-
 
 # Start Jason's code
 

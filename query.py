@@ -117,7 +117,7 @@ class query(object):
         current.question = newQuestion
         current.save()
 
-    # Brody's code
+    #  Brody's code
 
     def voidAnswer(self, q_id, child_id):
         q = db.question_answers.get(db.question_answers.q == q_id, db.question_answers.child == child_id, db.question_answers.void_ind == 'n')
@@ -129,8 +129,11 @@ class query(object):
         c.save()
 
     def findChild(self, child_id):
-        c = db.child.get(db.child.child_id == child_id)
-        return c
+        try:
+            c = db.child.get(db.child.child_id == child_id)
+            return c
+        except:
+            return None
 
     def getAnswer(self, question_id, child_id):
         try:
