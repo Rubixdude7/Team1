@@ -237,6 +237,15 @@ def questions():
 def questionsUserView():
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
+    c = querydb.findChild(child_id)
+    print(c.child_nm_fst)
+    print(child_name)
+    if c is None:
+        return redirect(url_for('index'))
+    elif c.user.user_id is not current_user.id:
+        return redirect(url_for('index'))
+    elif child_name != c.child_nm_fst:
+        return redirect(url_for('index'))
     print(child_id)
     questions = querydb.getAllQuestions()
     # Brody code
