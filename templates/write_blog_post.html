@@ -1,6 +1,17 @@
 {% extends "base.html" %}
 {% block title %}Write a Blog Post{% endblock %}
 {% block content %}
+<script src="/static/scripts/tinymce/js/tinymce/tinymce.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    tinymce.init({
+        selector: 'textarea',
+        theme: 'modern',
+        mobile: {
+            theme: 'mobile',
+            toolbar: ['undo', 'redo', 'bold', 'italic', 'link', 'unlink']
+        }
+    });
+</script>
 <main id="psyc-page">
     <div class="box">
         <form action="{{ url_for('write_blog_post') }}" method="post" enctype="multipart/form-data">
