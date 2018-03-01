@@ -93,7 +93,14 @@ window.onload = progress;
                 <a class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous</a>
             {% endif %}
             {% if pagination.get_page_count() > page %}
-                <a class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next</a>
+
+                  <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView', href="./?page={{ page + 1 }}",child_id=child_id, child_name=child_name) }}'" type="button">
+                                           Next Page
+
+                                        </button>
+
+                 <a class="next" style="font-size:30px;" href="./?page={{ page + 1 }}"  value="{{ child_id}}">Next</a>
+                 <input type="hidden" name="qField" value="{{ child_id}}")>
             {% endif %}
         <!--Only show submit button if last page  -->
             {% if pagination.get_page_count() == page %}
