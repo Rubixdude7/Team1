@@ -474,9 +474,9 @@ def admin():
         page_num = int(request.args['page_num'])
     form = SearchBar()
     if form.validate_on_submit():
-        users = querydb.getSearchedUsers(form.search.data, page_num, 5)
+        users = querydb.getSearchedUsers(form.search.data, page_num, 10)
     else:
-        users = querydb.getAllUsers(page_num, 5)
+        users = querydb.getAllUsers(page_num, 10)
     roles = list()
     usersandroles = dict()
     for u in users:
