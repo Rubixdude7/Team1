@@ -1,5 +1,7 @@
 import calendar
 
+from flask import Markup
+import bleach
 import models as db
 import datetime
 from peewee import *
@@ -279,7 +281,7 @@ class query(object):
         return [{
             'title': t[0],
             'date_posted': t[1],
-            'contents': t[2], 
+            'contents': Markup(t[2]),
             'psyc_id': t[3],
             'author': '{0} {1}'.format(t[4], t[5])
         } for t in tuples]
@@ -318,6 +320,7 @@ class query(object):
         return psyc_id
 
     def createBlogPost(self, u_id, psyc_id, subject, text):
+        text = bleach.clean(text)
         now = datetime.datetime.now()
         blog_post = db.blog(psyc=psyc_id,
                             subject=subject,

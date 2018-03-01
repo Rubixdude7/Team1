@@ -5,11 +5,14 @@
 <script type="text/javascript">
     tinymce.init({
         selector: 'textarea',
+        plugins: 'link',
+        menubar: false,
         theme: 'modern',
         mobile: {
             theme: 'mobile',
             toolbar: ['undo', 'redo', 'bold', 'italic', 'link', 'unlink']
-        }
+        },
+        toolbar: 'undo redo | bold italic | link unlink'
     });
 </script>
 <main id="psyc-page">

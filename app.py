@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, Markup
 import datetime
 from flask_sqlalchemy import SQLAlchemy
 from playhouse.flask_utils import object_list
@@ -582,7 +582,7 @@ def psikolog(id=None):
             blog_posts = [{
                 'title': post.subject,
                 'date_posted': post.updt_dtm,
-                'contents': post.text
+                'contents': Markup(post.text)
             } for post in blg]
 
             can_edit = False
