@@ -90,10 +90,18 @@ window.onload = progress;
             <br>
 
             {% if page > 1 %}
-                <a class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous</a>
+                 <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView', page=page - 1,child_id=child_id, child_name=child_name) }}';" type="button">
+                                           Previous Page
+
+                                        </button>
             {% endif %}
             {% if pagination.get_page_count() > page %}
-                <a class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next</a>
+
+                  <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView', page=page + 1,child_id=child_id, child_name=child_name) }}';" type="button">
+                                           Next Page
+
+                                        </button>
+
             {% endif %}
         <!--Only show submit button if last page  -->
             {% if pagination.get_page_count() == page %}
