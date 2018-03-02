@@ -141,6 +141,7 @@ class query(object):
     def findChild(self, child_id):
         try:
             c = db.child.get(db.child.child_id == child_id)
+            print(c.child_nm_fst)
             return c
         except:
             return None

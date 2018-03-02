@@ -240,6 +240,10 @@ def questionsUserView():
     c = querydb.findChild(child_id)
 
     # brody
+    if c is None:
+        return redirect(url_for('parent'))
+    elif c.user.user_id != current_user.id:
+        return redirect(url_for('parent'))
     page = request.args.get("page")
     if page is not None:
         page = int(page)
@@ -267,6 +271,10 @@ def questionsUserView2():
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
     c = querydb.findChild(child_id)
+    if c is None:
+        return redirect(url_for('parent'))
+    elif c.user.user_id != current_user.id:
+        return redirect(url_for('parent'))
     paginate = 3
     questions = querydb.getAllQuestions()
     # Brody code
@@ -275,7 +283,8 @@ def questionsUserView2():
         answers.append(querydb.getAnswer(q.q_id, child_id))
     print("Page: ", page)
     print("Paginate by: ", paginate)
-    answers = answers[(paginate * (int(page)-1)): len(answers)]
+    if page is not None:
+        answers = answers[(paginate * (int(page)-1)): len(answers)]
     print("Answers: ", answers)
     # End Brody code
 
@@ -335,9 +344,9 @@ def parent_seeanswers():
     child_id = request.args.get('child_id')
     c = querydb.findChild(child_id)
     if c is None:
-        return redirect(url_for('index'))
+        return redirect(url_for('parent'))
     elif current_user.id is not c.user.user_id:
-        return redirect(url_for('index'))
+        return redirect(url_for('parent'))
     questions = querydb.getAllQuestionsForUsers()
     # Brody code
     answers = []
