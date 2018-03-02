@@ -514,9 +514,11 @@ def admin():
         page_num = int(request.args['page_num'])
     form = SearchBar()
     if form.validate_on_submit():
-        users = querydb.getSearchedUsers(form.search.data, page_num, 10)
+        users = querydb.getSearchedUsers(form.search.data, page_num, 5)
+        num_of_pages = round(querydb.getSearchedUserCount(form.search.data) / 5)
     else:
-        users = querydb.getAllUsers(page_num, 10)
+        users = querydb.getAllUsers(page_num, 5)
+        num_of_pages = round(querydb.getUserCount() / 5)
     roles = list()
     usersandroles = dict()
     for u in users:
@@ -530,7 +532,8 @@ def admin():
             usersandroles[u.email] = 'Psychologist'
         if r == 'staff':
             usersandroles[u.email] = 'Office Staff'
-    return render_template('admin/admin.html', users=users, roles=roles, usersandroles=usersandroles, form=form, page_num=page_num)
+    return render_template('admin/admin.html', users=users, roles=roles, usersandroles=usersandroles, form=form
+                           , page_num=page_num, num_of_pages=num_of_pages)
 
 
 @app.route('/edit', methods=['GET', 'POST'])
