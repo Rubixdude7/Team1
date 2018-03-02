@@ -241,6 +241,8 @@ def questionsUserView():
 
 
 
+
+
     questions = querydb.getAllQuestions()
     # Brody code
     answers = []
@@ -249,6 +251,57 @@ def questionsUserView():
         answers.append(querydb.getAnswer(q.q_id, child_id))
     # end Brody code
     return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name, answers=answers)
+
+
+@app.route('/questionsUserView2/', methods=['GET', 'POST'])
+@login_required
+def questionsUserView2():
+
+    page = request.args.get('page')
+    totalPage = request.args.get('totalPage')
+    child_id = request.args.get('child_id')
+    child_name = request.args.get('child_name')
+    c = querydb.findChild(child_id)
+    paginate = 3
+    questions = querydb.getAllQuestions()
+    # Brody code
+    answers = []
+    for q in questions:
+        print("Q_ID: ", q.q_id)
+        answers.append(querydb.getAnswer(q.q_id, child_id))
+    # end Brody code
+
+
+
+
+
+
+
+    questionAnswerList = request.form.getlist('fname')
+
+    print('test')
+    print(questionAnswerList)
+    questionIdList = request.form.getlist('qField')
+    childId = request.form.get('cField')
+    q_id = request.args.get('q_id')
+
+    # Brody says: q = answer, q2 = questionId
+    for (q, q2) in zip(questionAnswerList, questionIdList):
+        print(current_user.id)
+        print(questionAnswerList)
+        print("Q", q)
+        print("Q2", q2)
+        # lack of this if was causing false "completed" question forms
+        if q is not '':
+            querydb.addQuestionAnswers(q, current_user.id, q2, childId)
+            print('page')
+            print(page)
+            print(totalPage)
+    if page == totalPage:
+
+        return redirect(url_for('parent'))
+    return object_list("questionsUserView.html", paginate_by=paginate, query=questions, context_variable='questions',
+                       child_id=child_id, child_name=child_name, answers=answers)
 
 
 @app.route('/questionsEditQuestions/')

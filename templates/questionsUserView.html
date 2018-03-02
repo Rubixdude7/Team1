@@ -58,7 +58,7 @@ window.onload = progress;
               <p> Progress: {{  ((100/pagination.get_page_count()) *(page - 1)) |round|int }} % </p>
             <h1 class="title">Question List</h1>
             <hr>
-        <form method="post" action="/post_add_questionAnswers" name="myForm" onsubmit="return validateFormMultiple()" onload="pagination()">
+       <form method="post" onsubmit="return validateFormMultiple()" action="{{ url_for('questionsUserView2', page=page + 1,child_id=child_id, child_name=child_name, totalPage=pagination.get_page_count() + 1) }}" name="myForm" onsubmit="" onload="pagination()">
          <input type="hidden" name="cField" value="{{ child_id }}")>
             {% for u in questions %}
                 <!-- question list -->
@@ -96,22 +96,24 @@ window.onload = progress;
                                         </button>
             {% endif %}
             {% if pagination.get_page_count() > page %}
-
-                  <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView', page=page + 1,child_id=child_id, child_name=child_name) }}';" type="button">
+<!--
+                  <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView2', page=page + 1,child_id=child_id, child_name=child_name) }}';" type="button">
                                            Next Page
 
                                         </button>
+-->
+                 <input type="submit" value="Next Page" onsubmit="return validateFormMultiple()">
+
 
             {% endif %}
         <!--Only show submit button if last page  -->
             {% if pagination.get_page_count() == page %}
+
                 <br>
                 <br>
                 <input type="submit" value="Submit Answers" onsubmit="return validateFormMultiple()">
+
             {% else %}
-                <br>
-                <br>
-                <input type="submit" value="Save Answers" onsubmit="return validateFormMultiple()">
             {% endif %}
 
         </form>
