@@ -275,13 +275,13 @@ def questionsUserView2():
         answers.append(querydb.getAnswer(q.q_id, child_id))
     print("Page: ", page)
     print("Paginate by: ", paginate)
-    answers = answers[(paginate * (int(page)-1)): len(answers)-1]
+    answers = answers[(paginate * (int(page)-1)): len(answers)]
     print("Answers: ", answers)
     # End Brody code
 
     questionAnswerList = request.form.getlist('fname')
 
-    print(questionAnswerList)
+    print("QA list: ", questionAnswerList)
     questionIdList = request.form.getlist('qField')
     childId = request.form.get('cField')
 
