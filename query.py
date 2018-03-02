@@ -63,6 +63,7 @@ class query(object):
 
         return questionsUpdated
 
+
     def addQuestionAnswers(self, questionAnswer, user, q_id, childId):
         # Begin Brody
         '''
@@ -73,7 +74,7 @@ class query(object):
         if alreadyExists is None:
             # Begin Jared
             current = db.child.get(db.child.child_id == childId)
-            current.q_comp_dtm = datetime.datetime.now()
+            current.q_comp_dtm = None
             current.save()
 
             q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(), q=q_id,
@@ -87,40 +88,7 @@ class query(object):
             query.voidAnswer(self, q_id, childId)
             # Begin Jared
             current = db.child.get(db.child.child_id == childId)
-            current.q_comp_dtm = datetime.datetime.now()
-            current.save()
-
-            q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(),
-                                    q=q_id,
-                                    child=childId, void_ind='n')
-            q.save()
-            # End Jared
-        # End Brody
-    def addQuestionAnswers(self, questionAnswer, user, q_id, childId):
-        # Begin Brody
-        '''
-            This should now prevent additional rows from being
-            added unnecessarily, i.e., the answer didn't change for this kid, for this question
-        '''
-        alreadyExists = query.getAnswer(self, q_id, childId)
-        if alreadyExists is None:
-            # Begin Jared
-            current = db.child.get(db.child.child_id == childId)
-            current.q_comp_dtm = datetime.datetime.now()
-            current.save()
-
-            q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(), q=q_id,
-                                    child=childId, void_ind='n')
-            q.save()
-            # End Jared
-        elif alreadyExists == questionAnswer:
-            print("Answer already exists and didn't change!")
-        else:
-            print("Updating answer")
-            query.voidAnswer(self, q_id, childId)
-            # Begin Jared
-            current = db.child.get(db.child.child_id == childId)
-            current.q_comp_dtm = datetime.datetime.now()
+            current.q_comp_dtm = None
             current.save()
 
             q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(),
@@ -133,7 +101,11 @@ class query(object):
     def paginate(self, num):
         num = db.questions.select()
         return num
-
+    def checkComp(self, childId):
+        current = db.child.get(db.child.child_id == childId)
+        print('test3r')
+        current.q_comp_dtm = datetime.datetime.now()
+        current.save()
     def getAllQuestions(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd')
         return questions

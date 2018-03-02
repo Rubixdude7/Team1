@@ -284,6 +284,7 @@ def questionsUserView2():
     print(questionAnswerList)
     questionIdList = request.form.getlist('qField')
     childId = request.form.get('cField')
+
     q_id = request.args.get('q_id')
 
     # Brody says: q = answer, q2 = questionId
@@ -294,7 +295,7 @@ def questionsUserView2():
         if q is not '':
             querydb.addQuestionAnswers(q, current_user.id, q2, childId)
     if page == totalPage:
-
+        querydb.checkComp(child_id)
         return redirect(url_for('parent'))
     return object_list("questionsUserView.html", paginate_by=paginate, query=questions, context_variable='questions',
                        child_id=child_id, child_name=child_name, answers=answers)
@@ -363,33 +364,6 @@ def post_questions():
 
     return redirect(url_for('questions'))
 
-
-@app.route('/post_add_questionAnswers', methods=['GET', 'POST'])
-def post_questionAnswers():
-
-    questionAnswerList = request.form.getlist('fname')
-    questionIdList = request.form.getlist('qField')
-    childId = request.form.get('cField')
-    q_id = request.args.get('q_id')
-
-
-    # Brody says: q = answer, q2 = questionId
-    for (q,q2) in zip (questionAnswerList, questionIdList):
-      print(current_user.id)
-      print(questionAnswerList)
-      print("Q", q)
-      print("Q2", q2)
-      # lack of this if was causing false "completed" question forms
-      if q is not '':
-          querydb.addQuestionAnswers(q, current_user.id, q2, childId)
-
-
-    # question = request.args.get('question')
-    # question=request.form.get('question')
-    # print(question);
-    # querydb.addQuestion(question, current_user.id)
-
-    return redirect(url_for('parent'))
 
 #Gabe
 @app.route('/parent')
