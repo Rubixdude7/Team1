@@ -339,7 +339,7 @@ class query(object):
         return psyc_id
 
     def createBlogPost(self, u_id, psyc_id, subject, text):
-        text = bleach.clean(text)
+        text = bleach.clean(text, tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', u'p'])
         now = datetime.datetime.now()
         blog_post = db.blog(psyc=psyc_id,
                             subject=subject,
