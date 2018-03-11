@@ -389,9 +389,10 @@ def post_questions():
 @roles_required('user')
 def parent():
 
+    updatedQuestions = querydb.checkNewQuestions(current_user.id)
     return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name,
                            children = querydb.getChildren(current_user.id),
-                           contact_info=querydb.contactID(current_user.id), querydb=querydb)
+                           contact_info=querydb.contactID(current_user.id), querydb=querydb, updatedQuestions = updatedQuestions)
 
 
 @app.route('/parent/contact')
@@ -412,8 +413,11 @@ def editContact():
 
 
 # Start Brody's code
+
+# this may be code thats not used anymore?
 @app.route('/child/<int:child_id>')
 def child(child_id=None):
+
     r = querydb.role(current_user.id)
     if r == 'user' or r == 'admin' or r == 'staff' or r == 'psyc':
         child_info = querydb.findChild(child_id)
@@ -426,9 +430,13 @@ def child(child_id=None):
             return redirect(url_for('index'))
         else:
             updatedQuestions = querydb.checkNewQuestions(child_id)
+            print("updated", updatedQuestions)
             return render_template('child.html', child_info=child_info, child_age=age, updatedQuestions=updatedQuestions)
     else:
         return redirect(url_for('index'))
+#end code that is not used anymore.
+
+
 
 @app.route('/childform')
 @roles_required('user')

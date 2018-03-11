@@ -1,8 +1,7 @@
 <!-- put these at top otherwise it doesn't show year for some reason-->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <script src="{{ url_for('static', filename='scripts/question.js') }}" type="text/jscript"></script>
-
 {% extends "base.html" %}
 {% block title %}Questions{% endblock %}
 {% block content %}
@@ -25,15 +24,15 @@ $(document).ready(function(){
 var global1 = false;
  function validateFormMultiple() {
     var x = document.getElementsByName('fname');
-		for (i=0; i<x.length; i++)
-			{
-			 if (x[i].value == "")
-				{
-			 	 alert('All fields must be filled');
-			 	 return false;
-				}
+    if (global1 == false) { //only validate if the next button is being used
+        for (i = 0; i < x.length; i++) {
+            if (x[i].value == "") {
+                alert('All fields must be filled');
+                return false;
+            }
 
-			}
+        }
+    }
      if (global1 == true) {
 
          var frm = document.getElementById("mainForm")
@@ -110,7 +109,17 @@ window.onload = progress;
             {% endfor %}
             <br>
             <br>
-            {% if pagination.get_page_count() > page %}
+
+            {% if page > 1 %}
+                 <input style="background-color: orange"  type="submit" name="checkButton" value="Previous" onsubmit="return validateFormMultiple()" onclick="return buttonClick(this)">
+             <!--    <button style="background-color: orange" onclick="location.href='{{ url_for('questionsUserView2', page=page - 1,child_id=child_id, child_name=child_name) }}';" type="button">
+                                           Previous Page
+
+                                        </button> -->
+
+
+            {% endif %}
+              {% if pagination.get_page_count() > page %}
 <!--
                   <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView2', page=page + 1,child_id=child_id, child_name=child_name) }}';" type="button">
                                            Next Page
@@ -118,15 +127,6 @@ window.onload = progress;
                                         </button>
 -->
                  <input type="submit" name="checkButton" value="NextPage" onsubmit="return validateFormMultiple()">
-
-
-            {% endif %}
-            {% if page > 1 %}
-                 <input type="submit" name="checkButton" value="Previous" onsubmit="return validateFormMultiple()" onclick="return buttonClick(this)">
-                 <button style="background-color: orange" onclick="location.href='{{ url_for('questionsUserView2', page=page - 1,child_id=child_id, child_name=child_name) }}';" type="button">
-                                           Previous Page
-
-                                        </button>
 
 
             {% endif %}
