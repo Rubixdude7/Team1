@@ -738,9 +738,23 @@ def edit_qualifications():
 @roles_required('psyc')
 def edit_availability_list():
     psyc_id = querydb.getPsycId(current_user.id)
-    availabilities = querydb.getAvailabilities(psyc_id)
+    avail_list = querydb.getAvailabilities(psyc_id)
     weekdays = querydb.getWeekDays()
-    return render_template('edit_availability_list.html', psyc_id=psyc_id, availabilities=availabilities, weekdays=weekdays)
+    
+    for a in avail_list:
+        a['time_st'] = {
+            'hour': a['time_st'].hour,
+            'minute': a['time_st'].minute,
+            'second': a['time_st'].second
+        }
+        a['time_end'] = {
+            'hour': a['time_end'].hour,
+            'minute': a['time_end'].minute,
+            'second': a['time_end'].second
+        }
+        a['weekday'] = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
+    
+    return render_template('edit_availability_list.html', psyc_id=psyc_id, avails=avail_list, weekdays=weekdays)
 
 @app.route('/psikolog/delete_availability/<int:avail_id>')
 @roles_required('psyc')

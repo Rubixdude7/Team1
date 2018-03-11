@@ -1,8 +1,28 @@
 {% extends "base.html" %}
+
+{% import "psikolog/calendar.html" as calendar %}
+
 {% block title %}Your Availability List{% endblock %}
+
+{% block head %}
+{{ super() }}
+{{ calendar.script_tag() }}
+{% endblock %}
+
 {% block content %}
 <main id="your-availability-list">
     <div class="box">
+        {{ calendar.calendar("calendar") }}
+        <script type="text/javascript">
+            var avails = {{ avails|tojson|safe }};
+            
+            $(document).ready(function() {
+                var cal = new calendarModule.Calendar("#calendar");
+                cal.setup();
+                cal.setAvailabilities(avails);
+                cal.refresh();
+            });
+        </script>
         <p><a href="{{ url_for('add_availability') }}"><i class="fa fa-plus"></i> Add Availability</a></p>
         <table border="1" style="width:100%">
             <thead>
@@ -14,14 +34,14 @@
                 </tr>
             </thead>
             <tbody>
-                {% for avail in availabilities %}
+                {% for avail in avails %}
                 <tr>
-                    <td>{{ avail['time_st'] }}</td>
-                    <td>{{ avail['time_end'] }}</td>
+                    <td>{{ '%02d:%02d:%02d'|format(avail['time_st']['hour'], avail['time_st']['minute'], avail['time_st']['second']) }}</td>
+                    <td>{{ '%02d:%02d:%02d'|format(avail['time_end']['hour'], avail['time_end']['minute'], avail['time_end']['second']) }}</td>
                     <td>{{ weekdays[avail['weekday']] }}</td>
                     <td>
-                        <a href="{{ url_for('edit_availability', avail_id=avail.avail_id) }}"><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">Edit</span></a>
-                        <a href="{{ url_for('delete_availability', avail_id=avail.avail_id) }}"><i class="fa fa-trash" aria-hidden="true"></i><span class="sr-only">Delete</span></a>
+                        <a href="{{ url_for('edit_availability', avail_id=avail['avail_id']) }}"><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">Edit</span></a>
+                        <a href="{{ url_for('delete_availability', avail_id=avail['avail_id']) }}"><i class="fa fa-trash" aria-hidden="true"></i><span class="sr-only">Delete</span></a>
                     </td>
                 </tr>
                 {% endfor %}
