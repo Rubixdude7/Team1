@@ -281,6 +281,7 @@ var calendarModule = (function() {
                 dayElem.html("&nbsp;");
                 dayElem.attr("data-this-month", "false");
                 dayElem.removeAttr("data-day");
+                dayElem.removeAttr("data-weekday");
             } else {
                 var dayNum = (index - daysFromPrevMonth) + 1;
                 var html = "<div class=\"cal-day-number\">" + dayNum.toString() + "</div>";
@@ -298,6 +299,7 @@ var calendarModule = (function() {
                 dayElem.html(html);
                 dayElem.attr("data-this-month", "true");
                 dayElem.attr("data-day", cal.year.toString() +  "-" + (cal.month+1).toString() + "-" + dayNum.toString());
+                dayElem.attr("data-weekday", (index % 7).toString());
             }
         });
 

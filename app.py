@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, Markup, jsonify
+from flask import Flask, render_template, request, redirect, url_for, Markup, jsonify, json
 import datetime
 from flask_sqlalchemy import SQLAlchemy
 from playhouse.flask_utils import object_list
@@ -171,18 +171,16 @@ def slide_update(s_id):
 @app.route('/consultation', methods=['GET', 'POST'])
 @login_required
 def consultation():
-    cnslt = dict()
-    cnslt['psyc'] = request.form.get('psyc', None)
-    cnslt['len_fee'] = request.form.get('length', None)
-    cnslt['date'] = request.form.get('date', None)
-    cnslt['hour'] = request.form.get('hour', None)
-    cnslt['min'] = request.form.get('min', None)
-    cnslt['child_id'] = request.args.get('child_id')
-    print(cnslt)
-    querydb.get_psyc_cnslt(cnslt)
+    req = request.json['data']
+    year = request.form['year']
+    month = request.form['month']
+    day = request.form['day']
 
-    params = querydb.get_consultation()
-    return render_template("consultation.html", psycs=params[0], len_fee=params[1])
+    print(req)
+
+    print(year + month + day)
+
+    return jsonify({'status': 'OK', 'user': 'brandon', 'pass': 'nopass'})
 
 
 #           END BRANDON         #
