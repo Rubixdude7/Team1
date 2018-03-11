@@ -611,6 +611,9 @@ footer {
   white-space: nowrap;
   background-color: #ffcb05; }
 
+.calendar-planning .cal-head {
+  background-color: #fff; }
+
 .cal-month-name {
   margin: 0;
   padding: 12px 0;
@@ -628,8 +631,9 @@ footer {
   background-color: #cc9900;
   color: #fff; }
 
-.cal-body {
-  background-color: #ffcb05; }
+.calendar-planning .cal-column-title {
+  color: #000;
+  background-color: #fff; }
 
 .cal-week {
   line-height: 0;
@@ -650,13 +654,18 @@ footer {
   border-color: #999;
   border-width: 1px 0 0 1px;
   overflow: hidden;
-  white-space: nowrap;
+  white-space: nowrap; }
+
+.calendar-planning .cal-day {
+  border-color: #000; }
+
+.calendar-pretty .cal-day {
   cursor: pointer; }
 
-.cal-day:not([data-this-month="false"]):hover {
+.calendar-pretty .cal-day:not([data-this-month="false"]):hover {
   box-shadow: inset 0 0 4px #66F; }
 
-.cal-day:not([data-this-month="false"]):active {
+.calendar-pretty .cal-day:not([data-this-month="false"]):active {
   background-color: #CCC;
   box-shadow: inset 0 0 4px #339; }
 
@@ -671,13 +680,16 @@ footer {
   background-color: #CCC;
   cursor: auto; }
 
+.calendar-planning .cal-day[data-this-month="false"] {
+  background-color: #000; }
+
 @media only screen and (max-width: 759px) {
   .cal-day {
     height: 40px; }
 
   .cal-day-number {
     font-size: 12pt; } }
-.cal-space-slot {
+.calendar-pretty .cal-space-slot {
   display: inline-block;
   margin: 4px 0;
   height: 9px;
@@ -689,7 +701,7 @@ footer {
   border-radius: 0;
   background-color: #BBB; }
 
-.cal-ok-slot {
+.calendar-pretty .cal-ok-slot {
   display: inline-block;
   margin: 4px 0;
   height: 9px;
@@ -700,6 +712,30 @@ footer {
   border-width: 0;
   border-radius: 0;
   background-color: #00C; }
+
+.calendar-planning .cal-space-slot {
+  display: inline-block;
+  margin: 4px 0;
+  height: 9px;
+  padding: 0;
+  line-height: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  border-width: 0;
+  border-radius: 0;
+  background-color: transparent; }
+
+.calendar-planning .cal-ok-slot {
+  display: inline-block;
+  margin: 4px 0;
+  height: 9px;
+  padding: 0;
+  line-height: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  border-width: 0;
+  border-radius: 0;
+  background-color: #000; }
 
 /**********END GLOBAL CSS**********/
 /**********BEGIN HOME**********/

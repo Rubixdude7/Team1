@@ -3,8 +3,8 @@
     <script type="text/javascript" src="/static/scripts/calendar.js"></script>
 {%- endmacro %}
 
-{% macro calendar(id='calendar') -%}
-    <div class="calendar" id="{{ id }}">
+{% macro calendar(id='calendar', classes='calendar-pretty') -%}
+    <div class="calendar {{ classes }}" id="{{ id }}">
         <div class="cal-head">
             <div class="cal-month-name">
                 <div>
