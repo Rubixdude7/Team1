@@ -48,10 +48,8 @@ class query(object):
         question.void_ind = 'd'
 
         question.save()
-
-
-
         question.save()
+
     def addQuestion(self, question2, user):
 
         q = db.questions(question=question2, user_id_crea=user, crea_dtm=datetime.datetime.now())
@@ -106,26 +104,24 @@ class query(object):
     def paginate(self, num):
         num = db.questions.select()
         return num
+
     def checkComp(self, childId):
         current = db.child.get(db.child.child_id == childId)
         print('test3r')
         current.q_comp_dtm = datetime.datetime.now()
         current.save()
+
     def getAllQuestions(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd')
         return questions
 
     def getAllQuestionsForUsers(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd' and db.questions.void_ind == 'n')
-
         return questions
+
     def getAllQuestionAnswers(self, child_id):
-
         questionAnswers = db.question_answers.select().where(db.question_answers.child == child_id)
-
-
         return questionAnswers
-
 
     def editQuestion(self, a, newQuestion):
         current = db.questions.get(db.questions.q_id == a)
