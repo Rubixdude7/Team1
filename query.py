@@ -416,6 +416,20 @@ class query(object):
             'time_end': t[2],
             'weekday': t[3]
         } for t in tuples]
+        
+    def getAllAvailabilities(self):
+        tuples = db.calendar.select(db.psychologist.psyc_id, db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
+                            .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
+                            .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
+                            .where(db.calendar.void_ind == 'n')\
+                            .tuples()
+        return [{
+            'psyc_id': t[0],
+            'avail_id': t[1],
+            'time_st': t[2],
+            'time_end': t[3],
+            'weekday': t[4]
+        } for t in tuples]
 
     def getAvailabilitiesForDay(self, psyc_id, year, month, day):
         wkd_index = datetime.date(year, month, day).weekday()

@@ -1,0 +1,42 @@
+{% macro script_tag() -%}
+    <!-- Calendar code -->
+    <script type="text/javascript" src="/static/scripts/calendar.js"></script>
+{%- endmacro %}
+
+{% macro calendar(id='calendar') -%}
+    <div class="calendar" id="{{ id }}">
+        <div class="cal-head">
+            <div class="cal-month-name">
+                <div>
+                    <i class="fa fa-calendar-alt" aria-hidden="true"></i>
+                    <span id="cal-month-label" aria-live="polite" aria-relevant="text"></span>
+                </div>
+                <div>
+                    <button class="cal-prev-btn" aria-controls="cal-month-label"><i class="fa fa-arrow-left" aria-hidden="true"></i><span class="sr-only">Previous Month</span></button>
+                    <button class="cal-next-btn" aria-controls="cal-month-label"><i class="fa fa-arrow-right" aria-hidden="true"></i><span class="sr-only">Next Month</span></button>
+                </div>
+            </div><div class="cal-column-title" aria-hidden="true">
+                Senin
+            </div><div class="cal-column-title" aria-hidden="true">
+                Selasa
+            </div><div class="cal-column-title" aria-hidden="true">
+                Rabu
+            </div><div class="cal-column-title" aria-hidden="true">
+                Kamis
+            </div><div class="cal-column-title" aria-hidden="true">
+                Jumat
+            </div><div class="cal-column-title" aria-hidden="true">
+                Sabtu
+            </div><div class="cal-column-title" aria-hidden="true">
+                Minggu
+            </div>
+        </div>
+        {% for week in range(6) -%}
+            <div class="cal-week">
+                {%- for weekday in range(7) -%}
+                    <div id="cal-day-{{ week*7 + weekday }}" class="cal-day" onclick="viewDay({{ week*7 + weekday }});">&nbsp;</div>
+                {%- endfor -%}
+            </div>
+        {%- endfor %}
+    </div>
+{%- endmacro %}
