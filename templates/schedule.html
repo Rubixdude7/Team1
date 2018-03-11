@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% import "psikolog/calendar.html" as calendar %}
+
+{% block title %}Schedule an Appointment{% endblock %}
+
+{% block head %}
+{{ super() }}
+{{ calendar.script_tag() }}
+{% endblock %}
+
+{% block content %}
+<main id="schedule-page">
+    <div class="box">
+        <h2>Schedule an Appointment</h2>
+        
+        <select id="psyc-select">
+            <option value="all" selected="selected">-- All Psychologists --</option>
+        {%- for pn in psyc_names %}
+            <option value="{{ pn.psyc_id }}">{{ pn.first_name }} {{ pn.last_name }}</option>
+        {%- endfor %}
+        </select>
+        
+        {{ calendar.calendar("calendar") }}
+        
+        <script type="text/javascript">
+            var allAvails = {{ avails|tojson|safe }};
+            
+            $(document).ready(function() {
+                var cal = new calendarModule.Calendar("#calendar");
+                cal.setup();
+                
+                cal.setAvailabilities(allAvails);
+                cal.refresh();
+            });
+        </script>
+    </div>
+</main>
+{% endblock %}
