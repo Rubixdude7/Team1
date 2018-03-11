@@ -10,7 +10,7 @@ from flask_user import login_required, roles_required, UserManager, UserMixin, S
 from flask_user.forms import RegisterForm
 from flask_mail import Mail
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateTimeField, Form, SelectField, SubmitField
+from wtforms import StringField, DateTimeField, Form, SelectField, SubmitField, RadioField
 from wtforms.validators import DataRequired
 from flask import redirect, url_for
 from werkzeug.utils import secure_filename
@@ -18,6 +18,7 @@ from wtforms import StringField, DateField
 from wtforms.validators import DataRequired, ValidationError
 import query
 import models
+import math
 from flask import flash, render_template, request, redirect
 from jose import jwt
 
@@ -37,7 +38,6 @@ app.config.from_pyfile('config.cfg')
 
 db = SQLAlchemy(app)
 mail = Mail(app)
-
 
 class User(db.Model, UserMixin):
 
@@ -482,7 +482,8 @@ class ClientEditForm(FlaskForm):
 
 
 class SearchBar(FlaskForm):
-    search = StringField('Search', default='Search')
+    radio = RadioField('Items Per Page', choices=[('5', 5), ('10', 10), ('15', 15)], default='5')
+    search = StringField('Search', render_kw={"placeholder":"Search"})
     submit = SubmitField('Submit')
 
 
@@ -491,15 +492,21 @@ class SearchBar(FlaskForm):
 @roles_required('admin')
 def admin():
     page_num = 1
+    items_per_page = 5
     if 'page_num' in request.args:
         page_num = int(request.args['page_num'])
     form = SearchBar()
     if form.validate_on_submit():
-        users = querydb.getSearchedUsers(form.search.data, page_num, 5)
-        num_of_pages = round(querydb.getSearchedUserCount(form.search.data) / 5)
+        items_per_page = form.radio.data
+        form.radio.default = items_per_page
+        users = querydb.getSearchedUsers(form.search.data, page_num, int(items_per_page))
+        num_of_pages = math.ceil(querydb.getSearchedUserCount(form.search.data) / int(items_per_page))
     else:
-        users = querydb.getAllUsers(page_num, 5)
-        num_of_pages = round(querydb.getUserCount() / 5)
+        if 'items_per_page' in request.args:
+            items_per_page = request.args['items_per_page']
+        form.radio.default = items_per_page
+        users = querydb.getAllUsers(page_num, int(items_per_page))
+        num_of_pages = math.ceil(querydb.getUserCount() / int(items_per_page))
     roles = list()
     usersandroles = dict()
     for u in users:
@@ -513,8 +520,9 @@ def admin():
             usersandroles[u.email] = 'Psychologist'
         if r == 'staff':
             usersandroles[u.email] = 'Office Staff'
+        form.process()
     return render_template('admin/admin.html', users=users, roles=roles, usersandroles=usersandroles, form=form
-                           , page_num=page_num, num_of_pages=num_of_pages)
+                           , page_num=page_num, num_of_pages=num_of_pages, items_per_page=items_per_page)
 
 
 @app.route('/edit', methods=['GET', 'POST'])
