@@ -72,3 +72,26 @@ puts the page at the top of the screen*/
   padding: 0;
 }
 
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
+}
+
+.center {
+    text-align: center;
+}
+
+.pull-left {
+    float: left;
+}
+
+.pull-right {
+    float: right;
+}
+
+.clear-both {
+    clear: both;
+}

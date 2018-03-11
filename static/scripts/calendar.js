@@ -1,3 +1,4 @@
+// Month names in the Indonesian language
 var monthNames = [
     "Januari",
     "Februari",
@@ -225,3 +226,10 @@ function viewDay(index) {
         window.location = "/psikolog/" + psyc_id.toString() + "/" + currentYear.toString() + "/" + month.toString() + "/" + day.toString();
     }
 }
+
+$(document).ready(function() {
+    // Initialize all the calendars on the page
+    $('.calendar').each(function(index, element) {
+        initCalendar(element);
+    });
+});
