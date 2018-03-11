@@ -39,6 +39,10 @@
   color: #fff;
 }
 
+.cal-body {
+  background-color: #ffcb05;
+}
+
 .cal-week {
   line-height: 0;
   margin: 0;
@@ -54,7 +58,7 @@
   height: 50px;
   margin: 0 0 0 -1px;
   padding: 0;
-  background-color: transparent;
+  background-color: white;
   border-style: solid;
   border-color: #999;
   border-width: 1px 0 0 1px;

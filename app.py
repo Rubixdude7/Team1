@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, Markup, jsonify
 import datetime
 from flask_sqlalchemy import SQLAlchemy
 from playhouse.flask_utils import object_list
@@ -196,7 +196,7 @@ def editQuestion():
     if form.validate_on_submit():
         newQuestion = form.question.data
         querydb.editQuestion(q_id, newQuestion)
-        # flash('Your changes have been saved.')
+        flash('Your changes have been saved.')
         return redirect(url_for('questions'))
     return render_template('editQuestion.html', title='Edit Question',
                            form=form, question=getQuestion)
@@ -206,6 +206,7 @@ def editQuestion():
 def questiondeactivate():
     q_id = request.args.get('q_id')
     querydb.deactivateQuestion(q_id)
+    flash('Your blog post has been deactivated!')
     return redirect(url_for('questions'))
 
 
@@ -213,6 +214,7 @@ def questiondeactivate():
 def questionreactivate():
     q_id = request.args.get('q_id')
     querydb.reactivateQuestion(q_id)
+    flash('Your blog post has been reactivated!')
     return redirect(url_for('questions'))
 
 
@@ -220,6 +222,7 @@ def questionreactivate():
 def questionDelete():
     q_id = request.args.get('q_id')
     querydb.questionDelete(q_id)
+    flash('Question has been deleted!')
     return redirect(url_for('questions'))
 
 
@@ -232,35 +235,102 @@ def questions():
 
 
 
-@app.route('/questionsUserView/')
+@app.route('/questionsUserView/', methods=['GET', 'POST'])
 @login_required
 def questionsUserView():
+    totalQuestions = request.args.get('totalQuestions')
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
     c = querydb.findChild(child_id)
 
+    # brody
+    if c is None:
+        return redirect(url_for('parent'))
+    elif c.user.user_id != current_user.id:
+        return redirect(url_for('parent'))
+    page = request.args.get("page")
+    if page is not None:
+        page = int(page)
+        if page >= 1:
+            savePaginateAnswers()
+    # end brody
 
 
-    questions = querydb.getAllQuestions()
+
+    questions = querydb.getAllQuestionsForUsers()
     # Brody code
     answers = []
     for q in questions:
-        print("Q_ID: ", q.q_id)
         answers.append(querydb.getAnswer(q.q_id, child_id))
     # end Brody code
-    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name, answers=answers)
+    if totalQuestions is None:
+        totalQuestions = len(questions) #for progress bar
+        totalQuestions = int(totalQuestions)
+
+    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name, answers=answers, totalQuestions=totalQuestions)
 
 
+@app.route('/questionsUserView2/', methods=['GET', 'POST'])
+@login_required
+def questionsUserView2(): #post QuestionUserView
+    #getargs
+    totalQuestions = request.args.get('totalQuestions')
+    totalQuestions = int(totalQuestions)
+    page = request.args.get('page')
+    totalPage = request.args.get('totalPage')
+    child_id = request.args.get('child_id')
+    child_name = request.args.get('child_name')
+
+    #validation
+    c = querydb.findChild(child_id)
+    if c is None:
+        return redirect(url_for('parent'))
+    elif c.user.user_id != current_user.id:
+        return redirect(url_for('parent'))
+
+    paginate = 3 #how much each page should paginate by, change for differet number of questions per page(please change this value for other question views if you change)
+    questions = querydb.getAllQuestionsForUsers()
+    # Brody code
+    answers = []
+    for q in questions:
+        answers.append(querydb.getAnswer(q.q_id, child_id))
+    if page is not None:
+        answers = answers[(paginate * (int(page)-1)): len(answers)]
+    # End Brody code
+
+    questionAnswerList = request.form.getlist('fname')
+
+    questionIdList = request.form.getlist('qField')
+    childId = request.form.get('cField')
+
+    q_id = request.args.get('q_id')
+
+    # Brody says: q = answer, q2 = questionId
+    for (q, q2) in zip(questionAnswerList, questionIdList):
+        # lack of this if was causing false "completed" question forms
+        if q is not '':
+            querydb.addQuestionAnswers(q, current_user.id, q2, childId)
+
+    if page == totalPage:
+        querydb.checkComp(child_id)
+        return redirect(url_for('parent'))
+
+    return object_list("questionsUserView.html", paginate_by=paginate, query=questions, context_variable='questions',
+                       child_id=child_id, child_name=child_name, answers=answers, totalQuestions=totalQuestions)
+
+
+#This path is currently not used, will remove if confirmed
 @app.route('/questionsEditQuestions/')
 @login_required
 def questionsEditQuestions():
+    # request args
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
-    print(child_id)
+
     questions = querydb.checkNewQuestions(child_id)
 
     return object_list("questionsEditQuestions.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
-
+#END
 
 
 
@@ -269,7 +339,6 @@ def questionsEditQuestions():
 def viewAnswers():
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
-    print(child_name)
     questions = querydb.getAllQuestionAnswers()
     #  count = querydb.paginate(page_num) --still working on pagination
     return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
@@ -285,9 +354,9 @@ def parent_seeanswers():
     child_id = request.args.get('child_id')
     c = querydb.findChild(child_id)
     if c is None:
-        return redirect(url_for('index'))
+        return redirect(url_for('parent'))
     elif current_user.id is not c.user.user_id:
-        return redirect(url_for('index'))
+        return redirect(url_for('parent'))
     questions = querydb.getAllQuestionsForUsers()
     # Brody code
     answers = []
@@ -315,42 +384,16 @@ def post_questions():
     return redirect(url_for('questions'))
 
 
-@app.route('/post_add_questionAnswers', methods=['GET', 'POST'])
-def post_questionAnswers():
-
-    questionAnswerList = request.form.getlist('fname')
-    questionIdList = request.form.getlist('qField')
-    childId = request.form.get('cField')
-    q_id = request.args.get('q_id')
-
-
-    # Brody says: q = answer, q2 = questionId
-    for (q,q2) in zip (questionAnswerList, questionIdList):
-      print(current_user.id)
-      print(questionAnswerList)
-      print("Q", q)
-      print("Q2", q2)
-      # lack of this if was causing false "completed" question forms
-      if q is not '':
-          querydb.addQuestionAnswers(q, current_user.id, q2, childId)
-
-
-    # question = request.args.get('question')
-    # question=request.form.get('question')
-    # print(question);
-    # querydb.addQuestion(question, current_user.id)
-
-    return redirect(url_for('parent'))
-
 #Gabe
 @app.route('/parent')
 @login_required
 @roles_required('user')
 def parent():
 
+    updatedQuestions = querydb.checkNewQuestions(current_user.id)
     return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name,
                            children = querydb.getChildren(current_user.id),
-                           contact_info=querydb.contactID(current_user.id), querydb=querydb)
+                           contact_info=querydb.contactID(current_user.id), querydb=querydb, updatedQuestions = updatedQuestions)
 
 
 @app.route('/parent/contact')
@@ -371,8 +414,11 @@ def editContact():
 
 
 # Start Brody's code
+
+# this may be code thats not used anymore?
 @app.route('/child/<int:child_id>')
 def child(child_id=None):
+
     r = querydb.role(current_user.id)
     if r == 'user' or r == 'admin' or r == 'staff' or r == 'psyc':
         child_info = querydb.findChild(child_id)
@@ -385,9 +431,13 @@ def child(child_id=None):
             return redirect(url_for('index'))
         else:
             updatedQuestions = querydb.checkNewQuestions(child_id)
+            print("updated", updatedQuestions)
             return render_template('child.html', child_info=child_info, child_age=age, updatedQuestions=updatedQuestions)
     else:
         return redirect(url_for('index'))
+#end code that is not used anymore.
+
+
 
 @app.route('/childform')
 @roles_required('user')
@@ -405,6 +455,23 @@ def addChild():
         return parent()
     querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'), request.form.get('dateofbirth'))
     return parent()
+
+
+@app.route('/post_add_questionAnswers', methods=['GET', 'POST'])
+def savePaginateAnswers():
+
+    questionAnswerList = request.form.getlist('fname')
+    questionIdList = request.form.getlist('qField')
+    childId = request.form.get('cField')
+    q_id = request.args.get('q_id')
+
+
+    # Brody says: q = answer, q2 = questionId
+    for (q,q2) in zip (questionAnswerList, questionIdList):
+      # lack of this if was causing false "completed" question forms
+      if q is not '':
+          querydb.addQuestionAnswers(q, current_user.id, q2, childId)
+
 
 # End Brody
 
@@ -475,8 +542,10 @@ def admin():
     form = SearchBar()
     if form.validate_on_submit():
         users = querydb.getSearchedUsers(form.search.data, page_num, 5)
+        num_of_pages = round(querydb.getSearchedUserCount(form.search.data) / 5)
     else:
         users = querydb.getAllUsers(page_num, 5)
+        num_of_pages = round(querydb.getUserCount() / 5)
     roles = list()
     usersandroles = dict()
     for u in users:
@@ -490,7 +559,8 @@ def admin():
             usersandroles[u.email] = 'Psychologist'
         if r == 'staff':
             usersandroles[u.email] = 'Office Staff'
-    return render_template('admin/admin.html', users=users, roles=roles, usersandroles=usersandroles, form=form, page_num=page_num)
+    return render_template('admin/admin.html', users=users, roles=roles, usersandroles=usersandroles, form=form
+                           , page_num=page_num, num_of_pages=num_of_pages)
 
 
 @app.route('/edit', methods=['GET', 'POST'])
@@ -570,6 +640,27 @@ def my_psikolog_page():
     psyc_id = querydb.getPsycId(current_user.id)
     return redirect(url_for('psikolog', id=psyc_id))
 
+@app.route('/schedule')
+@roles_required('user')
+def schedule():
+    avail_list = querydb.getAllAvailabilities()
+    for a in avail_list:
+        del a['avail_id']
+        a['time_st'] = {
+            'hour': a['time_st'].hour,
+            'minute': a['time_st'].minute,
+            'second': a['time_st'].second
+        }
+        a['time_end'] = {
+            'hour': a['time_end'].hour,
+            'minute': a['time_end'].minute,
+            'second': a['time_end'].second
+        }
+        a['weekday'] = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
+    return render_template('schedule.html',
+                           psyc_names=querydb.getPsychologistNames(),
+                           avails=avail_list)
+
 @app.route('/psikolog/')
 @app.route('/psikolog/<int:id>')
 def psikolog(id=None):
@@ -582,7 +673,7 @@ def psikolog(id=None):
             blog_posts = [{
                 'title': post.subject,
                 'date_posted': post.updt_dtm,
-                'contents': post.text
+                'contents': Markup(post.text)
             } for post in blg]
 
             can_edit = False
@@ -596,7 +687,7 @@ def psikolog(id=None):
             
             availabilities = querydb.getAvailabilities(id)
 
-            return render_template('psikolog.html', psyc_info=psyc_info, blog_posts=blog_posts, can_edit=can_edit, avatar_url=avatar_url, availabilities=availabilities)
+            return render_template('psikolog/psikolog_page.html', psyc_info=psyc_info, blog_posts=blog_posts, can_edit=can_edit, avatar_url=avatar_url, availabilities=availabilities)
 
     # Either no id was given or no psychologist was found.
     # In both cases, show a list of psychologists.

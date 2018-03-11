@@ -1,5 +1,7 @@
 import calendar
 
+from flask import Markup
+import bleach
 import models as db
 import datetime
 from peewee import *
@@ -47,15 +49,24 @@ class query(object):
 
         question.save()
 
+
+
+        question.save()
     def addQuestion(self, question2, user):
+
         q = db.questions(question=question2, user_id_crea=user, crea_dtm=datetime.datetime.now())
         q.save()
 
-    def checkNewQuestions(self, child):
-        child = db.child.get(db.child.child_id == child)
-        x = child.q_comp_dtm
-        questionsUpdated = db.questions.select().where(db.questions.crea_dtm > x)
+    def checkNewQuestions(self, user_id):
+        questionsUpdated = []
+        c = db.child.select().where(db.child.user == user_id)
+        for child in c:
+            print(child.child_id)
+            x = child.q_comp_dtm
+            if db.questions.select().where(db.questions.crea_dtm > x):
+                questionsUpdated.append(child.child_id)
 
+        print(questionsUpdated)
         return questionsUpdated
 
     def addQuestionAnswers(self, questionAnswer, user, q_id, childId):
@@ -68,7 +79,7 @@ class query(object):
         if alreadyExists is None:
             # Begin Jared
             current = db.child.get(db.child.child_id == childId)
-            current.q_comp_dtm = datetime.datetime.now()
+            current.q_comp_dtm = None
             current.save()
 
             q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(), q=q_id,
@@ -82,7 +93,7 @@ class query(object):
             query.voidAnswer(self, q_id, childId)
             # Begin Jared
             current = db.child.get(db.child.child_id == childId)
-            current.q_comp_dtm = datetime.datetime.now()
+            current.q_comp_dtm = None
             current.save()
 
             q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(),
@@ -95,7 +106,11 @@ class query(object):
     def paginate(self, num):
         num = db.questions.select()
         return num
-
+    def checkComp(self, childId):
+        current = db.child.get(db.child.child_id == childId)
+        print('test3r')
+        current.q_comp_dtm = datetime.datetime.now()
+        current.save()
     def getAllQuestions(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd')
         return questions
@@ -131,6 +146,7 @@ class query(object):
     def findChild(self, child_id):
         try:
             c = db.child.get(db.child.child_id == child_id)
+            print(c.child_nm_fst)
             return c
         except:
             return None
@@ -146,13 +162,24 @@ class query(object):
 
 # Start Jason's code
 
-    def getAllUsers(self, page_num, num_of_pages):
-        users = db.user.select().where(db.user.active).paginate(page_num, num_of_pages)
+    def getAllUsers(self, page_num, page_size):
+        users = db.user.select().where(db.user.active).join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user).order_by(db.user_roles.role).paginate(page_num, page_size)
         return users
 
-    def getSearchedUsers(self, search, page_num, num_of_pages):
-        users = db.user.select().where(db.user.active & db.user.email.contains(search)).paginate(page_num, num_of_pages)
+    def getSearchedUsers(self, search, page_num, page_size):
+        users = db.user.select().where(db.user.active & db.user.email.contains(search)).join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user).order_by(db.user_roles.role).paginate(page_num, page_size)
+
+        # users = db.user.select().where(db.user.active & db.user.email.contains(search)).paginate(page_num, num_of_pages)
         return users
+
+    def getUserCount(self):
+        usercount = db.user.select().count()
+        return usercount
+
+    def getSearchedUserCount(self, search):
+        usercount = db.user.select().where(db.user.active & db.user.email.contains(search)).count()
+        return usercount
+
 
     def getAllRoles(self):
         roles = db.role.select(db.role.role_nm)
@@ -279,7 +306,7 @@ class query(object):
         return [{
             'title': t[0],
             'date_posted': t[1],
-            'contents': t[2], 
+            'contents': Markup(t[2]),
             'psyc_id': t[3],
             'author': '{0} {1}'.format(t[4], t[5])
         } for t in tuples]
@@ -318,6 +345,7 @@ class query(object):
         return psyc_id
 
     def createBlogPost(self, u_id, psyc_id, subject, text):
+        text = bleach.clean(text, tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', u'p'])
         now = datetime.datetime.now()
         blog_post = db.blog(psyc=psyc_id,
                             subject=subject,
@@ -367,6 +395,15 @@ class query(object):
 
         print('nope')
         return None
+    
+    def getPsychologistNames(self):
+        tuples = db.psychologist.select(db.psychologist.psyc_id, db.user.first_name, db.user.last_name)\
+                               .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                               .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                               .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
+                               .where(db.user.active & (db.role.role_nm == 'psyc'))\
+                               .tuples()
+        return [{ 'psyc_id': t[0], 'first_name': t[1], 'last_name': t[2] } for t in tuples]
         
     def getAvailability(self, avail_id, psyc_id):
         t = db.calendar.select(db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
@@ -384,14 +421,34 @@ class query(object):
     def getAvailabilities(self, psyc_id):
         tuples = db.calendar.select(db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
                             .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
+                            .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                            .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                            .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
                             .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
-                            .where((db.psychologist.psyc_id == psyc_id) & (db.calendar.void_ind == 'n'))\
+                            .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id) & (db.calendar.void_ind == 'n'))\
                             .tuples()
         return [{
             'avail_id': t[0],
             'time_st': t[1],
             'time_end': t[2],
             'weekday': t[3]
+        } for t in tuples]
+        
+    def getAllAvailabilities(self):
+        tuples = db.calendar.select(db.psychologist.psyc_id, db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
+                            .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
+                            .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
+                            .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                            .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                            .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
+                            .where(db.user.active & (db.role.role_nm == 'psyc') & (db.calendar.void_ind == 'n'))\
+                            .tuples()
+        return [{
+            'psyc_id': t[0],
+            'avail_id': t[1],
+            'time_st': t[2],
+            'time_end': t[3],
+            'weekday': t[4]
         } for t in tuples]
 
     def getAvailabilitiesForDay(self, psyc_id, year, month, day):

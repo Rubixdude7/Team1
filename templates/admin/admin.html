@@ -23,66 +23,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                <!-- I'm sorry in advance for this... this is the easiest way I could think of to sort based on role-->
                     {% for u in users %}
                         <tr>
-                        {% if usersandroles[u.email] == 'Admin' %}
-                            <td>{{ u.email }}</td>
-                            <td>{{ usersandroles[u.email] }}</td>
-                            {% if current_user.id == u.user_id %}
+                        <td>{{ u.email }}</td>
+                        <td>{{ usersandroles[u.email] }}</td>
+                        {% if current_user.id == u.user_id %}
 
-                            {% else %}
-                                <td><a href="{{ url_for('edit', u_id=u.user_id) }}">Edit</a></td>
-                                <td><a href="{{ url_for('delete', u_id=u.user_id) }}" onclick="confirmAction()">Delete</a></td>
-                            {% endif %}
-                        {% endif %}
-                        </tr>
-                    {% endfor %}
-                    {% for u in users %}
-                        <tr>
-                        {% if usersandroles[u.email] == 'Office Staff' %}
-                            <td>{{ u.email }}</td>
-                            <td>{{ usersandroles[u.email] }}</td>
-                            {% if current_user.id == u.user_id %}
-
-                            {% else %}
-                                <td><a href="{{ url_for('edit', u_id=u.user_id) }}">Edit</a></td>
-                                <td><a href="{{ url_for('delete', u_id=u.user_id) }}" onclick="confirmAction()">Delete</a></td>
-                            {% endif %}
-                        {% endif %}
-                        </tr>
-                    {% endfor %}
-                    {% for u in users %}
-                        <tr>
-                        {% if usersandroles[u.email] == 'Psychologist' %}
-                            <td>{{ u.email }}</td>
-                            <td>{{ usersandroles[u.email] }}</td>
-                            {% if current_user.id == u.user_id %}
-
-                            {% else %}
-                                <td><a href="{{ url_for('edit', u_id=u.user_id) }}">Edit</a></td>
-                                <td><a href="{{ url_for('delete', u_id=u.user_id) }}" onclick="confirmAction()">Delete</a></td>
-                            {% endif %}
-                        {% endif %}
-                        </tr>
-                    {% endfor %}
-                    {% for u in users %}
-                        <tr>
-                        {% if usersandroles[u.email] == 'User' %}
-                            <td>{{ u.email }}</td>
-                            <td>{{ usersandroles[u.email] }}</td>
-                            {% if current_user.id == u.user_id %}
-
-                            {% else %}
-                                <td><a href="{{ url_for('edit', u_id=u.user_id) }}">Edit</a></td>
-                                <td><a href="{{ url_for('delete', u_id=u.user_id) }}" onclick="confirmAction()">Delete</a></td>
-                            {% endif %}
+                        {% else %}
+                            <td><a href="{{ url_for('edit', u_id=u.user_id) }}">Edit</a></td>
+                            <td><a href="{{ url_for('delete', u_id=u.user_id) }}" onclick="confirmAction()">Delete</a></td>
                         {% endif %}
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+
         <p>
             {% if page_num > 1 %}
                 <a href="{{ url_for('admin', page_num=page_num - 1) }}">Previous Page</a>
@@ -90,8 +46,13 @@
                 Previous Page
             {% endif %}
             /
+            {% if page_num != num_of_pages %}
             <a href="{{ url_for('admin', page_num=page_num + 1) }}">Next Page</a>
+            {% else %}
+                Next Page
+            {% endif %}
         </p>
+
     </div>
 <script>
 function confirmAction() {

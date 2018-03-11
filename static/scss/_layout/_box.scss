@@ -125,8 +125,25 @@ button{
   color: #fff;
 }
 
+input[type=submit]:disabled,
+button:disabled {
+  background-color: #777;
+  border-color: #000;
+  color: #000;
+  cursor: auto;
+}
+
 .input-icon {
   display: inline-block;
   margin-right: 8px;
   font-size: 82%;
+}
+
+img.avatar {
+    display: block;
+    margin: 6px;
+    padding: 3px;
+    width: 128px;
+    height: 128px;
+    border: 1px solid #999;
 }

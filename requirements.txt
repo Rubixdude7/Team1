@@ -8,3 +8,4 @@ Flask-User==0.6.19
 blinker==1.4
 WTForms==2.1
 cloudinary==1.10.0
+bleach==2.1.2

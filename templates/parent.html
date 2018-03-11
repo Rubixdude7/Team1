@@ -70,7 +70,7 @@
 
 
                             {% if current_user.is_authenticated and current_user.is_in_role("user") %}
-                                {% if child.q_comp_dtm != None and not updatedQuestions %}
+                                {% if child.q_comp_dtm != None and not child.child_id in updatedQuestions %}
                                     <form>
                                         <button onclick="location.href='{{ url_for('parent_seeanswers', child_id=child.child_id) }}'" type="button">
                                             View Question Answers
@@ -90,13 +90,13 @@
                                     </form>
                                 {% endif %}
 
-                                {% if updatedQuestions %}
-                                    <button style="background-color: red" onclick="location.href='{{ url_for('questionsEditQuestions', child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button">
+                                {% if child.child_id in updatedQuestions %}
+                                    <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView', child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button">
                                         Answer New Questions!
                                     </button>
                                 {% endif %}
 
-                                {% if not updatedQuestions and child.q_comp_dtm != None %}
+                                {% if not child.child_id in updatedQuestions and child.q_comp_dtm != None %}
                                         <br>Questions completed on: {{ child.q_comp_dtm }}<br>
                                 {% endif %}
                             {% endif %}

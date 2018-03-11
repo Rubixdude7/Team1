@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% import 'psikolog/calendar.html' as calendar %}
+
+{% block title %}{{ psyc_info.full_name }}{% endblock %}
+
+{% block content %}
+<main id="psyc-page">
+    <div class="box">
+        <h2>
+            <div class="pull-right" aria-hidden="true">
+                <img class="avatar" src="{{ avatar_url }}" alt="[photograph of {{ psyc_info.full_name }}]" />
+            </div>
+            {{ psyc_info.full_name }}
+        </h2>
+        
+        <p class="psyc-bio">
+            {{ psyc_info.qualifications }}
+        </p>
+    </div>
+</main>
+{% endblock %}

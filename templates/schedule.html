@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% import "psikolog/calendar.html" as calendar %}
+
+{% block title %}Schedule an Appointment{% endblock %}
+
+{% block head %}
+{{ super() }}
+{{ calendar.script_tag() }}
+{% endblock %}
+
+{% block content %}
+<main id="schedule-page">
+    <div class="box">
+        <h2>Schedule an Appointment</h2>
+        
+        <select id="psyc-select">
+            <option value="all" selected="selected">-- All Psychologists --</option>
+        {%- for pn in psyc_names %}
+            <option value="{{ pn.psyc_id }}">{{ pn.first_name }} {{ pn.last_name }}</option>
+        {%- endfor %}
+        </select>
+        
+        {{ calendar.calendar("calendar") }}
+        
+        <script type="text/javascript">
+            var allAvails = {{ avails|tojson|safe }};
+            
+            function filterByPsyc(cal) {
+                var psyc = $("#psyc-select").val();
+                
+                if (psyc == "all") {
+                    cal.setAvailabilities(allAvails);
+                    cal.refresh();
+                } else {
+                    psyc_id = parseInt(psyc);
+                    var avails = [];
+                    for (var i = 0; i < allAvails.length; i++) {
+                        if (allAvails[i]["psyc_id"] == psyc_id) {
+                            avails[avails.length] = allAvails[i];
+                        }
+                    }
+                    cal.setAvailabilities(avails);
+                    cal.refresh();
+                }
+            }
+            
+            $(document).ready(function() {
+                var cal = new calendarModule.Calendar("#calendar");
+                cal.setup();
+                filterByPsyc(cal);
+                
+                $("#psyc-select").on("change", function() {
+                    filterByPsyc(cal);
+                });
+                
+                $("#calendar").find(".cal-day").on("click", function() {
+                    var dateString = $(this).attr("data-day");
+                    if (dateString != undefined) {
+                        var parts = dateString.split("-");
+                        var year = parseInt(parts[0]);
+                        var month = parseInt(parts[1]);
+                        var day = parseInt(parts[2]);
+                        window.location = "/consultation";
+                    }
+                });
+            });
+        </script>
+    </div>
+</main>
+{% endblock %}
