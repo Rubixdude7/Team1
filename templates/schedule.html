@@ -32,6 +32,25 @@
                 
                 cal.setAvailabilities(allAvails);
                 cal.refresh();
+                
+                $("#psyc-select").on("change", function() {
+                    var psyc = $("#psyc-select").val();
+                    
+                    if (psyc == "all") {
+                        cal.setAvailabilities(allAvails);
+                        cal.refresh();
+                    } else {
+                        psyc_id = parseInt(psyc);
+                        var avails = [];
+                        for (var i = 0; i < allAvails.length; i++) {
+                            if (allAvails[i]["psyc_id"] == psyc_id) {
+                                avails[avails.length] = allAvails[i];
+                            }
+                        }
+                        cal.setAvailabilities(avails);
+                        cal.refresh();
+                    }
+                });
             });
         </script>
     </div>
