@@ -2,6 +2,8 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <script src="{{ url_for('static', filename='scripts/question.js') }}" type="text/jscript"></script>
+<!-- This script source is currently messing up 2018 @ js function, dont know why  -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 {% extends "base.html" %}
 {% block title %}Questions{% endblock %}
 {% block content %}
@@ -39,7 +41,7 @@ var global1 = false;
     if(frm)
     {
 
-        frm.action = "{{ url_for('questionsUserView2', child_id=child_id,page=page - 1,child_name=child_name,totalPage=pagination.get_page_count() + 1)|safe }}";
+        frm.action = "{{ url_for('questionsUserView2', child_id=child_id,page=page - 1,child_name=child_name,totalPage=pagination.get_page_count() + 1,totalQuestions=totalQuestions)|safe }}";
 
 
 
@@ -49,14 +51,13 @@ var global1 = false;
      }
   }
   function progress() {
+
+    var numItems = document.getElementsByClassName("question").length;
     var x = document.getElementById('progress');
     x.value = {{  ((100/pagination.get_page_count()) *(page - 1)) |round|int }};
 }
- function keepChildName() {
-    var x = document.getElementById('childName');
 
-    x.value = {{  ((100/pagination.get_page_count()) *(page - 1)) |round|int }};
-}
+
 
 window.onload = progress;
 
@@ -72,14 +73,14 @@ window.onload = progress;
     <main>
 
         <div id = "box" class="box">
-
         <p id="childName">Your Child: {{ child_name }}</p>
     <progress id ="progress" value=" ((100/pagination.get_page_count()) *(page - 1)) |round|int }}" max="100"> </progress>
+
               <p> Progress: {{  ((100/pagination.get_page_count()) *(page - 1)) |round|int }} % </p>
             <h1 class="title">Question List</h1>
             <hr>
 
-       <form method="post" id="mainForm" onsubmit="return validateFormMultiple()" action="{{ url_for('questionsUserView2', page=page + 1,child_id=child_id, child_name=child_name, totalPage=pagination.get_page_count() + 1) }}" name="myForm" onsubmit="" onload="pagination()">
+       <form method="post" id="mainForm" onsubmit="return validateFormMultiple()" action="{{ url_for('questionsUserView2', page=page + 1,child_id=child_id, child_name=child_name, totalPage=pagination.get_page_count() + 1, totalQuestions=totalQuestions) }}" name="myForm" onsubmit="" onload="pagination()">
          <input type="hidden" name="cField" value="{{ child_id }}")>
             {% for u in questions %}
                 <!-- question list -->
@@ -88,6 +89,7 @@ window.onload = progress;
 
 
             {% endif %}
+
                <div class="question">
 
                 <p id="questiontitle"><b><u>{{ u.question }}</u></b></p>
@@ -105,6 +107,7 @@ window.onload = progress;
             <span id="error" style="color:red"></span>
             <!-- END QUESTION -->
             </div>
+
                 <br>
             {% endfor %}
             <br>
@@ -144,3 +147,6 @@ window.onload = progress;
         </div>
     </main>
 {% endblock %}
+ <!-- JQUERY Library for Jared Lewis-->
+
+    <!--End -->

@@ -196,7 +196,7 @@ def editQuestion():
     if form.validate_on_submit():
         newQuestion = form.question.data
         querydb.editQuestion(q_id, newQuestion)
-        # flash('Your changes have been saved.')
+        flash('Your changes have been saved.')
         return redirect(url_for('questions'))
     return render_template('editQuestion.html', title='Edit Question',
                            form=form, question=getQuestion)
@@ -206,6 +206,7 @@ def editQuestion():
 def questiondeactivate():
     q_id = request.args.get('q_id')
     querydb.deactivateQuestion(q_id)
+    flash('Your blog post has been deactivated!')
     return redirect(url_for('questions'))
 
 
@@ -213,6 +214,7 @@ def questiondeactivate():
 def questionreactivate():
     q_id = request.args.get('q_id')
     querydb.reactivateQuestion(q_id)
+    flash('Your blog post has been reactivated!')
     return redirect(url_for('questions'))
 
 
@@ -220,6 +222,7 @@ def questionreactivate():
 def questionDelete():
     q_id = request.args.get('q_id')
     querydb.questionDelete(q_id)
+    flash('Question has been deleted!')
     return redirect(url_for('questions'))
 
 
@@ -235,6 +238,7 @@ def questions():
 @app.route('/questionsUserView/', methods=['GET', 'POST'])
 @login_required
 def questionsUserView():
+    totalQuestions = request.args.get('totalQuestions')
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
     c = querydb.findChild(child_id)
@@ -253,51 +257,49 @@ def questionsUserView():
 
 
 
-    questions = querydb.getAllQuestions()
+    questions = querydb.getAllQuestionsForUsers()
     # Brody code
     answers = []
     for q in questions:
         answers.append(querydb.getAnswer(q.q_id, child_id))
     # end Brody code
-    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name, answers=answers)
+    if totalQuestions is None:
+        totalQuestions = len(questions) #for progress bar
+        totalQuestions = int(totalQuestions)
+
+    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name, answers=answers, totalQuestions=totalQuestions)
 
 
 @app.route('/questionsUserView2/', methods=['GET', 'POST'])
 @login_required
-def questionsUserView2():
+def questionsUserView2(): #post QuestionUserView
+    #getargs
+    totalQuestions = request.args.get('totalQuestions')
+    totalQuestions = int(totalQuestions)
     page = request.args.get('page')
-
-
-
     totalPage = request.args.get('totalPage')
-    print("OFFICIAL")
-    print("Page", page)
-    print("totalpage", totalPage)
-    print("END")
     child_id = request.args.get('child_id')
-    print("child", child_id)
     child_name = request.args.get('child_name')
+
+    #validation
     c = querydb.findChild(child_id)
     if c is None:
         return redirect(url_for('parent'))
     elif c.user.user_id != current_user.id:
         return redirect(url_for('parent'))
-    paginate = 3
-    questions = querydb.getAllQuestions()
+
+    paginate = 3 #how much each page should paginate by, change for differet number of questions per page(please change this value for other question views if you change)
+    questions = querydb.getAllQuestionsForUsers()
     # Brody code
     answers = []
     for q in questions:
         answers.append(querydb.getAnswer(q.q_id, child_id))
-    print("Page: ", page)
-    print("Paginate by: ", paginate)
     if page is not None:
         answers = answers[(paginate * (int(page)-1)): len(answers)]
-    print("Answers: ", answers)
     # End Brody code
 
     questionAnswerList = request.form.getlist('fname')
 
-    print("QA list: ", questionAnswerList)
     questionIdList = request.form.getlist('qField')
     childId = request.form.get('cField')
 
@@ -305,8 +307,6 @@ def questionsUserView2():
 
     # Brody says: q = answer, q2 = questionId
     for (q, q2) in zip(questionAnswerList, questionIdList):
-        print("Q", q)
-        print("Q2", q2)
         # lack of this if was causing false "completed" question forms
         if q is not '':
             querydb.addQuestionAnswers(q, current_user.id, q2, childId)
@@ -316,19 +316,21 @@ def questionsUserView2():
         return redirect(url_for('parent'))
 
     return object_list("questionsUserView.html", paginate_by=paginate, query=questions, context_variable='questions',
-                       child_id=child_id, child_name=child_name, answers=answers)
+                       child_id=child_id, child_name=child_name, answers=answers, totalQuestions=totalQuestions)
 
 
+#This path is currently not used, will remove if confirmed
 @app.route('/questionsEditQuestions/')
 @login_required
 def questionsEditQuestions():
+    # request args
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
-    print(child_id)
+
     questions = querydb.checkNewQuestions(child_id)
 
     return object_list("questionsEditQuestions.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
-
+#END
 
 
 
@@ -337,7 +339,6 @@ def questionsEditQuestions():
 def viewAnswers():
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
-    print(child_name)
     questions = querydb.getAllQuestionAnswers()
     #  count = querydb.paginate(page_num) --still working on pagination
     return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
