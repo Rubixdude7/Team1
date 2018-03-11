@@ -12,17 +12,7 @@
 {% block content %}
 <main id="your-availability-list">
     <div class="box">
-        {{ calendar.calendar("calendar") }}
-        <script type="text/javascript">
-            var avails = {{ avails|tojson|safe }};
-            
-            $(document).ready(function() {
-                var cal = new calendarModule.Calendar("#calendar");
-                cal.setup();
-                cal.setAvailabilities(avails);
-                cal.refresh();
-            });
-        </script>
+        
         <p><a href="{{ url_for('add_availability') }}"><i class="fa fa-plus"></i> Add Availability</a></p>
         <table border="1" style="width:100%">
             <thead>
@@ -47,6 +37,17 @@
                 {% endfor %}
             </tbody>
         </table>
+        {{ calendar.calendar("calendar") }}
+        <script type="text/javascript">
+            var avails = {{ avails|tojson|safe }};
+            
+            $(document).ready(function() {
+                var cal = new calendarModule.Calendar("#calendar");
+                cal.setup();
+                cal.setAvailabilities(avails);
+                cal.refresh();
+            });
+        </script>
     </div>
 </main>
 {% endblock %}
