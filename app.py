@@ -444,6 +444,12 @@ def child(child_id=None):
 def childform():
     return render_template('childform.html')
 
+@app.route('/videoConf')
+def videoConf():
+    return render_template('videoConf.html')
+
+
+
 
 @app.route('/childform', methods=['post'])
 @roles_required('user')
