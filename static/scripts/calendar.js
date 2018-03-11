@@ -21,7 +21,6 @@ var calendarStripModule = (function() {
     
     StripGroup.prototype.combine = function() {
         // combine() - Combines adjacent and overlapping strips.
-        // Loop until we're done.
         var keep = [];
         
         for (var i = 0; i < this.strips.length; i++) {
@@ -55,6 +54,45 @@ var calendarStripModule = (function() {
         this.normalize();
     };
     
+    StripGroup.prototype.exclude = function(otherGroup) {
+        var keep = [];
+        
+        for (var i = 0; i < this.strips.length; i++) {
+            keep[i] = true;
+        }
+        
+        for (var i = 0; i < this.strips.length; i++) {
+            for (var j = 0; j < otherGroup.strips.length; j++) {
+                var stripA = this.strips[i];
+                var stripB = otherGroup.strips[j];
+                
+                if (stripA.start < stripB.end && stripA.end > stripB.start) {
+                    if (stripA.start >= stripB.start && stripA.end <= stripB.end) {
+                        keep[i] = false;
+                    } else if (stripA.start <= stripB.start && stripA.end < stripB.end) {
+                        stripA.end = stripB.start;
+                    } else if (stripA.start < stripB.end && stripA.end >= stripB.end) {
+                        stripA.start = stripB.end;
+                    } else {
+                        this.strips[this.strips.length] = new Strip(stripB.end, stripA.end);
+                        keep[keep.length] = true;
+                        stripA.end = stripB.start;
+                    }
+                }
+            }
+        }
+        
+        // Discard ones we don't keep
+        var newStrips = [];
+        for (var i = 0; i < this.strips.length; i++) {
+            if (keep[i]) {
+                newStrips[newStrips.length] = this.strips[i];
+            }
+        }
+        
+        this.strips = newStrips;
+    };
+    
     StripGroup.prototype.splitAtIntervals = function(interval) {
         // splitAtIntervals() - Splits existing strips at intervals.
         var done = false;
@@ -86,7 +124,7 @@ var calendarStripModule = (function() {
                 fn(strip.start, strip.end);
             }
         }
-    }
+    };
     
     StripGroup.prototype.normalize = function() {
         // Make sure starts are before ends
@@ -101,7 +139,7 @@ var calendarStripModule = (function() {
         
         // Sort
         this.strips.sort(compareStrips);
-    }
+    };
     
     mod.StripGroup = StripGroup;
     
@@ -242,6 +280,7 @@ var calendarModule = (function() {
             if (index < daysFromPrevMonth || index >= 7*6 - daysFromNextMonth) {
                 dayElem.html("&nbsp;");
                 dayElem.attr("data-this-month", "false");
+                dayElem.removeAttr("data-day");
             } else {
                 var dayNum = (index - daysFromPrevMonth) + 1;
                 var html = "<div class=\"cal-day-number\">" + dayNum.toString() + "</div>";
@@ -258,6 +297,7 @@ var calendarModule = (function() {
                 
                 dayElem.html(html);
                 dayElem.attr("data-this-month", "true");
+                dayElem.attr("data-day", cal.year.toString() +  "-" + (cal.month+1).toString() + "-" + dayNum.toString());
             }
         });
 

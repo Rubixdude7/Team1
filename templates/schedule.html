@@ -26,29 +26,42 @@
         <script type="text/javascript">
             var allAvails = {{ avails|tojson|safe }};
             
+            function filterByPsyc(cal) {
+                var psyc = $("#psyc-select").val();
+                
+                if (psyc == "all") {
+                    cal.setAvailabilities(allAvails);
+                    cal.refresh();
+                } else {
+                    psyc_id = parseInt(psyc);
+                    var avails = [];
+                    for (var i = 0; i < allAvails.length; i++) {
+                        if (allAvails[i]["psyc_id"] == psyc_id) {
+                            avails[avails.length] = allAvails[i];
+                        }
+                    }
+                    cal.setAvailabilities(avails);
+                    cal.refresh();
+                }
+            }
+            
             $(document).ready(function() {
                 var cal = new calendarModule.Calendar("#calendar");
                 cal.setup();
-                
-                cal.setAvailabilities(allAvails);
-                cal.refresh();
+                filterByPsyc(cal);
                 
                 $("#psyc-select").on("change", function() {
-                    var psyc = $("#psyc-select").val();
-                    
-                    if (psyc == "all") {
-                        cal.setAvailabilities(allAvails);
-                        cal.refresh();
-                    } else {
-                        psyc_id = parseInt(psyc);
-                        var avails = [];
-                        for (var i = 0; i < allAvails.length; i++) {
-                            if (allAvails[i]["psyc_id"] == psyc_id) {
-                                avails[avails.length] = allAvails[i];
-                            }
-                        }
-                        cal.setAvailabilities(avails);
-                        cal.refresh();
+                    filterByPsyc(cal);
+                });
+                
+                $("#calendar").find(".cal-day").on("click", function() {
+                    var dateString = $(this).attr("data-day");
+                    if (dateString != undefined) {
+                        var parts = dateString.split("-");
+                        var year = parseInt(parts[0]);
+                        var month = parseInt(parts[1]);
+                        var day = parseInt(parts[2]);
+                        window.location = "/consultation";
                     }
                 });
             });
