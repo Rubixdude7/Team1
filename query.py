@@ -496,6 +496,10 @@ class query(object):
         for wkd in wkds:
             d[wkd.day_typ_cd] = wkd.day
         return d
+        
+    def getWeekDayList(self):
+        wkds = db.day_typ_cd.select()
+        return [d.day for d in wkds]
 
     def psychologistLinks(self):
         tuples = db.psychologist.select(db.psychologist.psyc_id,

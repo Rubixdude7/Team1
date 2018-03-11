@@ -746,7 +746,7 @@ def edit_qualifications():
 def edit_availability_list():
     psyc_id = querydb.getPsycId(current_user.id)
     avail_list = querydb.getAvailabilities(psyc_id)
-    weekdays = querydb.getWeekDays()
+    weekdays = querydb.getWeekDayList()
     
     for a in avail_list:
         a['time_st'] = {
