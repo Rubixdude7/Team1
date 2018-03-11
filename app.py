@@ -19,6 +19,7 @@ from wtforms.validators import DataRequired, ValidationError
 import query
 import models
 from flask import flash, render_template, request, redirect
+from jose import jwt
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
