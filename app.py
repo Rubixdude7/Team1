@@ -265,10 +265,17 @@ def questionsUserView():
 @app.route('/questionsUserView2/', methods=['GET', 'POST'])
 @login_required
 def questionsUserView2():
-
     page = request.args.get('page')
+
+
+
     totalPage = request.args.get('totalPage')
+    print("OFFICIAL")
+    print("Page", page)
+    print("totalpage", totalPage)
+    print("END")
     child_id = request.args.get('child_id')
+    print("child", child_id)
     child_name = request.args.get('child_name')
     c = querydb.findChild(child_id)
     if c is None:
@@ -303,9 +310,11 @@ def questionsUserView2():
         # lack of this if was causing false "completed" question forms
         if q is not '':
             querydb.addQuestionAnswers(q, current_user.id, q2, childId)
+
     if page == totalPage:
         querydb.checkComp(child_id)
         return redirect(url_for('parent'))
+
     return object_list("questionsUserView.html", paginate_by=paginate, query=questions, context_variable='questions',
                        child_id=child_id, child_name=child_name, answers=answers)
 

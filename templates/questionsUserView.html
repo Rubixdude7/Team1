@@ -22,9 +22,9 @@ $(document).ready(function(){
         }});
     });
 });
-
+var global1 = false;
  function validateFormMultiple() {
-var x = document.getElementsByName('fname');
+    var x = document.getElementsByName('fname');
 		for (i=0; i<x.length; i++)
 			{
 			 if (x[i].value == "")
@@ -34,6 +34,20 @@ var x = document.getElementsByName('fname');
 				}
 
 			}
+     if (global1 == true) {
+
+         var frm = document.getElementById("mainForm")
+    if(frm)
+    {
+
+        frm.action = "{{ url_for('questionsUserView2', child_id=child_id,page=page - 1,child_name=child_name,totalPage=pagination.get_page_count() + 1)|safe }}";
+
+
+
+    }
+         global = false;
+         return true;
+     }
   }
   function progress() {
     var x = document.getElementById('progress');
@@ -47,6 +61,13 @@ var x = document.getElementsByName('fname');
 
 window.onload = progress;
 
+ function buttonClick(theButton){
+     global1 = true;
+
+    return true;
+}
+
+
 </script>
 
     <main>
@@ -58,7 +79,8 @@ window.onload = progress;
               <p> Progress: {{  ((100/pagination.get_page_count()) *(page - 1)) |round|int }} % </p>
             <h1 class="title">Question List</h1>
             <hr>
-       <form method="post" onsubmit="return validateFormMultiple()" action="{{ url_for('questionsUserView2', page=page + 1,child_id=child_id, child_name=child_name, totalPage=pagination.get_page_count() + 1) }}" name="myForm" onsubmit="" onload="pagination()">
+
+       <form method="post" id="mainForm" onsubmit="return validateFormMultiple()" action="{{ url_for('questionsUserView2', page=page + 1,child_id=child_id, child_name=child_name, totalPage=pagination.get_page_count() + 1) }}" name="myForm" onsubmit="" onload="pagination()">
          <input type="hidden" name="cField" value="{{ child_id }}")>
             {% for u in questions %}
                 <!-- question list -->
@@ -88,13 +110,6 @@ window.onload = progress;
             {% endfor %}
             <br>
             <br>
-
-            {% if page > 1 %}
-                 <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView2', page=page - 1,child_id=child_id, child_name=child_name) }}';" type="button">
-                                           Previous Page
-
-                                        </button>
-            {% endif %}
             {% if pagination.get_page_count() > page %}
 <!--
                   <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView2', page=page + 1,child_id=child_id, child_name=child_name) }}';" type="button">
@@ -102,7 +117,16 @@ window.onload = progress;
 
                                         </button>
 -->
-                 <input type="submit" value="Next Page" onsubmit="return validateFormMultiple()">
+                 <input type="submit" name="checkButton" value="NextPage" onsubmit="return validateFormMultiple()">
+
+
+            {% endif %}
+            {% if page > 1 %}
+                 <input type="submit" name="checkButton" value="Previous" onsubmit="return validateFormMultiple()" onclick="return buttonClick(this)">
+                 <button style="background-color: orange" onclick="location.href='{{ url_for('questionsUserView2', page=page - 1,child_id=child_id, child_name=child_name) }}';" type="button">
+                                           Previous Page
+
+                                        </button>
 
 
             {% endif %}
