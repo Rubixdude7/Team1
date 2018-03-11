@@ -742,10 +742,14 @@ def edit_qualifications():
         return redirect(url_for('psikolog', id=psyc_id))
         
 @app.route('/psikolog/edit_availability_list')
+@app.route('/psikolog/edit_availability_list/<int:page>')
 @roles_required('psyc')
-def edit_availability_list():
+def edit_availability_list(page=1):
+    if page < 1:
+        page = 1
+    
     psyc_id = querydb.getPsycId(current_user.id)
-    avail_list = querydb.getAvailabilities(psyc_id)
+    avail_list = querydb.getAvailabilities(psyc_id, page=page)
     weekdays = querydb.getWeekDayList()
     
     for a in avail_list:
