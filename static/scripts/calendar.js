@@ -91,6 +91,7 @@ var calendarStripModule = (function() {
         }
         
         this.strips = newStrips;
+        this.normalize();
     };
     
     StripGroup.prototype.splitAtIntervals = function(interval) {

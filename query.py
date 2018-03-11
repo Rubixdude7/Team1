@@ -48,10 +48,8 @@ class query(object):
         question.void_ind = 'd'
 
         question.save()
-
-
-
         question.save()
+
     def addQuestion(self, question2, user):
 
         q = db.questions(question=question2, user_id_crea=user, crea_dtm=datetime.datetime.now())
@@ -106,26 +104,24 @@ class query(object):
     def paginate(self, num):
         num = db.questions.select()
         return num
+
     def checkComp(self, childId):
         current = db.child.get(db.child.child_id == childId)
         print('test3r')
         current.q_comp_dtm = datetime.datetime.now()
         current.save()
+
     def getAllQuestions(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd')
         return questions
 
     def getAllQuestionsForUsers(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd' and db.questions.void_ind == 'n')
-
         return questions
+
     def getAllQuestionAnswers(self, child_id):
-
         questionAnswers = db.question_answers.select().where(db.question_answers.child == child_id)
-
-
         return questionAnswers
-
 
     def editQuestion(self, a, newQuestion):
         current = db.questions.get(db.questions.q_id == a)
@@ -418,15 +414,20 @@ class query(object):
             'weekday': t[2]
         }
         
-    def getAvailabilities(self, psyc_id):
-        tuples = db.calendar.select(db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
-                            .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
-                            .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
-                            .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
-                            .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
-                            .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
-                            .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id) & (db.calendar.void_ind == 'n'))\
-                            .tuples()
+    def getAvailabilities(self, psyc_id, page=-1):
+        q = db.calendar.select(db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
+                       .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
+                       .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                       .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                       .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
+                       .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
+                       .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id) & (db.calendar.void_ind == 'n'))
+        
+        if page < 1:
+            tuples = q.tuples()
+        else:
+            tuples = q.paginate(page, 20).tuples()
+        
         return [{
             'avail_id': t[0],
             'time_st': t[1],
@@ -496,6 +497,10 @@ class query(object):
         for wkd in wkds:
             d[wkd.day_typ_cd] = wkd.day
         return d
+        
+    def getWeekDayList(self):
+        wkds = self.getWeekDays()
+        return [wkds[d] for d in ['m', 't', 'w', 'th', 'f', 's', 'su']]
 
     def psychologistLinks(self):
         tuples = db.psychologist.select(db.psychologist.psyc_id,

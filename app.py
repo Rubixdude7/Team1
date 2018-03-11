@@ -10,7 +10,7 @@ from flask_user import login_required, roles_required, UserManager, UserMixin, S
 from flask_user.forms import RegisterForm
 from flask_mail import Mail
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateTimeField, Form, SelectField, SubmitField
+from wtforms import StringField, DateTimeField, Form, SelectField, SubmitField, RadioField
 from wtforms.validators import DataRequired
 from flask import redirect, url_for
 from werkzeug.utils import secure_filename
@@ -18,7 +18,9 @@ from wtforms import StringField, DateField
 from wtforms.validators import DataRequired, ValidationError
 import query
 import models
+import math
 from flask import flash, render_template, request, redirect
+from jose import jwt
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
@@ -36,7 +38,6 @@ app.config.from_pyfile('config.cfg')
 
 db = SQLAlchemy(app)
 mail = Mail(app)
-
 
 class User(db.Model, UserMixin):
 
@@ -185,7 +186,7 @@ def consultation():
 
 #           END BRANDON         #
 
-
+#    Begin Jared
 @app.route('/editQuestion', methods=['GET', 'POST'])
 def editQuestion():
     q_id = request.args.get('q_id')
@@ -286,7 +287,8 @@ def questionsUserView2(): #post QuestionUserView
     elif c.user.user_id != current_user.id:
         return redirect(url_for('parent'))
 
-    paginate = 3 #how much each page should paginate by, change for differet number of questions per page(please change this value for other question views if you change)
+    # how much each page should paginate by, change for differet number of questions per page(please change this value for other question views if you change)
+    paginate = 3
     questions = querydb.getAllQuestionsForUsers()
     # Brody code
     answers = []
@@ -300,8 +302,6 @@ def questionsUserView2(): #post QuestionUserView
 
     questionIdList = request.form.getlist('qField')
     childId = request.form.get('cField')
-
-    q_id = request.args.get('q_id')
 
     # Brody says: q = answer, q2 = questionId
     for (q, q2) in zip(questionAnswerList, questionIdList):
@@ -317,21 +317,6 @@ def questionsUserView2(): #post QuestionUserView
                        child_id=child_id, child_name=child_name, answers=answers, totalQuestions=totalQuestions)
 
 
-#This path is currently not used, will remove if confirmed
-@app.route('/questionsEditQuestions/')
-@login_required
-def questionsEditQuestions():
-    # request args
-    child_id = request.args.get('child_id')
-    child_name = request.args.get('child_name')
-
-    questions = querydb.checkNewQuestions(child_id)
-
-    return object_list("questionsEditQuestions.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
-#END
-
-
-
 @app.route('/viewAnswers/')
 @login_required
 def viewAnswers():
@@ -340,10 +325,6 @@ def viewAnswers():
     questions = querydb.getAllQuestionAnswers()
     #  count = querydb.paginate(page_num) --still working on pagination
     return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
-
-
-
-
 
 
 @app.route('/parent_seeanswers')
@@ -373,7 +354,6 @@ def add_questions():
 
 @app.route('/post_add_questions', methods=['GET', 'POST'])
 def post_questions():
-    # question = request.args.get('question')
     question = request.form.get('question')
     print(question)
     print(current_user.id)
@@ -381,13 +361,32 @@ def post_questions():
 
     return redirect(url_for('questions'))
 
+@app.route('/post_edit_questionAnswers', methods=['GET', 'POST'])
+def post_editQuestions():
+    questionAnswerList = request.form.getlist('fname')
+    questionIdList = request.form.getlist('qField')
+    childId = request.form.get('cField')
+
+    for (q, q2) in zip(questionAnswerList, questionIdList):
+        print(current_user.id)
+        print(questionAnswerList)
+        querydb.addQuestionAnswers(q, current_user.id, q2, childId)
+
+    return redirect(url_for('parent'))
+
+
+@app.route('/videoConf')
+def videoConf():
+    return render_template('videoConf.html')
+
+
+#   End Jared
 
 #Gabe
 @app.route('/parent')
 @login_required
 @roles_required('user')
 def parent():
-
     updatedQuestions = querydb.checkNewQuestions(current_user.id)
     return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name,
                            children = querydb.getChildren(current_user.id),
@@ -413,30 +412,6 @@ def editContact():
 
 # Start Brody's code
 
-# this may be code thats not used anymore?
-@app.route('/child/<int:child_id>')
-def child(child_id=None):
-
-    r = querydb.role(current_user.id)
-    if r == 'user' or r == 'admin' or r == 'staff' or r == 'psyc':
-        child_info = querydb.findChild(child_id)
-        if child_info is None:
-            return redirect(url_for('index'))
-        born = datetime.datetime.strptime(child_info.child_dob.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
-        today = datetime.date.today()
-        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
-        if age < 0:
-            return redirect(url_for('index'))
-        else:
-            updatedQuestions = querydb.checkNewQuestions(child_id)
-            print("updated", updatedQuestions)
-            return render_template('child.html', child_info=child_info, child_age=age, updatedQuestions=updatedQuestions)
-    else:
-        return redirect(url_for('index'))
-#end code that is not used anymore.
-
-
-
 @app.route('/childform')
 @roles_required('user')
 def childform():
@@ -461,8 +436,6 @@ def savePaginateAnswers():
     questionAnswerList = request.form.getlist('fname')
     questionIdList = request.form.getlist('qField')
     childId = request.form.get('cField')
-    q_id = request.args.get('q_id')
-
 
     # Brody says: q = answer, q2 = questionId
     for (q,q2) in zip (questionAnswerList, questionIdList):
@@ -470,27 +443,8 @@ def savePaginateAnswers():
       if q is not '':
           querydb.addQuestionAnswers(q, current_user.id, q2, childId)
 
-
 # End Brody
 
-@app.route('/post_edit_questionAnswers', methods=['GET', 'POST'])
-def post_editQuestions():
-    questionAnswerList = request.form.getlist('fname')
-    questionIdList = request.form.getlist('qField')
-    childId = request.form.get('cField')
-    q_id = request.args.get('q_id')
-
-    for (q, q2) in zip(questionAnswerList, questionIdList):
-        print(current_user.id)
-        print(questionAnswerList)
-        querydb.addQuestionAnswers(q, current_user.id, q2, childId)
-
-    # question = request.args.get('question')
-    # question=request.form.get('question')
-    # print(question);
-    # querydb.addQuestion(question, current_user.id)
-
-    return redirect(url_for('parent'))
 
 # Start Jason's code
 
@@ -526,7 +480,8 @@ class ClientEditForm(FlaskForm):
 
 
 class SearchBar(FlaskForm):
-    search = StringField('Search', default='Search')
+    radio = RadioField('Items Per Page', choices=[('5', 5), ('10', 10), ('15', 15)], default='5')
+    search = StringField('Search', render_kw={"placeholder":"Search"})
     submit = SubmitField('Submit')
 
 
@@ -535,15 +490,21 @@ class SearchBar(FlaskForm):
 @roles_required('admin')
 def admin():
     page_num = 1
+    items_per_page = 5
     if 'page_num' in request.args:
         page_num = int(request.args['page_num'])
     form = SearchBar()
     if form.validate_on_submit():
-        users = querydb.getSearchedUsers(form.search.data, page_num, 5)
-        num_of_pages = round(querydb.getSearchedUserCount(form.search.data) / 5)
+        items_per_page = form.radio.data
+        form.radio.default = items_per_page
+        users = querydb.getSearchedUsers(form.search.data, page_num, int(items_per_page))
+        num_of_pages = math.ceil(querydb.getSearchedUserCount(form.search.data) / int(items_per_page))
     else:
-        users = querydb.getAllUsers(page_num, 5)
-        num_of_pages = round(querydb.getUserCount() / 5)
+        if 'items_per_page' in request.args:
+            items_per_page = request.args['items_per_page']
+        form.radio.default = items_per_page
+        users = querydb.getAllUsers(page_num, int(items_per_page))
+        num_of_pages = math.ceil(querydb.getUserCount() / int(items_per_page))
     roles = list()
     usersandroles = dict()
     for u in users:
@@ -557,8 +518,9 @@ def admin():
             usersandroles[u.email] = 'Psychologist'
         if r == 'staff':
             usersandroles[u.email] = 'Office Staff'
+        form.process()
     return render_template('admin/admin.html', users=users, roles=roles, usersandroles=usersandroles, form=form
-                           , page_num=page_num, num_of_pages=num_of_pages)
+                           , page_num=page_num, num_of_pages=num_of_pages, items_per_page=items_per_page)
 
 
 @app.route('/edit', methods=['GET', 'POST'])
@@ -733,12 +695,30 @@ def edit_qualifications():
         return redirect(url_for('psikolog', id=psyc_id))
         
 @app.route('/psikolog/edit_availability_list')
+@app.route('/psikolog/edit_availability_list/<int:page>')
 @roles_required('psyc')
-def edit_availability_list():
+def edit_availability_list(page=1):
+    if page < 1:
+        page = 1
+    
     psyc_id = querydb.getPsycId(current_user.id)
-    availabilities = querydb.getAvailabilities(psyc_id)
-    weekdays = querydb.getWeekDays()
-    return render_template('edit_availability_list.html', psyc_id=psyc_id, availabilities=availabilities, weekdays=weekdays)
+    avail_list = querydb.getAvailabilities(psyc_id, page=page)
+    weekdays = querydb.getWeekDayList()
+    
+    for a in avail_list:
+        a['time_st'] = {
+            'hour': a['time_st'].hour,
+            'minute': a['time_st'].minute,
+            'second': a['time_st'].second
+        }
+        a['time_end'] = {
+            'hour': a['time_end'].hour,
+            'minute': a['time_end'].minute,
+            'second': a['time_end'].second
+        }
+        a['weekday'] = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
+    
+    return render_template('edit_availability_list.html', psyc_id=psyc_id, avails=avail_list, weekdays=weekdays, page=page)
 
 @app.route('/psikolog/delete_availability/<int:avail_id>')
 @roles_required('psyc')

@@ -20,6 +20,10 @@
   background-color: #ffcb05;
 }
 
+.calendar-planning .cal-head {
+  background-color: #fff;
+}
+
 .cal-month-name {
   margin: 0;
   padding: 12px 0;
@@ -39,8 +43,9 @@
   color: #fff;
 }
 
-.cal-body {
-  background-color: #ffcb05;
+.calendar-planning .cal-column-title {
+  color: #000;
+  background-color: #fff;
 }
 
 .cal-week {
@@ -64,14 +69,21 @@
   border-width: 1px 0 0 1px;
   overflow: hidden;
   white-space: nowrap;
+}
+
+.calendar-planning .cal-day {
+  border-color: #000;
+}
+
+.calendar-pretty .cal-day {
   cursor: pointer;
 }
 
-.cal-day:not([data-this-month="false"]):hover {
+.calendar-pretty .cal-day:not([data-this-month="false"]):hover {
   box-shadow: inset 0 0 4px #66F;
 }
 
-.cal-day:not([data-this-month="false"]):active {
+.calendar-pretty .cal-day:not([data-this-month="false"]):active {
   background-color: #CCC;
   box-shadow: inset 0 0 4px #339;
 }
@@ -87,6 +99,10 @@
 .cal-day[data-this-month="false"] {
   background-color: #CCC;
   cursor: auto;
+}
+
+.calendar-planning .cal-day[data-this-month="false"] {
+  background-color: #000;
 }
 
 @media only screen and (max-width: 759px) {
@@ -111,12 +127,22 @@
   border-radius: 0;
 }
 
-.cal-space-slot {
+.calendar-pretty .cal-space-slot {
   @include cal-slot;
   background-color: #BBB;
 }
 
-.cal-ok-slot {
+.calendar-pretty .cal-ok-slot {
   @include cal-slot;
   background-color: #00C;
+}
+
+.calendar-planning .cal-space-slot {
+  @include cal-slot;
+  background-color: transparent;
+}
+
+.calendar-planning .cal-ok-slot {
+  @include cal-slot;
+  background-color: #000;
 }
