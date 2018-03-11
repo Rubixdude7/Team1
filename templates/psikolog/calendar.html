@@ -31,12 +31,14 @@
                 Minggu
             </div>
         </div>
-        {% for week in range(6) -%}
-            <div class="cal-week">
-                {%- for weekday in range(7) -%}
-                    <div class="cal-day">&nbsp;</div>
-                {%- endfor -%}
-            </div>
-        {%- endfor %}
+        <div class="cal-body">
+            {% for week in range(6) -%}
+                <div class="cal-week">
+                    {%- for weekday in range(7) -%}
+                        <div class="cal-day">&nbsp;</div>
+                    {%- endfor -%}
+                </div>
+            {%- endfor %}
+        </div>
     </div>
 {%- endmacro %}

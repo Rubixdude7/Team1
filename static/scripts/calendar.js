@@ -30,7 +30,7 @@ var calendarModule = (function() {
         this.minMonth = this.month;
         this.minYear = this.year;
         
-        var max = new Date(this.year, this.month + 3, 1);
+        var max = new Date(this.year, this.month + 2, 1);
         this.maxMonth = max.getMonth();
         this.maxYear = max.getFullYear();
         
@@ -54,19 +54,33 @@ var calendarModule = (function() {
         var d = new Date(this.year, this.month + 1, 1);
         this.month = d.getMonth();
         this.year = d.getFullYear();
-        this.refresh();
+        
+        var cal = this;
+        this.elem.find(".cal-month-label").fadeOut(400);
+        this.elem.find(".cal-body").slideUp(400, function() {
+            cal.refresh();
+            cal.elem.find(".cal-month-label").fadeIn(400);
+            cal.elem.find(".cal-body").slideDown(400);
+        });
     };
     
     Calendar.prototype.prev = function() {
         var d = new Date(this.year, this.month - 1, 1);
         this.month = d.getMonth();
         this.year = d.getFullYear();
-        this.refresh();
+        
+        var cal = this;
+        this.elem.find(".cal-month-label").fadeOut(400);
+        this.elem.find(".cal-body").slideUp(400, function() {
+            cal.refresh();
+            cal.elem.find(".cal-month-label").fadeIn(400);
+            cal.elem.find(".cal-body").slideDown(400);
+        });
     };
     
     Calendar.prototype.refresh = function() {
         // Set the month label
-        this.elem.find(".cal-month-label").text(mod.MONTH_NAMES[this.month - 1] + " " + this.year);
+        this.elem.find(".cal-month-label").text(mod.MONTH_NAMES[this.month] + " " + this.year);
         
         // On this page of the calendar, how many days from the previous month are visible?
         // And from next month?
@@ -82,7 +96,7 @@ var calendarModule = (function() {
             if (daysFromPrevMonth < 0)
                 daysFromPrevMonth += 7;
 
-            var lastDayThisMonth = new Date(this.year, this.month + 1, -1);
+            var lastDayThisMonth = new Date(this.year, this.month + 1, 0);
 
             daysFromNextMonth = 7*6  - (daysFromPrevMonth + lastDayThisMonth.getDate());
         }
