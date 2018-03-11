@@ -765,7 +765,7 @@ def edit_availability_list(page=1):
         }
         a['weekday'] = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
     
-    return render_template('edit_availability_list.html', psyc_id=psyc_id, avails=avail_list, weekdays=weekdays)
+    return render_template('edit_availability_list.html', psyc_id=psyc_id, avails=avail_list, weekdays=weekdays, page=page)
 
 @app.route('/psikolog/delete_availability/<int:avail_id>')
 @roles_required('psyc')
