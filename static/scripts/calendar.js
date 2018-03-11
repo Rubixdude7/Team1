@@ -1,18 +1,197 @@
+var calendarModule = (function() {
+    var mod = {};
+    
+    // Indonesian month names
+    mod.MONTH_NAMES = [
+        "Januari",
+        "Februari",
+        "Maret",
+        "April",
+        "Mei",
+        "Juni",
+        "Juli",
+        "Agustus",
+        "September",
+        "Oktober",
+        "November",
+        "Desember"
+    ];
+    
+    // Calendar object: the main part of this module
+    var Calendar = function(elem) {
+        this.elem = $(elem);
+        this.nextBtn = this.elem.find(".cal-next-btn");
+        this.prevBtn = this.elem.find(".cal-prev-btn");
+        
+        var now = new Date();
+        this.month = now.getMonth();
+        this.year = now.getFullYear();
+        
+        this.minMonth = this.month;
+        this.minYear = this.year;
+        
+        var max = new Date(this.year, this.month + 3, 1);
+        this.maxMonth = max.getMonth();
+        this.maxYear = max.getFullYear();
+        
+        this.avails = [];
+    };
+    
+    Calendar.prototype.setup = function() {
+        var cal = this;
+        
+        // Set handlers for the "prev month" and "next month" buttons
+        this.nextBtn.on("click", function() {
+            cal.next();
+        });
+        
+        this.prevBtn.on("click", function() {
+            cal.prev();
+        });
+    };
+    
+    Calendar.prototype.next = function() {
+        var d = new Date(this.year, this.month + 1, 1);
+        this.month = d.getMonth();
+        this.year = d.getFullYear();
+        this.refresh();
+    };
+    
+    Calendar.prototype.prev = function() {
+        var d = new Date(this.year, this.month - 1, 1);
+        this.month = d.getMonth();
+        this.year = d.getFullYear();
+        this.refresh();
+    };
+    
+    Calendar.prototype.refresh = function() {
+        // Set the month label
+        this.elem.find(".cal-month-label").text(mod.MONTH_NAMES[this.month - 1] + " " + this.year);
+        
+        // On this page of the calendar, how many days from the previous month are visible?
+        // And from next month?
+        // Let's find out.
+        var daysFromPrevMonth, daysFromNextMonth;
+
+        {
+            var firstDayThisMonth = new Date(this.year, this.month, 1);
+
+            // We need to decrement the weekday because the JavaScript standard
+            // starts the weekday at Sunday, but in Indonesia it starts on Monday.
+            daysFromPrevMonth = firstDayThisMonth.getDay() - 1;
+            if (daysFromPrevMonth < 0)
+                daysFromPrevMonth += 7;
+
+            var lastDayThisMonth = new Date(this.year, this.month + 1, -1);
+
+            daysFromNextMonth = 7*6  - (daysFromPrevMonth + lastDayThisMonth.getDate());
+        }
+
+        this.elem.find('.cal-day').each(function (index, dayElem) {
+            dayElem = $(dayElem);
+            
+            if (index < daysFromPrevMonth || index >= 7*6 - daysFromNextMonth) {
+                dayElem.html("&nbsp;");
+                dayElem.attr("data-this-month", "false");
+            } else {
+                var dayNum = (index - daysFromPrevMonth) + 1;
+                var html = "<div class=\"cal-day-number\">" + dayNum.toString() + "</div>";
+/*
+                // We're creating a little stripe that shows availabilities
+                var eventArray = []; // Contains time STARTs and time ENDs
+
+                // Add all STARTs and ENDs to an array
+                for (var a_i = 0; a_i < availabilities.length; a_i++) {
+                    if (availabilities[a_i].weekday == day) {
+                        eventArray[eventArray.length] = new TimeEvent(availabilities[a_i].time_st, "start");
+                        eventArray[eventArray.length] = new TimeEvent(availabilities[a_i].time_end, "end");
+                    }
+                }
+
+                // Sort by time
+                eventArray.sort(compareTimeEvent);
+
+                // Create the stripe
+                var SECONDS_IN_DAY = 24 * 60 * 60;
+                var in_avail_slot = false;
+                var depth = 0;
+                var currentSeconds = 0;
+                for (var ev_i = 0; ev_i < eventArray.length; ev_i++) {
+                    var event = eventArray[ev_i];
+
+                    if (event.start_or_end == "start")
+                        depth++;
+                    else
+                        depth--;
+
+                    if (in_avail_slot) {
+                        if (depth <= 0) {
+                            in_avail_slot = false;
+                            var s = event.time.toSeconds();
+                            var width = 100 * (s - currentSeconds) / SECONDS_IN_DAY;
+                            html += "<div class=\"cal-ok-slot\" aria-hidden=\"true\" style=\"width:" + width.toString() + "%;\"></div>";
+                            currentSeconds = s;
+                        }
+                    } else {
+                        if (depth > 0) {
+                            in_avail_slot = true;
+                            var s = event.time.toSeconds();
+                            var width = 100 * (s - currentSeconds) / SECONDS_IN_DAY;
+                            html += "<div class=\"cal-space-slot\" aria-hidden=\"true\" style=\"width:" + width.toString() + "%;\"></div>";
+                            currentSeconds = s;
+                        }
+                    }
+                }
+
+                var leftoverWidth = 100 * (SECONDS_IN_DAY - currentSeconds) / SECONDS_IN_DAY;
+                html += "<div class=\"cal-space-slot\" aria-hidden=\"true\" style=\"width:" + leftoverWidth.toString() + "%;\"></div>";
+*/
+                dayElem.html(html);
+                dayElem.attr("data-this-month", "true");
+            }
+        });
+
+        if (this.year == this.minYear && this.month == this.minMonth) {
+            this.prevBtn.attr("disabled", "disabled");
+        } else {
+            this.prevBtn.removeAttr("disabled");
+        }
+
+        if (this.year == this.maxYear && this.month == this.maxMonth) {
+            this.nextBtn.attr("disabled", "disabled");
+        } else {
+            this.nextBtn.removeAttr("disabled");
+        }
+    };
+    
+    Calendar.prototype.setAvailabilities = function(avails) {
+        this.avails = avails;
+    };
+    
+    mod.Calendar = Calendar;
+    
+    return mod;
+})();
+    
+    /*
+    Calendar: function() {
+    },
+    refresh = function(calendar_elem) {
+        cal = $(calendar_elem);
+        
+        // Update month name
+        cal.find('.cal-month-name').text(this.MONTH_NAMES[currentMonth] + " " + currentYear.toString());
+
+        
+    },
+    
+    setAvailabilities: function(calendar_elem, avails) {
+        
+    }
+};
+
 // Month names in the Indonesian language
-var monthNames = [
-    "Januari",
-    "Februari",
-    "Maret",
-    "April",
-    "Mei",
-    "Juni",
-    "Juli",
-    "Agustus",
-    "September",
-    "Oktober",
-    "November",
-    "Desember"
-];
+var monthNames = 
 
 var ALLOWED_MONTHS_AHEAD = 1;
 var monthsAhead = 0;
@@ -85,110 +264,6 @@ function compareTimeEvent(a, b) {
 }
 
 function resetCalendar() {
-    monthLabelElem.innerText = monthNames[currentMonth] + " " + currentYear.toString();
-
-    // On this page of the calendar, how many days from the previous month are visible?
-    // And from next month?
-    // Let's find out.
-    var daysFromNextMonth;
-
-    {
-        var firstDayThisMonth = new Date(currentYear, currentMonth, 1);
-
-        // We need to decrement the weekday because the JavaScript standard
-        // starts weekdays at Sunday, but in Indonesia they start on Monday.
-        daysFromPrevMonth = firstDayThisMonth.getDay() - 1;
-        if (daysFromPrevMonth < 0)
-            daysFromPrevMonth += 7;
-
-        var lastDayThisMonth = new Date(currentYear, currentMonth, 1);
-        for (var i = 2; i <= 31; i++) {
-            var candidate = new Date(currentYear, currentMonth, i);
-            if (candidate.getMonth() != currentMonth)
-                break;
-            lastDayThisMonth = candidate;
-        }
-
-        daysFromNextMonth = 7 * NUM_WEEKS_PER_PAGE - (daysFromPrevMonth + lastDayThisMonth.getDate());
-    }
-
-    for (var week = 0; week < NUM_WEEKS_PER_PAGE; week++) {
-        for (var day = 0; day < 7; day++) {
-            var index = 7 * week + day;
-
-            if (index < daysFromPrevMonth || index >= 7 * NUM_WEEKS_PER_PAGE - daysFromNextMonth) {
-                dayElems[index].innerHTML = "&nbsp;";
-                dayElems[index].setAttribute("data-this-month", "false");
-            } else {
-                var dayNum = (index - daysFromPrevMonth) + 1;
-                var html = "<div class=\"cal-day-number\">" + dayNum.toString() + "</div>";
-
-                // We're creating a little stripe that shows availabilities
-                var eventArray = []; // Contains time STARTs and time ENDs
-
-                // Add all STARTs and ENDs to an array
-                for (var a_i = 0; a_i < availabilities.length; a_i++) {
-                    if (availabilities[a_i].weekday == day) {
-                        eventArray[eventArray.length] = new TimeEvent(availabilities[a_i].time_st, "start");
-                        eventArray[eventArray.length] = new TimeEvent(availabilities[a_i].time_end, "end");
-                    }
-                }
-
-                // Sort by time
-                eventArray.sort(compareTimeEvent);
-
-                // Create the stripe
-                var SECONDS_IN_DAY = 24 * 60 * 60;
-                var in_avail_slot = false;
-                var depth = 0;
-                var currentSeconds = 0;
-                for (var ev_i = 0; ev_i < eventArray.length; ev_i++) {
-                    var event = eventArray[ev_i];
-
-                    if (event.start_or_end == "start")
-                        depth++;
-                    else
-                        depth--;
-
-                    if (in_avail_slot) {
-                        if (depth <= 0) {
-                            in_avail_slot = false;
-                            var s = event.time.toSeconds();
-                            var width = 100 * (s - currentSeconds) / SECONDS_IN_DAY;
-                            html += "<div class=\"cal-ok-slot\" aria-hidden=\"true\" style=\"width:" + width.toString() + "%;\"></div>";
-                            currentSeconds = s;
-                        }
-                    } else {
-                        if (depth > 0) {
-                            in_avail_slot = true;
-                            var s = event.time.toSeconds();
-                            var width = 100 * (s - currentSeconds) / SECONDS_IN_DAY;
-                            html += "<div class=\"cal-space-slot\" aria-hidden=\"true\" style=\"width:" + width.toString() + "%;\"></div>";
-                            currentSeconds = s;
-                        }
-                    }
-                }
-
-                var leftoverWidth = 100 * (SECONDS_IN_DAY - currentSeconds) / SECONDS_IN_DAY;
-                html += "<div class=\"cal-space-slot\" aria-hidden=\"true\" style=\"width:" + leftoverWidth.toString() + "%;\"></div>";
-
-                dayElems[index].innerHTML = html;
-                dayElems[index].setAttribute("data-this-month", "true");
-            }
-        }
-    }
-
-    if (monthsAhead == 0) {
-        document.getElementById("cal-prev-btn").setAttribute("disabled", "disabled");
-    } else {
-        document.getElementById("cal-prev-btn").removeAttribute("disabled");
-    }
-
-    if (monthsAhead == ALLOWED_MONTHS_AHEAD) {
-        document.getElementById("cal-next-btn").setAttribute("disabled", "disabled");
-    } else {
-        document.getElementById("cal-next-btn").removeAttribute("disabled");
-    }
 }
 
 function prevMonth() {
@@ -233,3 +308,4 @@ $(document).ready(function() {
         initCalendar(element);
     });
 });
+*/

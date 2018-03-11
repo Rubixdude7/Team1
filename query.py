@@ -395,6 +395,15 @@ class query(object):
 
         print('nope')
         return None
+    
+    def getPsychologistNames(self):
+        tuples = db.psychologist.select(db.psychologist.psyc_id, db.user.first_name, db.user.last_name)\
+                               .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                               .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                               .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
+                               .where(db.user.active & (db.role.role_nm == 'psyc'))\
+                               .tuples()
+        return [{ 'psyc_id': t[0], 'first_name': t[1], 'last_name': t[2] } for t in tuples]
         
     def getAvailability(self, avail_id, psyc_id):
         t = db.calendar.select(db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\

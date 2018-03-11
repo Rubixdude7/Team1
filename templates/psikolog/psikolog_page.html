@@ -4,11 +4,6 @@
 
 {% block title %}{{ psyc_info.full_name }}{% endblock %}
 
-{% block head %}
-    {{ super() }}
-    {{ calendar.script_tag() }}
-{% endblock %}
-
 {% block content %}
 <main id="psyc-page">
     <div class="box">
@@ -22,10 +17,6 @@
         <p class="psyc-bio">
             {{ psyc_info.qualifications }}
         </p>
-        
-        <div class="clear-both"></div>
-        
-        {{ calendar.calendar() }}
     </div>
 </main>
 {% endblock %}

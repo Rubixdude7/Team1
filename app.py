@@ -634,53 +634,17 @@ def delete():
 
 # Begin Charlie's code
 
-@app.route('/api/availability/all')
-def api_get_availability_all():
-    weekday_indices = { '' }
-    avail_list = querydb.getAllAvailabilities()
-    
-    # We have a list of availability slots for all psycs.
-    # Now prepare them for JSON
-    group_list = []
-    
-    for a in avail_list:
-        psyc_id = a['psyc_id']
-        
-        # Check if we've already made a group for this psyc
-        group = None
-        for g in group_list:
-            if g['psyc_id'] == psyc_id:
-                group = g
-        
-        if group is None:
-            group = {
-                'psyc_id': psyc_id,
-                'avails': []
-            }
-            group_list.append(group)
-        
-        avail = {
-            'time_st': {
-                'hour': a['time_st'].hour,
-                'minute': a['time_st'].minute,
-                'second': a['time_st'].second
-            },
-            'time_end': {
-                'hour': a['time_end'].hour,
-                'minute': a['time_end'].minute,
-                'second': a['time_end'].second
-            },
-            'weekday': weekday_indices[a['weekday']]
-        }
-        
-        group['avails'].append(avail)
-    
-    return jsonify(avails)
+@app.route('/my_psikolog_page')
+@roles_required('psyc')
+def my_psikolog_page():
+    psyc_id = querydb.getPsycId(current_user.id)
+    return redirect(url_for('psikolog', id=psyc_id))
 
-@app.route('/api/availability/<int:psyc_id>')
-def api_get_availability(psyc_id):
-    avails = querydb.getAvailabilities(psyc_id)
-    for a in avails:
+@app.route('/schedule')
+@roles_required('user')
+def schedule():
+    avail_list = querydb.getAllAvailabilities()
+    for a in avail_list:
         del a['avail_id']
         a['time_st'] = {
             'hour': a['time_st'].hour,
@@ -692,13 +656,10 @@ def api_get_availability(psyc_id):
             'minute': a['time_end'].minute,
             'second': a['time_end'].second
         }
-    return jsonify(avails)
-
-@app.route('/my_psikolog_page')
-@roles_required('psyc')
-def my_psikolog_page():
-    psyc_id = querydb.getPsycId(current_user.id)
-    return redirect(url_for('psikolog', id=psyc_id))
+        a['weekday'] = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
+    return render_template('schedule.html',
+                           psyc_names=querydb.getPsychologistNames(),
+                           avails=avail_list)
 
 @app.route('/psikolog/')
 @app.route('/psikolog/<int:id>')
