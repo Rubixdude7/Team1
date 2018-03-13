@@ -97,11 +97,11 @@
                                 {% endif %}
 
                                 {% if not child.child_id in updatedQuestions and child.q_comp_dtm != None %}
-                                        <br>Questions completed on: {{ child.q_comp_dtm }}<br>
+                                    <br>Questions completed on: {{ child.q_comp_dtm }}<br>
+                                    <button onclick="location.href='{{ url_for('schedule', child_id=child.child_id) }}'" type="button">Schedule Consultation</button>
                                 {% endif %}
                             {% endif %}
 
-                        <button onclick="location.href='{{ url_for('schedule', child_id=child.child_id) }}'" type="button"></button>
                         </p>
                     </div>
                 </li>

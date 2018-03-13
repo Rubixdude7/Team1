@@ -600,16 +600,24 @@ class query(object):
         return len_fee
 
     def schecule_cnslt(self, args):
-        fee = db.consultation_fee.select(db.consultation_fee.fee).where(db.consultation_fee.void_ind == 'n').join(db.consultation_length, JOIN_INNER, (args['len'] == db.consultation_length.length) & (db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id)).tuples()
-        fee = list(fee)[0][0]
+        try:
+            fee = db.consultation_fee.select(db.consultation_fee.fee).where(db.consultation_fee.void_ind == 'n').join(db.consultation_length, JOIN_INNER, (args['len'] == db.consultation_length.length) & (db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id)).tuples()
+            fee = list(fee)[0][0]
+            time_st = args['st_dt'].split("-")
+            time_st = time_st[0] + "-" + time_st[1] + "-" + time_st[2] + " " + time_st[3] + ":" + time_st[4]
+            time_st = datetime.datetime.strptime(time_st, '%Y-%m-%d %H:%M')
+            time_end = time_st + datetime.timedelta(hours=float(args['len']))
 
+            cnslt = db.consultation(child_id=args['child_id'], fee=fee, paid='n', length=args['len'], finished='n')
+            cnslt.save()
 
+            cnslt_tm = db.consult_time(cnslt_id=cnslt.cnslt_id, psyc_id=args['psyc_id'], time_st=time_st, time_end=time_end, approved='y')
+            cnslt_tm.save()
 
-        #cnslt = db.consultation(child_id=args['child_id'], fee=fee, paid='n', length=args['len'], finished='n')
-        #cnslt.save()
+            return True, "Your appointment has been made, contact office staff for payment processing."
 
-
-        #cnslt_tm = db.consult_time(cnslt_id=cnslt.cnslt_id, psyc_id=args['psyc_id'], time_st=, time_end=, approved='y')
+        except:
+            return False, "There was an error processing your request"
 
 
 #End Brandon

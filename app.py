@@ -161,14 +161,13 @@ def consultation():
         'child_id': request.json['child_id'],
         'psyc_id': request.json['psyc_id'],
         'len': request.json['len'],
-        'st_dtm': request.json['st_dtm'],
-        'end_dtm': request.json['end_dtm']
+        'st_dt': request.json['st_dt'],
     }
 
     print(req)
-    querydb.schecule_cnslt(req)
+    status = querydb.schecule_cnslt(req)
 
-    return jsonify({'status': 'OK', 'user': 'brandon', 'pass': 'nopass'})
+    return jsonify({'status': status[0], 'message': status[1]})
 
 
 #           END BRANDON         #

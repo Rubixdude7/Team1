@@ -101,6 +101,7 @@ class consultation(MySQLModel):
 class consult_time(MySQLModel):
     cnslt_tm_id = PrimaryKeyField()
     cnslt = ForeignKeyField(consultation, to_field="cnslt_id")
+    psyc = ForeignKeyField(psychologist, to_field="psyc_id")
     time_st = DateTimeField()
     time_end = DateTimeField()
     approved = CharField()
