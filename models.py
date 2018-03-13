@@ -126,7 +126,7 @@ class notes(MySQLModel):
 class consultation_fee(MySQLModel):
     cnslt_fee_id = PrimaryKeyField()
     fee = DoubleField()
-    void_ind = CharField
+    void_ind = CharField()
 
     class Meta:
         db_table = "consultation_fee"

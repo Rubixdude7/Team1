@@ -148,25 +148,10 @@ def page_not_found(e):
 
 @app.route('/')
 def index():
-    #slider = querydb.get_slider()
     page_num = 1
     if 'page_num' in request.args:
         page_num = int(request.args['page_num'])
     return render_template("index.html", blog_posts=querydb.getAllBlogPosts(page_num, 10), page_num=page_num)
-    #return render_template("index.html", slides=slider[0], desc=slider[1])
-
-
-@app.route('/slide-edit/<int:s_id>', methods=['GET', 'POST'])
-@roles_required('admin')
-def slide_edit(s_id):
-    return render_template('slide_edit.html', slide=querydb.get_slide(s_id), s_id=s_id)
-
-
-@app.route('/slide-update/<int:s_id>', methods=['GET', 'POST'])
-@roles_required('admin')
-def slide_update(s_id):
-    querydb.update_slide(s_id, request.files.get('image', None), request.form.get('desc', None), request.form.get('alt', None))
-    return redirect(url_for('admin'))
 
 
 @app.route('/consultation', methods=['GET', 'POST'])
@@ -176,10 +161,12 @@ def consultation():
         'child_id': request.json['child_id'],
         'psyc_id': request.json['psyc_id'],
         'len': request.json['len'],
-        'time_st': request.json['time_st']
+        'st_dtm': request.json['st_dtm'],
+        'end_dtm': request.json['end_dtm']
     }
 
     print(req)
+    querydb.schecule_cnslt(req)
 
     return jsonify({'status': 'OK', 'user': 'brandon', 'pass': 'nopass'})
 

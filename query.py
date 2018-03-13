@@ -288,7 +288,7 @@ class query(object):
                      .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id))\
                      .order_by(db.blog.updt_dtm.desc())
         return blg
-    
+
     def getAllBlogPosts(self, page_num, items_per_page):
         tuples = db.blog.select(db.blog.subject, db.blog.updt_dtm, db.blog.text, db.psychologist.psyc_id, db.user.first_name, db.user.last_name)\
                         .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
@@ -298,7 +298,7 @@ class query(object):
                         .where(db.user.active & (db.role.role_nm == 'psyc'))\
                         .order_by(db.blog.updt_dtm.desc())\
                         .paginate(page_num, items_per_page).tuples()
-        
+
         return [{
             'title': t[0],
             'date_posted': t[1],
@@ -391,7 +391,7 @@ class query(object):
 
         print('nope')
         return None
-    
+
     def getPsychologistNames(self):
         tuples = db.psychologist.select(db.psychologist.psyc_id, db.user.first_name, db.user.last_name)\
                                .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
@@ -400,7 +400,7 @@ class query(object):
                                .where(db.user.active & (db.role.role_nm == 'psyc'))\
                                .tuples()
         return [{ 'psyc_id': t[0], 'first_name': t[1], 'last_name': t[2] } for t in tuples]
-        
+
     def getAvailability(self, avail_id, psyc_id):
         t = db.calendar.select(db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
                        .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
@@ -413,7 +413,7 @@ class query(object):
             'time_end': t[1],
             'weekday': t[2]
         }
-        
+
     def getAvailabilities(self, psyc_id, page=-1):
         q = db.calendar.select(db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
                        .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
@@ -422,19 +422,19 @@ class query(object):
                        .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
                        .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
                        .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id) & (db.calendar.void_ind == 'n'))
-        
+
         if page < 1:
             tuples = q.tuples()
         else:
             tuples = q.paginate(page, 20).tuples()
-        
+
         return [{
             'avail_id': t[0],
             'time_st': t[1],
             'time_end': t[2],
             'weekday': t[3]
         } for t in tuples]
-        
+
     def getAllAvailabilities(self):
         tuples = db.calendar.select(db.psychologist.psyc_id, db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
                             .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
@@ -465,24 +465,24 @@ class query(object):
             'time_st': t[0],
             'time_end': t[1]
         } for t in tuples]
-    
+
     def addAvailability(self, psyc_id, time_st, time_end, weekday):
         # Find the weekday in the db
         wkd = db.day_typ_cd.select(db.day_typ_cd.day_typ_cd).where(db.day_typ_cd.day_typ_cd == weekday).tuples()[0][0]
         avail = db.calendar(psyc=psyc_id, time_st=time_st, time_end=time_end, day_typ_cd=wkd, void_ind='n')
         avail.save()
-    
+
     def deleteAvailability(self, avail_id, psyc_id):
         avail = db.calendar.select()\
                            .where((db.calendar.cal_id == avail_id) & (db.calendar.psyc == psyc_id))\
                            .get()
         avail.void_ind = 'y'
         avail.save()
-    
+
     def updateAvailability(self, avail_id, psyc_id, time_st, time_end, weekday):
         # Find the weekday in the db
         wkd = db.day_typ_cd.select(db.day_typ_cd.day_typ_cd).where(db.day_typ_cd.day_typ_cd == weekday).tuples()[0][0]
-        
+
         avail = db.calendar.select()\
                            .where((db.calendar.cal_id == avail_id) & (db.calendar.psyc == psyc_id) & (db.calendar.void_ind == 'n'))\
                            .get()
@@ -490,14 +490,14 @@ class query(object):
         avail.time_end = time_end
         avail.day_typ_cd = wkd
         avail.save()
-        
+
     def getWeekDays(self):
         wkds = db.day_typ_cd.select()
         d = {}
         for wkd in wkds:
             d[wkd.day_typ_cd] = wkd.day
         return d
-        
+
     def getWeekDayList(self):
         wkds = self.getWeekDays()
         return [wkds[d] for d in ['m', 't', 'w', 'th', 'f', 's', 'su']]
@@ -592,112 +592,24 @@ class query(object):
     #End Nolan's Code
 
 # Begin Brandon
-    def get_slides(self):
-        slider_a = []
-        for slide in db.slider.select():
-            slider_a.append({
-                'id': slide.slider_id,
-                'img': slide.img,
-                'version': slide.version,
-                'desc': slide.desc,
-                'alt': slide.alt
-            })
-        return slider_a
-
-    def get_slide(self, s_id):
-        slide = db.slider.get(db.slider.slider_id == s_id)
-        url = cloudinary.CloudinaryImage(slide.img, version=slide.version).image()
-        slide = {
-            'desc': slide.desc,
-            'alt': slide.alt,
-            'img': url
-        }
-        return slide
-
-    def allowed_file(self, filename):
-        return '.' in filename and \
-               filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
-
-    def update_slide(self, s_id, img, desc, alt):
-        slide = db.slider.get(db.slider.slider_id == s_id)
-        if img and self.allowed_file(img.filename):
-            upload = cloudinary.uploader.upload(img, public_id=slide.img)
-            slide.version = upload['version']
-        if desc is not None and desc != "":
-            slide.desc = desc
-        if alt is not None and alt != "":
-            slide.alt = alt
-        slide.save()
-
-    def get_slider(self):
-        slider_tag = []
-        slider_desc = []
-        for slide in db.slider.select().order_by(db.slider.slider_id.asc()):
-            slider_tag.append(cloudinary.CloudinaryImage(slide.img, version=slide.version).image(alt=slide.alt))
-            slider_desc.append(slide.desc)
-        return slider_tag, slider_desc
-
-    def get_consultation(self):
-        psycs = db.psychologist.select(db.psychologist.psyc_id, db.user.first_name, db.user.last_name).join(db.user, JOIN_INNER, db.user.user_id == db.psychologist.user).tuples()
-        psycs = list(psycs)
-
-        len_fee = db.consultation_length.select(db.consultation_length.cnslt_len_id, db.consultation_length.length, db.consultation_fee.fee).where(db.consultation_length.void_ind == 'n').join(db.consultation_fee, JOIN_INNER, db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id).tuples()
-        len_fee = list(len_fee)
-
-        return psycs, len_fee
-
-    def get_psyc_cnslt(self, cnslt):
-
-        if cnslt.get('psyc', None) == '-1':
-            time = cnslt.get('date', None) + " " + cnslt.get('hour', None) + ":" + cnslt.get('min', None)
-            time_st = datetime.datetime.strptime(time, '%Y-%m-%d %H:%M')
-            time_end = time_st + datetime.timedelta(hours=float(cnslt.get('len_fee', None)))
-            taken_times = db.consult_time.select()\
-                .where(((db.consult_time.time_st <= time_st) & (db.consult_time.time_end <= time_end) & (time_st <= db.consult_time.time_end))
-                       | ((db.consult_time.time_st >= time_st) & (db.consult_time.time_end >= time_end) & (time_end >= db.consult_time.time_st))
-                       | ((db.consult_time.time_st <= time_st) & (db.consult_time.time_end >= time_end))
-                       | ((db.consult_time.time_st >= time_st) & (db.consult_time.time_end <= time_end))).tuples()
-
-            taken_times = list(taken_times)
-
-            #if no conflicts
-            if len(taken_times) == 0:
-                day_of_week = calendar.day_name[time_st.weekday()]
-                cal = db.calendar.select().where((db.calendar.time_st <= time_st.time()) & (db.calendar.time_end >= time_end.time()) & (db.calendar.void_ind == 'n'))\
-                    .join(db.day_typ_cd, JOIN_INNER, (db.day_typ_cd.day == day_of_week) & (db.day_typ_cd.day_typ_cd == db.calendar.day_typ_cd)).tuples()
-                cal = list(cal)
-
-                psycs = []
-                for c in cal:
-                    psyc = db.psychologist.select(db.psychologist.psyc_id, db.psychologist.photo, db.user.first_name, db.user.last_name).where(db.psychologist.psyc_id == c[1]).join(db.user, JOIN_INNER, db.user.user_id == db.psychologist.user).tuples()
-                    print(list(psyc[0]))
-                    psyc = list(psyc[0])
-                    public_id, version = psyc[1].split('#')
-                    link = cloudinary.CloudinaryImage(public_id, version=version).build_url()
-                    print(psyc)
-                    psyc[1] = link
-
-                    book = dict()
-                    book['child_id'] = cnslt.get('child_id', None)
-                    fee = db.consultation_fee.select(db.consultation_fee.fee).where(db.consultation_fee.void_ind == 'n').join(db.consultation_length, JOIN_INNER, (db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id) & (db.consultation_length == cnslt.get('len_fee', None))).tuples()
-                    print(fee)
-                    book['fee'] = fee
-                    book['len'] = cnslt.get('len_fee', None)
-                    book['psyc_id'] = psyc[0]
-                    book['time_st'] = time_st
-                    book['time_end'] = time_end
-                    psyc.append(book)
-
-                    psycs.append(psyc)
-                print(psycs)
-
-        return None
 
     def get_len_fee(self):
-        len_fee = db.consultation_length.select(db.consultation_length.cnslt_len_id, db.consultation_length.length, db.consultation_fee.fee).where(db.consultation_length.void_ind == 'n').join(db.consultation_fee, JOIN_INNER, db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id).tuples()
+        len_fee = db.consultation_length.select(db.consultation_length.cnslt_len_id, db.consultation_length.length, db.consultation_fee.fee).where(db.consultation_length.void_ind == 'n').join(db.consultation_fee, JOIN_INNER, (db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id) & (db.consultation_fee.void_ind == 'n')).tuples()
         len_fee = list(len_fee)
 
         return len_fee
+
+    def schecule_cnslt(self, args):
+        fee = db.consultation_fee.select(db.consultation_fee.fee).where(db.consultation_fee.void_ind == 'n').join(db.consultation_length, JOIN_INNER, (args['len'] == db.consultation_length.length) & (db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id)).tuples()
+        fee = list(fee)[0][0]
+
+
+
+        #cnslt = db.consultation(child_id=args['child_id'], fee=fee, paid='n', length=args['len'], finished='n')
+        #cnslt.save()
+
+
+        #cnslt_tm = db.consult_time(cnslt_id=cnslt.cnslt_id, psyc_id=args['psyc_id'], time_st=, time_end=, approved='y')
 
 
 #End Brandon
