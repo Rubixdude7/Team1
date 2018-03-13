@@ -1,5 +1,122 @@
 #schedule-appt{
   //background-color: blue;
 
+  //display: none;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    transition: opacity 500ms;
+    visibility: hidden;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.popup {
+    background: #fff;
+    width: 80%;
+    position: relative;
+    transition: all 1s ease-in-out;
+    max-height: 100vh;
+}
+
+.popup h2 {
+    margin-top: 0;
+    padding-top: .5em;
+    text-align: center;
+}
+
+.popup .close {
+    position: absolute;
+    transition: all 200ms;
+    font-size: 2em;
+    font-weight: bold;
+    text-decoration: none;
+    color: $fontColor;
+    cursor: pointer;
+}
+
+.popup .close:hover {
+    color: $hoverColor;
+}
+
+#overlay-checkbox:checked ~ .overlay{
+  visibility: visible;
+  opacity: 1;
+  z-index: 16;
+}
+
+#overlay-checkbox{
   display: none;
+}
+
+//wide
+@media only screen and (min-width: 1001px) {
+    .popup .close {
+        top: 20px;
+        right: 30px;
+    }
+}
+
+//narrow
+@media screen and (max-width: 1000px) {
+    .popup {
+        width: 80%;
+    }
+    .popup .close {
+        top: 40px;
+        right: 30px;
+    }
+    .noNAV:checked~.fixed-mobile-nav,
+    .noNAV:checked~.clear-menu-btn,
+    .noNAV:checked~nav {
+        visibility: hidden;
+        opacity: 0;
+        transition: .25s ease-in-out;
+    }
+}
+
+.book-dtls{
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  position: relative;
+  z-index: 10;
+  transition: .5s ease-in-out;
+  margin: 1em;
+}
+
+.book:checked + .book-dtls{
+  max-height: 100em;
+  overflow: visible;
+  opacity: 1;
+  z-index: 10;
+}
+
+.book{
+  display: none;
+}
+
+.book-psyc{
+  margin: .5em;
+
+  h5{
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+  }
+
+  label{
+    float: right;
+    padding: 0;
+  }
+
+
 }
