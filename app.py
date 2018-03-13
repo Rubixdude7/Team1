@@ -172,14 +172,9 @@ def slide_update(s_id):
 @app.route('/consultation', methods=['GET', 'POST'])
 @login_required
 def consultation():
-    req = request.json['data']
-    year = request.form['year']
-    month = request.form['month']
-    day = request.form['day']
+    req = request.json['time']
 
     print(req)
-
-    print(year + month + day)
 
     return jsonify({'status': 'OK', 'user': 'brandon', 'pass': 'nopass'})
 

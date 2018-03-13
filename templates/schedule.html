@@ -77,20 +77,6 @@
                             }
                         }
 
-
-                        /*$.ajax({
-                            url : "{{ url_for('consultation') }}",
-                            data: data,
-                            contentType: 'application/json;charset=UTF-8',
-                            type: 'POST',
-                            success: function(response) {
-                                alert(JSON.stringify(response));
-                            },
-                            error: function(error) {
-                                alert(JSON.stringify(error));
-                            }
-                        });*/
-
                         var psyc = $("#psyc-select").val();
                         var psycs = {{ psyc_names|tojson|safe }};
                         var len_fee = {{ len_fee|tojson|safe }};
@@ -117,7 +103,9 @@
                                                 "<div id=\"book-dtls\">" +
                                                     "<label for=\"time-st\">Start Time</label>" +
                                                     "<input id=\"time-st\" type=\"number\" max=\"" + psycs_day[i]["time_end"]["hour"] + "\" min=\"" + psycs_day[i]["time_st"]["hour"] + "\" value=\"" + psycs_day[i]["time_st"]["hour"] +"\" step=\"1\">" +
-                                                    "<input type=\"number\" min=\"0\" max=\"" + psycs_day[i]["time_end"]["minute"] + "\" step=\"30\" value=\"0\">" +
+                                                    "<input id=\"time-st-mn\" type=\"number\" min=\"0\" max=\"30\" step=\"30\" value=\"0\">" +
+                                                    "<input type=\"hidden\" id=\"time-end-hr\" value=\"" + psycs_day[i]["time_end"]["hour"] + "\">" +
+                                                    "<input type=\"hidden\" id=\"time-end-mn\" value=\"" + psycs_day[i]["time_end"]["minute"] + "\">" +
                                                     len_fee_str +
                                                     "<input type=\"button\" value=\"Confirm\" onclick=\"confirm('" + k + "')\">" +
                                                 "</div>" +
@@ -141,8 +129,41 @@
                 });
             });
 
-            function confirm(name){
-                alert("you confirm " + name);
+            function confirm(id){
+                var st_tm_hr = parseInt($('#' + id).find('#time-st').val());
+                var st_tm_mn = parseInt($('#' + id).find('#time-st-mn').val());
+                st_tm_mn = st_tm_mn/60;
+                var end_tm_hr = parseInt($('#' + id).find('#time-end-hr').val());
+                var end_tm_mn = parseFloat($('#' + id).find('#time-end-mn').val());
+                end_tm_mn = end_tm_mn/60;
+                var len = parseFloat($('input[name=length]:checked').val());
+
+                var time = st_tm_hr + st_tm_mn + len;
+                var end = end_tm_hr + end_tm_mn;
+
+                if (isNaN(len)) alert("Please select a consultation length.");
+                else if (time > end) alert("Sorry, this  would run over time, pick a different configuration please.");
+                else{
+                    var send = {
+                        'time': time,
+                        'end': end
+                    };
+
+                     $.ajax({
+                        type : "POST",
+                        url : "{{ url_for('consultation') }}",
+                        data: JSON.stringify(send, null, '\t'),
+                        contentType: 'application/json;charset=UTF-8',
+                        success: function(result) {
+                            alert(JSON.stringify(result));
+                        },
+                        error: function(error) {
+                            alert(JSON.stringify(error));
+                        }
+                    });
+                }
+
+
             }
         </script>
     </div>
