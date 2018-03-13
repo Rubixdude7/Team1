@@ -93,23 +93,37 @@
 
                         var psyc = $("#psyc-select").val();
                         var psycs = {{ psyc_names|tojson|safe }};
+                        var len_fee = {{ len_fee|tojson|safe }}
                         $('#schedule-appt').empty();
 
                         for(var i = 0; i < psycs_day.length; i++){
                             for(var j = 0; j < psycs.length; j++) {
                                 if(psycs_day[i]["psyc_id"] == psycs[j]["psyc_id"] && psyc == "all"){
 
+                                    var len_fee_str = "";
+                                    for(var k = 0; k < len_fee.length; k++){
+                                        len_fee_str += "<input type=\"radio\" name=\"length\" id=\"" + len_fee[k][0] + "hr\" value=\"" + len_fee[k][1] +"\" required>" +
+                                                       "<label for=\"" + len_fee[k][0] + "hr\"> Length: " + len_fee[k][1] + " Fee: " + len_fee[k][2] + "</label>\""
+                                    }
+
                                     $('#schedule-appt').append(
-                                        "<br>" + psycs[j]["first_name"] + " " + psycs[j]["last_name"] +
-                                        "<br> <p>Start:</p>" + psycs_day[i]["time_st"]["hour"] + ":" + psycs_day[i]["time_st"]["minute"] +
-                                        "<p>End</p>" + psycs_day[i]["time_end"]["hour"] + ":" + psycs_day[i]["time_end"]["minute"] +
+                                            "<br>" + psycs[j]["first_name"] + " " + psycs[j]["last_name"] +
+                                            "<p>Start:</p>" + psycs_day[i]["time_st"]["hour"] + ":" + psycs_day[i]["time_st"]["minute"] +
+                                            "<p>End</p>" + psycs_day[i]["time_end"]["hour"] + ":" + psycs_day[i]["time_end"]["minute"] +
+                                            "<label for=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["time_st"]["hour"] + "\"> Book </label>" +
+                                            "<input type=\"radio\" name=\"book\" id=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["time_st"]["hour"] +"\">" +
+                                            "<div id=\"book-dtls\">" +
+                                                "<input for=\"time-st\">Start Time</label> <input id=\"time-st\" type=\"number\" start=\"" + psycs_day[i]["time_st"]["hour"] + "\" max=\"" + psycs_day[i]["time_end"]["hour"] + "\" step=\"1\">" +
+                                                len_fee_str
+                                            + "</div>"
+
                                     );
                                 }
                                 else {
                                     if(psycs_day[i]["psyc_id"] == psyc && psycs[j]["psyc_id"] == psyc) $('#schedule-appt').append(
                                         "<br>" + psycs[j]["first_name"] + " " + psycs[j]["last_name"] +
                                             "<br> <p>Start:</p>" + psycs_day[i]["time_st"]["hour"] + ":" + psycs_day[i]["time_st"]["minute"] +
-                                            "<p>End</p>" + psycs_day[i]["time_end"]["hour"] + ":" + psycs_day[i]["time_end"]["minute"] +
+                                            "<p>End</p>" + psycs_day[i]["time_end"]["hour"] + ":" + psycs_day[i]["time_end"]["minute"]
                                     );
                                 }
                             }

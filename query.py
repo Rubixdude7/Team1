@@ -693,6 +693,12 @@ class query(object):
 
         return None
 
+    def get_len_fee(self):
+        len_fee = db.consultation_length.select(db.consultation_length.cnslt_len_id, db.consultation_length.length, db.consultation_fee.fee).where(db.consultation_length.void_ind == 'n').join(db.consultation_fee, JOIN_INNER, db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id).tuples()
+        len_fee = list(len_fee)
+
+        return len_fee
+
 
 #End Brandon
 

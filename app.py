@@ -619,7 +619,7 @@ def schedule():
         a['weekday'] = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
     return render_template('schedule.html',
                            psyc_names=querydb.getPsychologistNames(),
-                           avails=avail_list)
+                           avails=avail_list, len_fee=querydb.get_len_fee())
 
 @app.route('/psikolog/')
 @app.route('/psikolog/<int:id>')
