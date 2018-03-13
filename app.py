@@ -172,7 +172,12 @@ def slide_update(s_id):
 @app.route('/consultation', methods=['GET', 'POST'])
 @login_required
 def consultation():
-    req = request.json['time']
+    req = {
+        'child_id': request.json['child_id'],
+        'psyc_id': request.json['psyc_id'],
+        'len': request.json['len'],
+        'time_st': request.json['time_st']
+    }
 
     print(req)
 
@@ -597,7 +602,8 @@ def my_psikolog_page():
 
 @app.route('/schedule')
 @roles_required('user')
-def schedule():
+def schedule():  # TODO make sure only child of that parent can get here
+    child_id = request.args.get('child_id')
     avail_list = querydb.getAllAvailabilities()
     for a in avail_list:
         del a['avail_id']
@@ -614,7 +620,7 @@ def schedule():
         a['weekday'] = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
     return render_template('schedule.html',
                            psyc_names=querydb.getPsychologistNames(),
-                           avails=avail_list, len_fee=querydb.get_len_fee())
+                           avails=avail_list, len_fee=querydb.get_len_fee(), child_id=child_id)
 
 @app.route('/psikolog/')
 @app.route('/psikolog/<int:id>')

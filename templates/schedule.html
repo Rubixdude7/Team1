@@ -95,6 +95,7 @@
 
                                     $('#schedule-appt').append(
                                             "<div id=\"" + k + "\">" +
+                                                "<input type=\"hidden\" id=\"psyc-id\" value=\"" + psycs_day[i]["psyc_id"] + "\">" +
                                                 psycs[j]["first_name"] + " " + psycs[j]["last_name"] +
                                                 "<p>Start:</p>" + psycs_day[i]["time_st"]["hour"] + ":" + psycs_day[i]["time_st"]["minute"] +
                                                 "<p>End</p>" + psycs_day[i]["time_end"]["hour"] + ":" + psycs_day[i]["time_end"]["minute"] +
@@ -130,6 +131,8 @@
             });
 
             function confirm(id){
+                var child_id= {{ child_id|tojson|safe }};
+                var psyc_id = parseInt($('#' + id).find('#psyc-id').val());
                 var st_tm_hr = parseInt($('#' + id).find('#time-st').val());
                 var st_tm_mn = parseInt($('#' + id).find('#time-st-mn').val());
                 st_tm_mn = st_tm_mn/60;
@@ -145,8 +148,10 @@
                 else if (time > end) alert("Sorry, this  would run over time, pick a different configuration please.");
                 else{
                     var send = {
-                        'time': time,
-                        'end': end
+                        'child_id': child_id,
+                        'psyc_id': psyc_id,
+                        'len': len,
+                        'time_st': st_tm_hr + st_tm_mn
                     };
 
                      $.ajax({

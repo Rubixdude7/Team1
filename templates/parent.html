@@ -101,11 +101,7 @@
                                 {% endif %}
                             {% endif %}
 
-                        <!--<form action="{{ url_for('consultation', child_id=child.child_id) }}">
-                            <button type="submit">
-                                Schedule Consultation
-                            </button>
-                        </form>-->
+                        <button onclick="location.href='{{ url_for('schedule', child_id=child.child_id) }}'" type="button"></button>
                         </p>
                     </div>
                 </li>
