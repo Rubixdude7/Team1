@@ -164,7 +164,6 @@ def consultation():
         'st_dt': request.json['st_dt'],
     }
 
-    print(req)
     status = querydb.schecule_cnslt(req)
 
     return jsonify({'status': status[0], 'message': status[1]})
