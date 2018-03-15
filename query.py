@@ -552,8 +552,8 @@ class query(object):
                             slot['end'] = cnslt['time_st']
                         elif cnslt['time_st'] > slot['st'] and cnslt['time_end'] < slot['end']:
                             # It bites off the middle?
+                            slots.append({'psyc_id': slot['psyc_id'], 'st': cnslt['time_end'], 'end': slot['end']})
                             slot['end'] = cnslt['time_st']
-                            print('TODO: Add slot after cut')
 
         for slot in slots:
             slot['st'] = {
