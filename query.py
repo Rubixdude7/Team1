@@ -500,12 +500,13 @@ class query(object):
                                 .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
                                 .where((db.role.role_nm == 'psyc') & db.user.active)\
                                 .tuples()
-        return [{
+        result = [{
             'psyc_id': t[0],
             'child_id': t[1],
             'time_st': t[2],
             'time_end': t[3]
         } for t in tuples]
+        return result
 
     def getAllSlotsThatCanBeBooked(self):
         avail_list = self.getAllAvailabilities()
@@ -541,16 +542,17 @@ class query(object):
                 if slot['psyc_id'] == cnslt['psyc_id']:
                     # Does this consultation cut into this slot?
                     if slot['st'] < cnslt['time_end'] and slot['end'] > cnslt['time_st']:
+                        print('Cutting appt from availability slot')
                         # Yes. The question is: in what WAY does it cut it?
                         if cnslt['time_st'] <= slot['st'] and cnslt['time_end'] < slot['end']:
                             # It just bites off a piece on the left?
                             slot['st'] = cnslt['time_end']
                         elif cnslt['time_st'] > slot['st'] and cnslt['time_end'] >= slot['end']:
                             # It bites off a piece on the right?
-                            slot['end'] = cnslt['time_start']
+                            slot['end'] = cnslt['time_st']
                         elif cnslt['time_st'] > slot['st'] and cnslt['time_end'] < slot['end']:
                             # It bites off the middle?
-                            slot['end'] = cnslt['time_start']
+                            slot['end'] = cnslt['time_st']
                             print('TODO: Add slot after cut')
 
         for slot in slots:
