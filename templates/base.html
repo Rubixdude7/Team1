@@ -64,11 +64,13 @@
                             </li>
                         {% endif %}
                         {% if current_user.is_authenticated %}
-                            <li>
+                            <li class="navDropdown">
                                 <a href="{{ url_for('user.profile') }}">WELCOME: {{ current_user.first_name.upper() }}</a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('user.logout') }}">LOG OUT</a>
+                                <ul class="subNav">
+                                    <li>
+                                        <a href="{{ url_for('user.logout') }}">LOG OUT</a>
+                                    </li>
+                                </ul>
                             </li>
                         {% else %}
                             <li>

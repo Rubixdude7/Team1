@@ -51,6 +51,39 @@
   .nav-wrapper ul li a:hover {
     color: $hoverColor !important;
   }
+
+  /*DROPDOWN SUBNAV*/
+
+  .subNav {
+      background-color: $mainColor;
+      left: 0;
+      opacity: 0;
+      position: absolute;
+      /*Why did i do this?*/
+      top: 0;
+      visibility: hidden;
+      z-index: 1;
+      -webkit-transition: all .4s ease;
+      transition: all .4s ease;
+  }
+  .subNav li {
+      background-color: $mainColor;
+      width: 10em;
+  }
+  .navDropdown:hover>.subNav {
+      opacity: 1;
+      top: 5em;
+      visibility: visible;
+      height: initial !important;
+  }
+  .subNav li a {
+      height: initial;
+  }
+.navDropdown input,
+  .navDropdown>img {
+      display: none;
+  }
+
   /*TEXT*/
   .nav-wrapper a {
     display: block;
@@ -105,7 +138,7 @@
     ul {
       z-index: 200;
       visibility: hidden;
-height: 0;
+      height: 0;
       opacity: 0;
       transition: 0.5s 0s ease-in-out;
       list-style: none;
@@ -198,16 +231,17 @@ height: 0;
 
   .hamburger-checkbox:checked {
     &~ .wrapper > header > .nav-close > .menu,
-    ~ .wrapper > header > nav > .nav-wrapper> ul {
+    ~ .wrapper > header > nav > .nav-wrapper> ul,
+    ~ .wrapper > header > nav > .nav-wrapper> ul .subNav{
       opacity: 1;
       visibility: visible;
     }
 
     &~ .wrapper > header > nav > .nav-wrapper> ul{
       position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       height: initial;
     }
 
