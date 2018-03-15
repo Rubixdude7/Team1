@@ -3,7 +3,7 @@
     <script type="text/javascript" src="/static/scripts/calendar.js"></script>
 {%- endmacro %}
 
-{% macro calendar(id='calendar', classes='calendar-pretty') -%}
+{% macro calendar(id='calendar', classes='calendar-pretty', show_arrows=True) -%}
     <div class="calendar {{ classes }}" id="{{ id }}">
         <div class="cal-head">
             <div class="cal-month-name">
@@ -11,10 +11,12 @@
                     <i class="fa fa-calendar-alt" aria-hidden="true"></i>
                     <span class="cal-month-label" aria-live="polite" aria-relevant="text"></span>
                 </div>
+                {% if show_arrows -%}
                 <div>
                     <button class="cal-prev-btn btn btn-info" aria-controls="cal-month-label"><i class="fa fa-arrow-left" aria-hidden="true"></i><span class="sr-only">Previous Month</span></button>
                     <button class="cal-next-btn btn btn-info" aria-controls="cal-month-label"><i class="fa fa-arrow-right" aria-hidden="true"></i><span class="sr-only">Next Month</span></button>
                 </div>
+                {%- endif %}
             </div><div class="cal-column-title" aria-hidden="true">
                 Senin
             </div><div class="cal-column-title" aria-hidden="true">

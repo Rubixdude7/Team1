@@ -414,7 +414,7 @@ class query(object):
             'weekday': t[2]
         }
 
-    def getAvailabilities(self, psyc_id, page=-1):
+    def getAvailabilities(self, psyc_id, page=0):
         q = db.calendar.select(db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
                        .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
                        .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
@@ -430,9 +430,9 @@ class query(object):
 
         return [{
             'avail_id': t[0],
-            'time_st': t[1],
-            'time_end': t[2],
-            'weekday': t[3]
+            'st': { 'hour': t[1].hour, 'minute': t[1].minute },
+            'end': { 'hour': t[2].hour, 'minute': t[2].minute },
+            'weekday': ['m', 't', 'w', 'th', 'f', 's', 'su'].index(t[3])
         } for t in tuples]
 
     def getAllAvailabilities(self):

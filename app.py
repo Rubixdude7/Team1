@@ -600,6 +600,13 @@ def api_calendar():
         s['end']['month'] -= 1
     return jsonify(slots)
 
+@app.route('/api/availabilities')
+@roles_required('psyc')
+def api_availabilities():
+    psyc_id = querydb.getPsycId(current_user.id)
+    avails = querydb.getAvailabilities(psyc_id)
+    return jsonify(avails)
+
 @app.route('/my_psikolog_page')
 @roles_required('psyc')
 def my_psikolog_page():
@@ -697,19 +704,6 @@ def edit_availability_list(page=1):
     psyc_id = querydb.getPsycId(current_user.id)
     avail_list = querydb.getAvailabilities(psyc_id, page=page)
     weekdays = querydb.getWeekDayList()
-    
-    for a in avail_list:
-        a['time_st'] = {
-            'hour': a['time_st'].hour,
-            'minute': a['time_st'].minute,
-            'second': a['time_st'].second
-        }
-        a['time_end'] = {
-            'hour': a['time_end'].hour,
-            'minute': a['time_end'].minute,
-            'second': a['time_end'].second
-        }
-        a['weekday'] = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
     
     return render_template('edit_availability_list.html', psyc_id=psyc_id, avails=avail_list, weekdays=weekdays, page=page)
 
