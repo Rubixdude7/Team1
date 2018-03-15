@@ -173,7 +173,7 @@ def consultation():
         'child_id': request.json['child_id'],
         'psyc_id': request.json['psyc_id'],
         'len': request.json['len'],
-        'st_dt': request.json['st_dt'],
+        'st_dt': request.json['st_dt']
     }
 
     status = querydb.schecule_cnslt(req)
