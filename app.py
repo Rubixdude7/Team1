@@ -579,6 +579,15 @@ def delete():
 
 # Begin Charlie's code
 
+@app.route('/api/calendar')
+def api_calendar():
+    slots = querydb.getAllSlotsThatCanBeBooked()
+    for s in slots:
+        #Adjust month number for javascript
+        s['st']['month'] -= 1
+        s['end']['month'] -= 1
+    return jsonify(slots)
+
 @app.route('/my_psikolog_page')
 @roles_required('psyc')
 def my_psikolog_page():
@@ -589,23 +598,9 @@ def my_psikolog_page():
 @roles_required('user')
 def schedule():  # TODO make sure only child of that parent can get here
     child_id = request.args.get('child_id')
-    avail_list = querydb.getAllAvailabilities()
-    for a in avail_list:
-        del a['avail_id']
-        a['time_st'] = {
-            'hour': a['time_st'].hour,
-            'minute': a['time_st'].minute,
-            'second': a['time_st'].second
-        }
-        a['time_end'] = {
-            'hour': a['time_end'].hour,
-            'minute': a['time_end'].minute,
-            'second': a['time_end'].second
-        }
-        a['weekday'] = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
     return render_template('schedule.html',
                            psyc_names=querydb.getPsychologistNames(),
-                           avails=avail_list, len_fee=querydb.get_len_fee(), child_id=child_id)
+                           len_fee=querydb.get_len_fee(), child_id=child_id)
 
 @app.route('/psikolog/')
 @app.route('/psikolog/<int:id>')

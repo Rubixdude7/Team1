@@ -37,8 +37,9 @@
 
         
         <script type="text/javascript">
-            var allAvails = {{ avails|tojson|safe }};
-            
+            // We set the value of this later with an ajax HTTP request to /api/calendar
+            var allAvails;
+
             function filterByPsyc(cal) {
 
                 var psyc = $("#psyc-select").val();
@@ -60,6 +61,13 @@
             }
             
             $(document).ready(function() {
+                $.getJSON('/api/calendar', function (data) {
+                    allAvails = data;
+                    setupCalendar();
+                });
+            });
+
+            function setupCalendar() {
                 var cal = new calendarModule.Calendar("#calendar");
                 cal.setup();
                 filterByPsyc(cal);
@@ -81,7 +89,7 @@
 
                         var psycs_day = [];
                         for (var i = 0; i < allAvails.length; i++) {
-                            if (allAvails[i]["weekday"] == weekday) {
+                            if (allAvails[i]["st"]["year"] == year && allAvails[i]["st"]["month"] == month && allAvails[i]["st"]["day"] == day) {
                                 psycs_day.push(allAvails[i]);
                             }
                         }
@@ -110,18 +118,18 @@
                                                     "<input type=\"hidden\" id=\"month\" value=\"" + month + "\">" +
                                                     "<input type=\"hidden\" id=\"year\" value=\"" + year + "\">" +
                                                     "<h4>" + psycs[j]["first_name"] + " " + psycs[j]["last_name"] + "</h4>" +
-                                                    "<h5>Start: " + psycs_day[i]["time_st"]["hour"] + ":" + psycs_day[i]["time_st"]["minute"] +
-                                                    " End: " + psycs_day[i]["time_end"]["hour"] + ":" + psycs_day[i]["time_end"]["minute"] + "</h5>" +
-                                                    "<label class=\"button\" for=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["time_st"]["hour"] + "\"> Book </label>" +
+                                                    "<h5>Start: " + psycs_day[i]["st"]["hour"] + ":" + psycs_day[i]["st"]["minute"] +
+                                                    " End: " + psycs_day[i]["end"]["hour"] + ":" + psycs_day[i]["end"]["minute"] + "</h5>" +
+                                                    "<label class=\"button\" for=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] + "\"> Book </label>" +
                                                 "</div>" +
 
-                                                "<input type=\"radio\" name=\"book\" class=\"book\" id=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["time_st"]["hour"] +"\">" +
+                                                "<input type=\"radio\" name=\"book\" class=\"book\" id=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] +"\">" +
                                                 "<div class=\"book-dtls\">" +
                                                     "<label for=\"time-st\">Start Time</label>" +
-                                                    "<input id=\"time-st\" type=\"number\" max=\"" + psycs_day[i]["time_end"]["hour"] + "\" min=\"" + psycs_day[i]["time_st"]["hour"] + "\" value=\"" + psycs_day[i]["time_st"]["hour"] +"\" step=\"1\">" +
+                                                    "<input id=\"time-st\" type=\"number\" max=\"" + psycs_day[i]["end"]["hour"] + "\" min=\"" + psycs_day[i]["st"]["hour"] + "\" value=\"" + psycs_day[i]["st"]["hour"] +"\" step=\"1\">" +
                                                     "<input id=\"time-st-mn\" type=\"number\" min=\"0\" max=\"30\" step=\"30\" value=\"0\">" +
-                                                    "<input type=\"hidden\" id=\"time-end-hr\" value=\"" + psycs_day[i]["time_end"]["hour"] + "\">" +
-                                                    "<input type=\"hidden\" id=\"time-end-mn\" value=\"" + psycs_day[i]["time_end"]["minute"] + "\">" +
+                                                    "<input type=\"hidden\" id=\"time-end-hr\" value=\"" + psycs_day[i]["end"]["hour"] + "\">" +
+                                                    "<input type=\"hidden\" id=\"time-end-mn\" value=\"" + psycs_day[i]["end"]["minute"] + "\">" +
                                                     len_fee_str +
                                                     "<input type=\"button\" value=\"Confirm\" onclick=\"confirm('" + k + "')\">" +
                                                 "</div>" +
@@ -137,16 +145,16 @@
                                                 "<input type=\"hidden\" id=\"month\" value=\"" + month + "\">" +
                                                 "<input type=\"hidden\" id=\"year\" value=\"" + year + "\">" +
                                                 psycs[j]["first_name"] + " " + psycs[j]["last_name"] +
-                                                "<p>Start:</p>" + psycs_day[i]["time_st"]["hour"] + ":" + psycs_day[i]["time_st"]["minute"] +
-                                                "<p>End</p>" + psycs_day[i]["time_end"]["hour"] + ":" + psycs_day[i]["time_end"]["minute"] +
-                                                "<label for=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["time_st"]["hour"] + "\"> Book </label>" +
-                                                "<input type=\"radio\" name=\"book\" id=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["time_st"]["hour"] +"\">" +
+                                                "<p>Start:</p>" + psycs_day[i]["st"]["hour"] + ":" + psycs_day[i]["st"]["minute"] +
+                                                "<p>End</p>" + psycs_day[i]["end"]["hour"] + ":" + psycs_day[i]["end"]["minute"] +
+                                                "<label for=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] + "\"> Book </label>" +
+                                                "<input type=\"radio\" name=\"book\" id=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] +"\">" +
                                                 "<div id=\"book-dtls\">" +
                                                     "<label for=\"time-st\">Start Time</label>" +
-                                                    "<input id=\"time-st\" type=\"number\" max=\"" + psycs_day[i]["time_end"]["hour"] + "\" min=\"" + psycs_day[i]["time_st"]["hour"] + "\" value=\"" + psycs_day[i]["time_st"]["hour"] +"\" step=\"1\">" +
+                                                    "<input id=\"time-st\" type=\"number\" max=\"" + psycs_day[i]["end"]["hour"] + "\" min=\"" + psycs_day[i]["st"]["hour"] + "\" value=\"" + psycs_day[i]["st"]["hour"] +"\" step=\"1\">" +
                                                     "<input id=\"time-st-mn\" type=\"number\" min=\"0\" max=\"30\" step=\"30\" value=\"0\">" +
-                                                    "<input type=\"hidden\" id=\"time-end-hr\" value=\"" + psycs_day[i]["time_end"]["hour"] + "\">" +
-                                                    "<input type=\"hidden\" id=\"time-end-mn\" value=\"" + psycs_day[i]["time_end"]["minute"] + "\">" +
+                                                    "<input type=\"hidden\" id=\"time-end-hr\" value=\"" + psycs_day[i]["end"]["hour"] + "\">" +
+                                                    "<input type=\"hidden\" id=\"time-end-mn\" value=\"" + psycs_day[i]["end"]["minute"] + "\">" +
                                                     len_fee_str +
                                                     "<input type=\"button\" value=\"Confirm\" onclick=\"confirm('" + k + "')\">" +
                                                 "</div>" +
@@ -162,7 +170,7 @@
 
                     }
                 });
-            });
+            }
 
             function confirm(id){
                 var child_id= {{ child_id|tojson|safe }};

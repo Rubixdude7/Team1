@@ -256,18 +256,18 @@ var calendarModule = (function() {
 
                 
         var stripGroup = new calendarStripModule.StripGroup();
-        for (var cell = 0; cell < 7*6; cell++) {
-            for (var i = 0; i < this.avails.length; i++) {
-                if (this.avails[i]["weekday"] == cell % 7) {
-                    var time_st = this.avails[i]["time_st"];
-                    var time_end = this.avails[i]["time_end"];
-                    
-                    var start = cell*24*60*60 + time_st["hour"]*60*60 + time_st["minute"]*60 + time_st["second"];
-                    var end = cell*24*60*60 + time_end["hour"]*60*60 + time_end["minute"]*60 + time_end["second"];
-                    
-                    stripGroup.add(start, end);
-                }
-            }
+        for (var i = 0; i < this.avails.length; i++) {
+            var a = this.avails[i];
+
+            var a_st = new Date(a['st']['year'], a['st']['month'], a['st']['day'], a['st']['hour'], a['st']['minute']);
+            var a_end = new Date(a['end']['year'], a['end']['month'], a['end']['day'], a['end']['hour'], a['end']['minute']);
+
+            var topleft_time = new Date(this.year, this.month, 1 - daysFromPrevMonth);
+
+            var strip_start = (a_st - topleft_time) / 1000;
+            var strip_end = (a_end - topleft_time) / 1000;
+
+            stripGroup.add(strip_start, strip_end);
         }
         
         stripGroup.normalize();
@@ -286,7 +286,7 @@ var calendarModule = (function() {
             } else {
                 var dayNum = (index - daysFromPrevMonth) + 1;
                 var html = "<div class=\"cal-day-number\">" + dayNum.toString() + "</div>";
-                
+
                 var lastEnd = index*24*60*60;
                 stripGroup.eachInRange(index*24*60*60, (index+1)*24*60*60, function(start, end) {
                     html += "<div class=\"cal-space-slot\" style=\"width: " + ((start - lastEnd) * 100 / (24*60*60)) + "%;\"></div>";
@@ -299,7 +299,7 @@ var calendarModule = (function() {
                 
                 dayElem.html(html);
                 dayElem.attr("data-this-month", "true");
-                dayElem.attr("data-day", cal.year.toString() +  "-" + (cal.month+1).toString() + "-" + dayNum.toString());
+                dayElem.attr("data-day", cal.year.toString() +  "-" + cal.month.toString() + "-" + dayNum.toString());
                 dayElem.attr("data-weekday", (index % 7).toString());
             }
         });

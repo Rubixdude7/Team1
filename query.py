@@ -491,6 +491,88 @@ class query(object):
         avail.day_typ_cd = wkd
         avail.save()
 
+    def getConsultations(self):
+        tuples = db.consultation.select(db.consult_time.psyc, db.consultation.child, db.consult_time.time_st, db.consult_time.time_end)\
+                                .join(db.consult_time, JOIN_INNER, db.consultation.cnslt_id == db.consult_time.cnslt)\
+                                .join(db.psychologist, JOIN_INNER, db.consult_time.psyc == db.psychologist.psyc_id)\
+                                .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                                .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
+                                .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
+                                .where((db.role.role_nm == 'psyc') & db.user.active)\
+                                .tuples()
+        return [{
+            'psyc_id': t[0],
+            'child_id': t[1],
+            'time_st': t[2],
+            'time_end': t[3]
+        } for t in tuples]
+
+    def getAllSlotsThatCanBeBooked(self):
+        avail_list = self.getAllAvailabilities()
+
+        slots = []
+
+        # Let's say the calendar is only valid up to 30 days ahead of today.
+        today = datetime.date.today()
+        for day_offset in range(31):
+            day = today + datetime.timedelta(day_offset)
+
+            # Find all availabilities that match this day, grouped by psychiatrist.
+            wkd = day.weekday()
+            for a in avail_list:
+                # What weekday is this availability for?
+                a_wkd = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
+
+                if wkd == a_wkd:
+                    st = datetime.datetime.combine(day, a['time_st'])
+                    end = datetime.datetime.combine(day, a['time_end'])
+
+                    # Add this availability to the result
+                    slots.append({
+                        'psyc_id': a['psyc_id'],
+                        'st': st,
+                        'end': end
+                    })
+
+        # Now the tough part -- cut out all the appointments and vacations
+        cnslt_list = self.getConsultations()
+        for cnslt in cnslt_list:
+            for slot in slots:
+                if slot['psyc_id'] == cnslt['psyc_id']:
+                    # Does this consultation cut into this slot?
+                    if slot['st'] < cnslt['time_end'] and slot['end'] > cnslt['time_st']:
+                        # Yes. The question is: in what WAY does it cut it?
+                        if cnslt['time_st'] <= slot['st'] and cnslt['time_end'] < slot['end']:
+                            # It just bites off a piece on the left?
+                            slot['st'] = cnslt['time_end']
+                        elif cnslt['time_st'] > slot['st'] and cnslt['time_end'] >= slot['end']:
+                            # It bites off a piece on the right?
+                            slot['end'] = cnslt['time_start']
+                        elif cnslt['time_st'] > slot['st'] and cnslt['time_end'] < slot['end']:
+                            # It bites off the middle?
+                            slot['end'] = cnslt['time_start']
+                            print('TODO: Add slot after cut')
+
+        for slot in slots:
+            slot['st'] = {
+                'year': slot['st'].year,
+                'month': slot['st'].month,
+                'day': slot['st'].day,
+                'hour': slot['st'].hour,
+                'minute': slot['st'].minute,
+                'weekday': slot['st'].weekday()
+            }
+            slot['end'] = {
+                'year': slot['end'].year,
+                'month': slot['end'].month,
+                'day': slot['end'].day,
+                'hour': slot['end'].hour,
+                'minute': slot['end'].minute,
+                'weekday': slot['end'].weekday()
+            }
+        
+        return slots
+
     def getWeekDays(self):
         wkds = db.day_typ_cd.select()
         d = {}
