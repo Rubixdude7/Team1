@@ -1,4 +1,6 @@
 import os
+
+import sqlalchemy.exc
 from flask import Flask, render_template, request, redirect, url_for, Markup, jsonify, json
 import datetime
 from flask_sqlalchemy import SQLAlchemy
@@ -144,6 +146,16 @@ def page_not_found(e):
 @app.errorhandler(500)
 def page_not_found(e):
     return render_template('500.html'), 500
+
+
+@app.errorhandler(sqlalchemy.exc.OperationalError)
+def handle_bad_request(e):
+    flash("TELL BRANDON!!! HE IS TRYING TO SEE IF THIS FIXES THE ERROR THAT HE CAUGHT!!! "
+          "SOME BACKGROUND, THIS HAPPENS BECAUSE OF AN ERROR WITH OUT DB TIMING OUT"
+          "THE FIX IS TO REFRESH THE PAGE AND IN THE FUTURE THAT IS WHAT WILL HAPPEND"
+          "BUT FOR NOW WE NEED TO SEND YOU HOME TO SEE IF THE ERROR IS EVEN BEING CAUGHT"
+          "SO TELL BRANDON!!!!!")
+    return redirect(url_for('index'))
 
 
 @app.route('/')

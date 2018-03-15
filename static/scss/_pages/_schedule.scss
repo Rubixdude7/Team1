@@ -87,10 +87,15 @@
   max-height: 0;
   overflow: hidden;
   opacity: 0;
-  position: relative;
-  z-index: 10;
+  //position: relative;
+  //z-index: 10;
   transition: .5s ease-in-out;
   margin: 1em;
+
+  label{
+    font-weight: bold;
+
+  }
 }
 
 .book:checked + .book-dtls{
