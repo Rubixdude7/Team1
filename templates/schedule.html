@@ -208,14 +208,12 @@
                         data: JSON.stringify(send, null, '\t'),
                         contentType: 'application/json;charset=UTF-8',
                         success: function(result) {
-                            console.log(result);
+
                             if (result.status){
                                 alert(result.message);
                                 window.location.href = "{{ url_for('parent') }}";
                             }
-                            else {
-                                alert("E: " + result.message);
-                            }
+                            else alert(result.message);
                         },
                         error: function(error) {
                             alert(JSON.stringify(error));
