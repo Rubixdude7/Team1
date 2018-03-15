@@ -542,7 +542,6 @@ class query(object):
                 if slot['psyc_id'] == cnslt['psyc_id']:
                     # Does this consultation cut into this slot?
                     if slot['st'] < cnslt['time_end'] and slot['end'] > cnslt['time_st']:
-                        print('Cutting appt from availability slot')
                         # Yes. The question is: in what WAY does it cut it?
                         if cnslt['time_st'] <= slot['st'] and cnslt['time_end'] < slot['end']:
                             # It just bites off a piece on the left?
