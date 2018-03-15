@@ -114,7 +114,7 @@ window.onload = progress;
             <br>
 
             {% if page > 1 %}
-                 <input style="background-color: orange"  type="submit" name="checkButton" value="Previous" onsubmit="return validateFormMultiple()" onclick="return buttonClick(this)">
+                 <input class="btn btn-warning"  type="submit" name="checkButton" value="Previous" onsubmit="return validateFormMultiple()" onclick="return buttonClick(this)">
              <!--    <button style="background-color: orange" onclick="location.href='{{ url_for('questionsUserView2', page=page - 1,child_id=child_id, child_name=child_name) }}';" type="button">
                                            Previous Page
 
@@ -129,7 +129,7 @@ window.onload = progress;
 
                                         </button>
 -->
-                 <input type="submit" name="checkButton" value="NextPage" onsubmit="return validateFormMultiple()">
+                 <input class="btn btn-success" type="submit" name="checkButton" value="NextPage" onsubmit="return validateFormMultiple()">
 
 
             {% endif %}
@@ -138,7 +138,7 @@ window.onload = progress;
 
                 <br>
                 <br>
-                <input type="submit" value="Submit Answers" onsubmit="return validateFormMultiple()">
+                <input class="btn btn-success" type="submit" value="Submit Answers" onsubmit="return validateFormMultiple()">
 
             {% else %}
             {% endif %}

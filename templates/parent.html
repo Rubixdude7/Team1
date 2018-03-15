@@ -36,7 +36,7 @@
 
 
             <form action="/parent/contact">
-                <button type="submit">
+                <button type="submit" class="btn btn-info">
                     {% if(contact_info) %}
                         Update Contact Information
 
@@ -49,7 +49,7 @@
             </form>
             <br>
              <form action="/childform">
-                <button type="submit">
+                <button type="submit" class="btn btn-secondary">
                     Add Child
                 </button>
              </form>
@@ -72,33 +72,33 @@
                             {% if current_user.is_authenticated and current_user.is_in_role("user") %}
                                 {% if child.q_comp_dtm != None and not child.child_id in updatedQuestions %}
                                     <form>
-                                        <button onclick="location.href='{{ url_for('parent_seeanswers', child_id=child.child_id) }}'" type="button">
+                                        <button onclick="location.href='{{ url_for('parent_seeanswers', child_id=child.child_id) }}'" type="button" class="btn btn-info">
                                             View Question Answers
                                         </button>
                                     </form>
                                     <form>
                                         <br>
-                                        <button style="background-color: orange" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button">
+                                        <button style="background-color: orange" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-warning">
                                             Edit Answers!
                                         </button>
                                     </form>
                                 {% elif child.q_comp_dtm == None %}
                                     <form>
-                                        <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button">
+                                        <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-danger">
                                             Questionnaire Needs Completed!
                                         </button>
                                     </form>
                                 {% endif %}
 
                                 {% if child.child_id in updatedQuestions %}
-                                    <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView', child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button">
+                                    <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView', child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-danger">
                                         Answer New Questions!
                                     </button>
                                 {% endif %}
 
                                 {% if not child.child_id in updatedQuestions and child.q_comp_dtm != None %}
                                     <br>Questions completed on: {{ child.q_comp_dtm }}<br>
-                                    <button onclick="location.href='{{ url_for('schedule', child_id=child.child_id) }}'" type="button">Schedule Consultation</button>
+                                    <button onclick="location.href='{{ url_for('schedule', child_id=child.child_id) }}'" type="button" class="btn btn-success">Schedule Consultation</button>
                                 {% endif %}
                             {% endif %}
 

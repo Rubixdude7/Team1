@@ -11,13 +11,19 @@
         <hr>
         <form action="" method="post">
             {{ form.hidden_tag() }}
+            <!--TODO REMOVE AND PUT IN CSS-->
+            <style>
+                input[type=radio]{
+                    display: none;
+                }
+            </style>
             <div class="form-control-1">
                 {% for choice in form.radio %}
                     {{ choice }}
-                    {{ choice.label }}
+                    {{ choice.label(class="btn btn-outline-info") }}
                 {% endfor %}
             </div>
-            <div class = form-control-2>{{ form.search(size=85) }} {{ form.submit() }} </div>
+            <div class = form-control-2>{{ form.search(size=85) }} {{ form.submit(class="btn btn-success") }} </div>
 
         </form>
         <div class="table-wrapper">
@@ -45,19 +51,26 @@
             </table>
         </div>
 
-        <p>
+        <ul class="pagination">
             {% if page_num > 1 %}
-                <a href="{{ url_for('admin', page_num=page_num - 1, items_per_page=items_per_page)}}">Previous Page</a>
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin', page_num=page_num - 1, items_per_page=items_per_page)}}">Previous Page</a>
+                </li>
             {% else %}
-                Previous Page
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">Previous Page</a>
+                </li>
             {% endif %}
-            /
             {% if page_num != num_of_pages %}
-            <a href="{{ url_for('admin', page_num=page_num + 1, items_per_page=items_per_page) }}">Next Page</a>
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin', page_num=page_num + 1, items_per_page=items_per_page) }}">Next Page</a>
+                </li>
             {% else %}
-                Next Page
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">Next Page</a>
+                </li>
             {% endif %}
-        </p>
+        </ul>
     </div>
 <script>
 function confirmAction() {

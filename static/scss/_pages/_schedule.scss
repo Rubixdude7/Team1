@@ -1,7 +1,9 @@
-#schedule-appt{
-  //background-color: blue;
-
-  //display: none;
+#psyc-select-wrapper{
+  width: 100%;
+  text-align: center;
+  div {
+    margin: 1em;
+  }
 }
 
 .overlay {
@@ -120,8 +122,11 @@
 
   label{
     float: right;
-    padding: 0;
   }
 
 
+}
+
+.book-len{
+  display: none;
 }

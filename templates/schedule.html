@@ -12,14 +12,18 @@
 {% block content %}
 <main id="schedule-page">
     <div class="box">
-        <h2>Schedule an Appointment</h2>
-        
-        <select id="psyc-select">
-            <option value="all" selected="selected">-- All Psychologists --</option>
-        {%- for pn in psyc_names %}
-            <option value="{{ pn.psyc_id }}">{{ pn.first_name }} {{ pn.last_name }}</option>
-        {%- endfor %}
-        </select>
+        <h2 class="title">Schedule an Appointment</h2>
+        <hr>
+        <div id="psyc-select-wrapper">
+            <div class="select">
+                <select id="psyc-select">
+                    <option value="all" selected="selected">-- All Psychologists --</option>
+                {%- for pn in psyc_names %}
+                    <option value="{{ pn.psyc_id }}">{{ pn.first_name }} {{ pn.last_name }}</option>
+                {%- endfor %}
+                </select>
+            </div>
+        </div>
         
         {{ calendar.calendar("calendar") }}
 
@@ -97,19 +101,21 @@
                         var psyc = $("#psyc-select").val();
                         var psycs = {{ psyc_names|tojson|safe }};
                         var len_fee = {{ len_fee|tojson|safe }};
-                        var len_fee_str = "";
-                        for(var k = 0; k < len_fee.length; k++){
-                            len_fee_str += "<input type=\"radio\" name=\"length\" id=\"" + len_fee[k][0] + "hr\" value=\"" + len_fee[k][1] + "\" required>" +
-                                           "<label> Length: " + len_fee[k][1] + "hr Fee: " + len_fee[k][2] + "</label>"
-                        }
+
 
                         $('#schedule-appt').empty();
 
                         for(var i = 0; i < psycs_day.length; i++){
                             for(var j = 0; j < psycs.length; j++) {
                                 var k = i.toString() + j.toString();
-                                if(psycs_day[i]["psyc_id"] == psycs[j]["psyc_id"] && psyc == "all"){
 
+                                var len_fee_str = "";
+                                for(var l = 0; l < len_fee.length; l++){
+                                    len_fee_str += "<input type=\"radio\" name=\"length\" class=\"book-len\" id=\"" + k + len_fee[l][0] + "\" value=\"" + len_fee[l][1] + "\">" +
+                                                   "<label for=\"" + k + len_fee[l][0] + "\" class=\"button\"> Length: " + len_fee[l][1] + "hr Fee: " + len_fee[l][2] + "</label>"
+                                }
+
+                                if(psycs_day[i]["psyc_id"] == psycs[j]["psyc_id"] && psyc == "all"){
                                     $('#schedule-appt').append(
                                             "<div id=\"" + k + "\">" +
                                                 "<div class=\"book-psyc\">" +
@@ -120,7 +126,7 @@
                                                     "<h4>" + psycs[j]["first_name"] + " " + psycs[j]["last_name"] + "</h4>" +
                                                     "<h5>Start: " + psycs_day[i]["st"]["hour"] + ":" + psycs_day[i]["st"]["minute"] +
                                                     " End: " + psycs_day[i]["end"]["hour"] + ":" + psycs_day[i]["end"]["minute"] + "</h5>" +
-                                                    "<label class=\"button\" for=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] + "\"> Book </label>" +
+                                                    "<label class=\"btn btn-success\" for=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] + "\"> Book </label>" +
                                                 "</div>" +
 
                                                 "<input type=\"radio\" name=\"book\" class=\"book\" id=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] +"\">" +
@@ -131,7 +137,7 @@
                                                     "<input type=\"hidden\" id=\"time-end-hr\" value=\"" + psycs_day[i]["end"]["hour"] + "\">" +
                                                     "<input type=\"hidden\" id=\"time-end-mn\" value=\"" + psycs_day[i]["end"]["minute"] + "\">" +
                                                     len_fee_str +
-                                                    "<input type=\"button\" value=\"Confirm\" onclick=\"confirm('" + k + "')\">" +
+                                                    "<input class=\"btn btn-success\" type=\"button\" value=\"Confirm\" onclick=\"confirm('" + k + "')\">" +
                                                 "</div>" +
                                             "</div>"
                                     );
