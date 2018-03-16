@@ -154,6 +154,28 @@ class query(object):
             return a.answer
         except:
             return None
+
+    def getChildNameFromID(self, child_id):
+        try:
+            child = db.child.get(db.child.child_id == child_id)
+            return child
+        except:
+            return None
+
+    def getDescendingConsultations(self):
+        try:
+            consultations = db.consultation.select().order_by(db.consultation.paid.desc())
+            return consultations
+        except:
+            return None
+
+    def markConsultApproved(self, consult_id):
+        try:
+            consultation = db.consultation.get(db.consultation.cnslt_id == consult_id)
+            consultation.paid = 'y'
+            consultation.save()
+        except:
+            print("Couldn't find consultation")
     # End Brody's code
 
 # Start Jason's code

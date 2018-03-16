@@ -417,7 +417,7 @@ def childform():
     return render_template('childform.html')
 
 
-@app.route('/childform', methods=['post'])
+@app.route('/childform', methods=['POST'])
 @roles_required('user')
 def addChild():
     born = datetime.datetime.strptime(request.form.get('dateofbirth'), "%Y-%m-%d")
@@ -446,6 +446,27 @@ def savePaginateAnswers():
       # lack of this if was causing false "completed" question forms
       if q is not '':
           querydb.addQuestionAnswers(q, current_user.id, q2, childId)
+
+
+@app.route('/staffconsultations')
+@roles_required('staff')
+def approvePayments():
+    consultations = querydb.getDescendingConsultations()
+    children = []
+    for c in consultations:
+        children.append(querydb.getChildNameFromID(c.child))
+    return render_template('staffconsultations.html', children=children, consultations=consultations)
+
+
+@app.route('/staffconsultations/approvals', methods=['POST'])
+def getPaymentChanges():
+    boxes = request.form.getlist('box')
+    consultations = request.form.getlist('consult_id')
+    for i, b in enumerate(boxes):
+        if b == 'on':
+            querydb.markConsultApproved(consultations[i])
+            print('Got here!')
+    return redirect(url_for('index'))
 
 # End Brody
 
