@@ -703,13 +703,30 @@ class query(object):
         time_st = datetime.datetime.strptime(time_st, '%Y-%m-%d %H:%M')
         time_end = time_st + datetime.timedelta(hours=float(args['len']))
 
-        cnslt = db.consultation(child_id=args['child_id'], fee=fee, paid='n', length=args['len'], finished='n')
-        cnslt.save()
+        # Make sure this time is actually available.
+        slots = self.getAllSlotsThatCanBeBooked(int(args['psyc_id']))
+        # Find a slot that fits the requested time.
+        ok = False
+        for s in slots:
+            s_st = datetime.datetime(s['st']['year'], s['st']['month'], s['st']['day'], s['st']['hour'],
+                                     s['st']['minute'])
+            s_end = datetime.datetime(s['end']['year'], s['end']['month'], s['end']['day'], s['end']['hour'],
+                                      s['end']['minute'])
 
-        cnslt_tm = db.consult_time(cnslt_id=cnslt.cnslt_id, psyc_id=args['psyc_id'], time_st=time_st, time_end=time_end, approved='y')
-        cnslt_tm.save()
+            if time_st >= s_st and time_end <= s_end:
+                ok = True
+                break
 
-        return True, "Your appointment has been made, contact office staff for payment processing."
+        if ok:
+            cnslt = db.consultation(child_id=args['child_id'], fee=fee, paid='n', length=args['len'], finished='n')
+            cnslt.save()
+
+            cnslt_tm = db.consult_time(cnslt_id=cnslt.cnslt_id, psyc_id=args['psyc_id'], time_st=time_st, time_end=time_end, approved='y')
+            cnslt_tm.save()
+
+            return True, "Your appointment has been made, contact office staff for payment processing."
+        else:
+            return False, "An invalid time range was specified."
 
 
 
