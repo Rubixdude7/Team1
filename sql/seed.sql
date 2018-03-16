@@ -13,10 +13,12 @@ insert into day_typ_cd values ('f', 'Friday');
 insert into day_typ_cd values ('s', 'Saturday');
 insert into day_typ_cd values ('su', 'Sunday');
 
-/*lengths*/
-insert into consultation_length (length) values (1);
-insert into consultation_length (length) values (1.5);
-insert into consultation_length (length) values (2);
-
 /*fees*/
 insert into consultation_fee (fee) values (500);
+
+/*lengths*/
+insert into consultation_length (length, cnslt_fee_id) values (1, 1);
+insert into consultation_length (length, cnslt_fee_id) values (1.5, 1);
+insert into consultation_length (length, cnslt_fee_id) values (2, 1);
+
+
