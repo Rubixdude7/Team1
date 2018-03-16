@@ -12,10 +12,15 @@
         {% if user_manager.enable_change_password %}
         <p><a href="{{ url_for('user.change_password') }}">{%trans%}Change password{%endtrans%}</a></p>
         {% endif %}
-        {% if current_user.is_in_role('psyc') %}
-        <p><a href="{{ url_for('my_psikolog_page') }}">Psikolog: My Profile</a></p>
-        <p><a href="{{ url_for('edit_availability_list') }}">Psikolog: Availability Time</a></p>
-        {% endif %}
     </div>
+    {%- if current_user.is_in_role('psyc') %}
+    <div class="box">
+        <h2>Psikolog</h2>
+        <p><a href="{{ url_for('my_psikolog_page') }}">Go To My Profile</a></p>
+        <p><a href="{{ url_for('edit_availability_list') }}">Availability Time</a></p>
+        <p><a href="{{ url_for('change_avatar') }}">Change Avatar <i class="far fa-image" aria-hidden="true"></i></a></p>
+        <p><a href="{{  url_for('write_blog_post') }}">Write Blog Post</a></p>
+    </div>
+    {%- endif %}
 </main>
 {% endblock %}

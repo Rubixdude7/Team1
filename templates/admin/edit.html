@@ -57,10 +57,12 @@
             <div class="form-control-2">
                 {{ form.role.label }}
                 <br>
-                {{ form.role(size=1) }}
+                <div class="select">
+                    {{ form.role(size=1) }}
+                </div>
             </div>
             <div class="form-control-2">
-                {{ form.submit() }}
+                {{ form.submit(class="btn btn-success") }}
             </div>
         </form>
     </div>

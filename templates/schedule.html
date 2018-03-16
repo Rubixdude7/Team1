@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% import "psikolog/calendar.html" as calendar %}
+
+{% block title %}Schedule an Appointment{% endblock %}
+
+{% block head %}
+{{ super() }}
+{{ calendar.script_tag() }}
+{% endblock %}
+
+{% block content %}
+<main id="schedule-page">
+    <div class="box">
+        <h2 class="title">Schedule an Appointment</h2>
+        <hr>
+        <div id="psyc-select-wrapper">
+            <div class="select">
+                <select id="psyc-select">
+                    <option value="all" selected="selected">All Psychologists</option>
+                {%- for pn in psyc_names %}
+                    <option value="{{ pn.psyc_id }}">{{ pn.first_name }} {{ pn.last_name }}</option>
+                {%- endfor %}
+                </select>
+            </div>
+        </div>
+        
+        {{ calendar.calendar("calendar") }}
+
+        <input type="checkbox" id="overlay-checkbox">
+        <div class="overlay">
+            <div class="popup">
+                <div class="popup-title">
+                    <h2>Schedule</h2>
+                    <hr>
+                    <label for="overlay-checkbox" class="close">&times;</label>
+                </div>
+                <div class="popup-contents">
+                    <div id="schedule-appt">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <script type="text/javascript">
+            // We set the value of this later with an ajax HTTP request to /api/calendar
+            var allAvails;
+
+            function filterByPsyc(cal) {
+
+                var psyc = $("#psyc-select").val();
+                
+                if (psyc == "all") {
+                    cal.setAvailabilities(allAvails);
+                    cal.refresh();
+                } else {
+                    psyc_id = parseInt(psyc);
+                    var avails = [];
+                    for (var i = 0; i < allAvails.length; i++) {
+                        if (allAvails[i]["psyc_id"] == psyc_id) {
+                            avails[avails.length] = allAvails[i];
+                        }
+                    }
+                    cal.setAvailabilities(avails);
+                    cal.refresh();
+                }
+            }
+            
+            $(document).ready(function() {
+                $.getJSON('/api/calendar', function (data) {
+                    allAvails = data;
+                    setupCalendar();
+                });
+            });
+
+            function setupCalendar() {
+                var cal = new calendarModule.Calendar("#calendar");
+                cal.setup();
+                filterByPsyc(cal);
+                
+                $("#psyc-select").on("change", function() {
+                    filterByPsyc(cal);
+                });
+                
+                $("#calendar").find(".cal-day").on("click", function() {
+                    var dateString = $(this).attr("data-day");
+                    var weekdayString = $(this).attr("data-weekday");
+                    if (dateString != undefined) {
+                        var parts = dateString.split("-");
+                        var year = parseInt(parts[0]);
+                        var month = parseInt(parts[1]);
+                        var day = parseInt(parts[2]);
+                        var weekday = parseInt(weekdayString);
+
+
+                        var psycs_day = [];
+                        for (var i = 0; i < allAvails.length; i++) {
+                            if (allAvails[i]["st"]["year"] == year && allAvails[i]["st"]["month"] == month && allAvails[i]["st"]["day"] == day) {
+                                psycs_day.push(allAvails[i]);
+                            }
+                        }
+
+                        var psyc = $("#psyc-select").val();
+                        var psycs = {{ psyc_names|tojson|safe }};
+                        var len_fee = {{ len_fee|tojson|safe }};
+
+
+                        $('#schedule-appt').empty();
+
+                        for(var i = 0; i < psycs_day.length; i++){
+                            for(var j = 0; j < psycs.length; j++) {
+                                var k = i.toString() + j.toString();
+
+
+                                var len_fee_str = "<div class=\"select\">" +
+                                                        "<select class=\"length\">";
+
+                                for (var l = 0; l < len_fee.length; l++){
+                                    len_fee_str += "<option value=\"" + len_fee[l][1] + "\">" + "Length: " + len_fee[l][1] + "hr Fee: " + len_fee[l][2] + "</option>";
+
+                                }
+
+                                len_fee_str +=          "</select>" +
+                                                    "</div>";
+
+                                var end_min = psycs_day[i]["end"]["minute"], st_min = psycs_day[i]["st"]["minute"];
+                                if (end_min == 0) end_min = "00";
+                                if (st_min == 0) st_min = "00";
+
+
+                                var time_select = "<div class=\"select\">" +
+                                                        "<select id=\"time-st\">";
+
+                                for (var l = psycs_day[i]["st"]["hour"]; l < psycs_day[i]["end"]["hour"]; l++){
+                                    time_select += "<option value=\"" + l + "\">" + l + "</option>";
+
+                                }
+
+                                time_select +=          "</select>" +
+                                                    "</div>";
+
+                                if(psycs_day[i]["psyc_id"] == psycs[j]["psyc_id"] && psyc == "all"){
+                                    $('#schedule-appt').append(
+                                            "<div id=\"" + k + "\">" +
+                                                "<div class=\"book-psyc\">" +
+                                                    "<input type=\"hidden\" id=\"psyc-id\" value=\"" + psycs_day[i]["psyc_id"] + "\">" +
+                                                    "<input type=\"hidden\" id=\"day\" value=\"" + day + "\">" +
+                                                    "<input type=\"hidden\" id=\"month\" value=\"" + month + "\">" +
+                                                    "<input type=\"hidden\" id=\"year\" value=\"" + year + "\">" +
+                                                    "<h4>" + psycs[j]["first_name"] + " " + psycs[j]["last_name"] + "</h4>" +
+                                                    "<div>" +
+                                                        "<div>" +
+                                                            "<h5>Start: " + psycs_day[i]["st"]["hour"] + ":" + st_min + "</h5>" +
+                                                            "<h5> End: " + psycs_day[i]["end"]["hour"] + ":" + end_min + "</h5>" +
+                                                        "</div>" +
+                                                        "<div>" +
+                                                            "<label class=\"btn btn-success\" for=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] + "\"> Book </label>" +
+                                                        "</div>" +
+                                                    "</div>" +
+                                                "</div>" +
+
+                                                "<input type=\"radio\" name=\"book\" class=\"book\" id=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] +"\">" +
+                                                "<div class=\"book-dtls\">" +
+                                                    "<div>" +
+                                                        "<p class=\"time-st-label\">Start Time:</p>" +
+                                                        time_select +
+                                                        "<div class=\"select\" >" +
+                                                            "<select id=\"time-st-mn\" >" +
+                                                                "<option value=\"00\"> 00 </option>" +
+                                                                "<option value=\"30\"> 30 </option>" +
+                                                            "</select>" +
+                                                        "</div>" +
+                                                    "</div>" +
+                                                    "<input type=\"hidden\" id=\"time-end-hr\" value=\"" + psycs_day[i]["end"]["hour"] + "\">" +
+                                                    "<input type=\"hidden\" id=\"time-end-mn\" value=\"" + psycs_day[i]["end"]["minute"] + "\">" +
+                                                    "<div>" +
+                                                        len_fee_str +
+                                                    "</div>" +
+                                                    "<div>" +
+                                                        "<input class=\"btn btn-success\" type=\"button\" value=\"Confirm\" onclick=\"confirm('" + k + "')\">" +
+                                                    "</div>" +
+                                                "</div>" +
+                                            "</div>"
+                                    );
+                                }
+                                else {
+                                    if(psycs_day[i]["psyc_id"] == psyc && psycs[j]["psyc_id"] == psyc){
+                                        $('#schedule-appt').append(
+                                            "<div id=\"" + k + "\">" +
+                                                "<div class=\"book-psyc\">" +
+                                                    "<input type=\"hidden\" id=\"psyc-id\" value=\"" + psycs_day[i]["psyc_id"] + "\">" +
+                                                    "<input type=\"hidden\" id=\"day\" value=\"" + day + "\">" +
+                                                    "<input type=\"hidden\" id=\"month\" value=\"" + month + "\">" +
+                                                    "<input type=\"hidden\" id=\"year\" value=\"" + year + "\">" +
+                                                    "<h4>" + psycs[j]["first_name"] + " " + psycs[j]["last_name"] + "</h4>" +
+                                                    "<h5>Start: " + psycs_day[i]["st"]["hour"] + ":" + psycs_day[i]["st"]["minute"] + "</h5>" +
+                                                    "<h5> End: " + psycs_day[i]["end"]["hour"] + ":" + psycs_day[i]["end"]["minute"] + "</h5>" +
+                                                    "<label class=\"button\" for=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] + "\"> Book </label>" +
+                                                "</div>" +
+
+                                                "<input type=\"radio\" name=\"book\" class=\"book\" id=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] +"\">" +
+                                                "<div class=\"book-dtls\">" +
+                                                    "<label for=\"time-st\">Start Time</label>" +
+                                                    "<input id=\"time-st\" type=\"number\" max=\"" + psycs_day[i]["end"]["hour"] + "\" min=\"" + psycs_day[i]["st"]["hour"] + "\" value=\"" + psycs_day[i]["st"]["hour"] +"\" step=\"1\">" +
+                                                    "<input id=\"time-st-mn\" type=\"number\" min=\"0\" max=\"30\" step=\"30\" value=\"0\">" +
+                                                    "<input type=\"hidden\" id=\"time-end-hr\" value=\"" + psycs_day[i]["end"]["hour"] + "\">" +
+                                                    "<input type=\"hidden\" id=\"time-end-mn\" value=\"" + psycs_day[i]["end"]["minute"] + "\">" +
+                                                    len_fee_str +
+                                                    "<input type=\"button\" value=\"Confirm\" onclick=\"confirm('" + k + "')\">" +
+                                                "</div>" +
+                                            "</div>"
+                                        );
+                                    }
+                                }
+                            }
+                        }
+
+                        $("#overlay-checkbox").prop("checked", true);
+
+
+                    }
+                });
+            }
+
+            function confirm(id){
+                var child_id= {{ child_id|tojson|safe }};
+                var psyc_id = parseInt($('#' + id).find('#psyc-id').val());
+                var st_tm_hr = parseInt($('#' + id).find('#time-st').val());
+                var st_tm_mn = parseInt($('#' + id).find('#time-st-mn').val());
+                var st_dt = $('#' + id).find('#year').val() + "-" + (parseInt($('#' + id).find('#month').val()) + 1) + "-" +$('#' + id).find('#day').val() + "-" + st_tm_hr + "-" + st_tm_mn;
+                st_tm_mn = st_tm_mn/60;
+                var end_tm_hr = parseInt($('#' + id).find('#time-end-hr').val());
+                var end_tm_mn = parseFloat($('#' + id).find('#time-end-mn').val());
+                end_tm_mn = end_tm_mn/60;
+                var len = parseFloat($('#' + id).find('.length').val());
+
+                var time = st_tm_hr + st_tm_mn + len;
+                var end = end_tm_hr + end_tm_mn;
+
+                if (isNaN(len)) alert("Please select a consultation length.");
+                else if (time > end) alert("Sorry, this  would run over time, pick a different configuration please.");
+                else{
+                    var send = {
+                        'child_id': child_id,
+                        'psyc_id': psyc_id,
+                        'len': len,
+                        'st_dt': st_dt
+                    };
+
+                     $.ajax({
+                        type : "POST",
+                        url : "{{ url_for('consultation') }}",
+                        data: JSON.stringify(send, null, '\t'),
+                        contentType: 'application/json;charset=UTF-8',
+                        success: function(result) {
+
+                            if (result.status){
+                                alert(result.message);
+                                window.location.href = "{{ url_for('parent') }}";
+                            }
+                            else alert(result.message);
+                        },
+                        error: function(error) {
+                            alert(JSON.stringify(error));
+                        }
+                    });
+                }
+
+
+            }
+
+        </script>
+    </div>
+</main>
+{% endblock %}

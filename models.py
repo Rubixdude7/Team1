@@ -88,11 +88,10 @@ class psychologist_child_xref(MySQLModel):
 class consultation(MySQLModel):
     cnslt_id = PrimaryKeyField()
     child = ForeignKeyField(child, to_field="child_id")
-    psyc = ForeignKeyField(psychologist, to_field="psyc_id")
     fee = DoubleField()
     paid = CharField()
     length = DoubleField()
-    approved = CharField()
+    finished = CharField()
 
     class Meta:
         db_table = "consultation"
@@ -101,6 +100,7 @@ class consultation(MySQLModel):
 class consult_time(MySQLModel):
     cnslt_tm_id = PrimaryKeyField()
     cnslt = ForeignKeyField(consultation, to_field="cnslt_id")
+    psyc = ForeignKeyField(psychologist, to_field="psyc_id")
     time_st = DateTimeField()
     time_end = DateTimeField()
     approved = CharField()
@@ -126,7 +126,7 @@ class notes(MySQLModel):
 class consultation_fee(MySQLModel):
     cnslt_fee_id = PrimaryKeyField()
     fee = DoubleField()
-    void_ind = CharField
+    void_ind = CharField()
 
     class Meta:
         db_table = "consultation_fee"

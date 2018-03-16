@@ -9,3 +9,4 @@ blinker==1.4
 WTForms==2.1
 cloudinary==1.10.0
 bleach==2.1.2
+python-jose==2.0.2

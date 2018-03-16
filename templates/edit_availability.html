@@ -16,18 +16,20 @@
             </div>
             <div class="form-control-2">
                 <label for="weekday">Weekday</label><br />
-                <select name="weekday" required="required">
-                    {% for wkd in ['su', 'm', 't', 'w', 'th', 'f', 's'] %}
-                        {% if avail['weekday'] == wkd %}
-                            <option value="{{ wkd }}" selected="selected">{{ weekdays[wkd] }}</option>
-                        {% else %}
-                            <option value="{{ wkd }}">{{ weekdays[wkd] }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
+                <div class="select">
+                    <select name="weekday" required="required">
+                        {% for wkd in ['su', 'm', 't', 'w', 'th', 'f', 's'] %}
+                            {% if avail['weekday'] == wkd %}
+                                <option value="{{ wkd }}" selected="selected">{{ weekdays[wkd] }}</option>
+                            {% else %}
+                                <option value="{{ wkd }}">{{ weekdays[wkd] }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
             <div class="form-control-2">
-                <button type="submit"><i class="fa fa-check" aria-hidden="true"></i> Save Availability Time</button>
+                <button class="btn btn-success" type="submit"><i class="fa fa-check" aria-hidden="true"></i> Save Availability Time</button>
             </div>
         </form>
     </div>

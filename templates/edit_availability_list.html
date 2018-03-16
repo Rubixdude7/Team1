@@ -1,9 +1,24 @@
 {% extends "base.html" %}
+
+{% import "psikolog/calendar.html" as calendar %}
+
 {% block title %}Your Availability List{% endblock %}
+
+{% block head %}
+{{ super() }}
+{{ calendar.script_tag() }}
+{% endblock %}
+
 {% block content %}
 <main id="your-availability-list">
     <div class="box">
-        <p><a href="{{ url_for('add_availability') }}"><i class="fa fa-plus"></i> Add Availability</a></p>
+        
+        <p class="pull-left btn btn-success"><a href="{{ url_for('add_availability') }}" style="text-decoration: none"><i class="fa fa-plus"></i> Add Availability</a></p>
+        <p class="pull-right">
+            <a href="{{ url_for('edit_availability_list', page=page-1) }}"><i class="fa fa-arrow-left"></i><span class="sr-only">Previous Page</span></a>
+            <a href="{{ url_for('edit_availability_list', page=page+1) }}"><span class="sr-only">Next Page</span><i class="fa fa-arrow-right"></i></a>
+        </p>
+        <div class="clear-both"></div>
         <table border="1" style="width:100%">
             <thead>
                 <tr>
@@ -14,19 +29,66 @@
                 </tr>
             </thead>
             <tbody>
-                {% for avail in availabilities %}
+                {% for avail in avails %}
                 <tr>
-                    <td>{{ avail['time_st'] }}</td>
-                    <td>{{ avail['time_end'] }}</td>
+                    <td>{{ '%02d:%02d'|format(avail['st']['hour'], avail['st']['minute']) }}</td>
+                    <td>{{ '%02d:%02d'|format(avail['end']['hour'], avail['end']['minute']) }}</td>
                     <td>{{ weekdays[avail['weekday']] }}</td>
                     <td>
-                        <a href="{{ url_for('edit_availability', avail_id=avail.avail_id) }}"><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">Edit</span></a>
-                        <a href="{{ url_for('delete_availability', avail_id=avail.avail_id) }}"><i class="fa fa-trash" aria-hidden="true"></i><span class="sr-only">Delete</span></a>
+                        <a href="{{ url_for('edit_availability', avail_id=avail['avail_id']) }}"><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">Edit</span></a>
+                        <a href="{{ url_for('delete_availability', avail_id=avail['avail_id']) }}"><i class="fa fa-trash" aria-hidden="true"></i><span class="sr-only">Delete</span></a>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+    <div class="box">
+        <h2>Preview</h2>
+        {{ calendar.calendar("calendar", "calendar-planning", False) }}
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $.getJSON('/api/availabilities', function (avails) {
+                    var cal = new calendarModule.Calendar("#calendar");
+                    cal.setup();
+
+                    // Make preview availability slots
+                    var slots = [];
+                    var now = new Date();
+                    var year = now.getFullYear();
+                    var month = now.getMonth();
+                    var numDays = new Date(year, month + 1, 0).getDate();
+
+                    for (var i = 1; i < numDays+1; i++) {
+                        var d = new Date(year, month, i);
+                        var wkd = (d.getDay() + 6) % 7;
+                        for (var j = 0; j < avails.length; j++) {
+                            if (avails[j]["weekday"] == wkd) {
+                                slots[slots.length] = {
+                                    "st": {
+                                        "year": year,
+                                        "month": month,
+                                        "day": i,
+                                        "hour": avails[j]["st"]["hour"],
+                                        "minute": avails[j]["st"]["minute"]
+                                    },
+                                    "end": {
+                                        "year": year,
+                                        "month": month,
+                                        "day": i,
+                                        "hour": avails[j]["end"]["hour"],
+                                        "minute": avails[j]["end"]["minute"]
+                                    }
+                                };
+                            }
+                        }
+                    }
+
+                    cal.setAvailabilities(slots);
+                    cal.refresh();
+                });
+            });
+        </script>
     </div>
 </main>
 {% endblock %}
