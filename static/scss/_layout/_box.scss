@@ -89,7 +89,8 @@ input:checked + .btn-outline-info{
   border-color: #28a745;
 }
 
-.btn-outline-success:hover {
+.btn-outline-success:hover,
+input:checked + .btn-outline-success{
     color: #fff;
     background-color: #28a745;
     border-color: #28a745;

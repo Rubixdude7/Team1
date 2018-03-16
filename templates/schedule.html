@@ -109,11 +109,39 @@
                             for(var j = 0; j < psycs.length; j++) {
                                 var k = i.toString() + j.toString();
 
+
+                                var len_fee_str = "<div class=\"select\">" +
+                                                        "<select class=\"length\">";
+
+                                for (var l = 0; l < len_fee.length; l++){
+                                    len_fee_str += "<option value=\"" + len_fee[l][1] + "\">" + "Length: " + len_fee[l][1] + "hr Fee: " + len_fee[l][2] + "</option>";
+
+                                }
+
+                                len_fee_str +=          "</select>" +
+                                                    "</div>";
+/*
                                 var len_fee_str = "";
                                 for(var l = 0; l < len_fee.length; l++){
                                     len_fee_str += "<input type=\"radio\" name=\"length\" class=\"book-len\" id=\"" + k + len_fee[l][0] + "\" value=\"" + len_fee[l][1] + "\">" +
-                                                   "<label for=\"" + k + len_fee[l][0] + "\" class=\"button\"> Length: " + len_fee[l][1] + "hr Fee: " + len_fee[l][2] + "</label>"
+                                                   "<label for=\"" + k + len_fee[l][0] + "\" class=\"btn btn-outline-success\"> Length: " + len_fee[l][1] + "hr Fee: " + len_fee[l][2] + "</label>"
                                 }
+*/
+
+                                var min = psycs_day[i]["end"]["minute"];
+                                if (min == 0) min = "00";
+
+
+                                var time_select = "<div class=\"select\">" +
+                                                        "<select id=\"time-st\">";
+
+                                for (var l = psycs_day[i]["st"]["hour"]; l < psycs_day[i]["end"]["hour"]; l++){
+                                    time_select += "<option value=\"" + l + "\">" + l + "</option>";
+
+                                }
+
+                                time_select +=          "</select>" +
+                                                    "</div>";
 
                                 if(psycs_day[i]["psyc_id"] == psycs[j]["psyc_id"] && psyc == "all"){
                                     $('#schedule-appt').append(
@@ -124,16 +152,25 @@
                                                     "<input type=\"hidden\" id=\"month\" value=\"" + month + "\">" +
                                                     "<input type=\"hidden\" id=\"year\" value=\"" + year + "\">" +
                                                     "<h4>" + psycs[j]["first_name"] + " " + psycs[j]["last_name"] + "</h4>" +
-                                                    "<h5>Start: " + psycs_day[i]["st"]["hour"] + ":" + psycs_day[i]["st"]["minute"] +
-                                                    " End: " + psycs_day[i]["end"]["hour"] + ":" + psycs_day[i]["end"]["minute"] + "</h5>" +
-                                                    "<label class=\"btn btn-success\" for=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] + "\"> Book </label>" +
+                                                    "<div>" +
+                                                        "<h5>Start: " + psycs_day[i]["st"]["hour"] + ":" + psycs_day[i]["st"]["minute"] +
+                                                        " End: " + psycs_day[i]["end"]["hour"] + ":" + min + "</h5>" +
+                                                        "<label class=\"btn btn-success\" for=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] + "\"> Book </label>" +
+                                                    "</div>" +
                                                 "</div>" +
 
                                                 "<input type=\"radio\" name=\"book\" class=\"book\" id=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] +"\">" +
                                                 "<div class=\"book-dtls\">" +
-                                                    "<label for=\"time-st\">Start Time</label>" +
-                                                    "<input id=\"time-st\" type=\"number\" max=\"" + psycs_day[i]["end"]["hour"] + "\" min=\"" + psycs_day[i]["st"]["hour"] + "\" value=\"" + psycs_day[i]["st"]["hour"] +"\" step=\"1\">" +
-                                                    "<input id=\"time-st-mn\" type=\"number\" min=\"0\" max=\"30\" step=\"30\" value=\"0\">" +
+                                                    "<div>" +
+                                                        "<label for=\"time-st\">Start Time</label>" +
+                                                        time_select +
+                                                        "<div class=\"select\" >" +
+                                                            "<select id=\"time-st-mn\" >" +
+                                                                "<option value=\"00\"> 00 </option>" +
+                                                                "<option value=\"30\"> 30 </option>" +
+                                                            "</select>" +
+                                                        "</div>" +
+                                                    "</div>" +
                                                     "<input type=\"hidden\" id=\"time-end-hr\" value=\"" + psycs_day[i]["end"]["hour"] + "\">" +
                                                     "<input type=\"hidden\" id=\"time-end-mn\" value=\"" + psycs_day[i]["end"]["minute"] + "\">" +
                                                     len_fee_str +
@@ -191,12 +228,10 @@
                 var end_tm_hr = parseInt($('#' + id).find('#time-end-hr').val());
                 var end_tm_mn = parseFloat($('#' + id).find('#time-end-mn').val());
                 end_tm_mn = end_tm_mn/60;
-                var len = parseFloat($('input[name=length]:checked').val());
+                var len = parseFloat($('#' + id).find('.length').val());
 
                 var time = st_tm_hr + st_tm_mn + len;
                 var end = end_tm_hr + end_tm_mn;
-
-
 
                 if (isNaN(len)) alert("Please select a consultation length.");
                 else if (time > end) alert("Sorry, this  would run over time, pick a different configuration please.");
