@@ -88,11 +88,10 @@ class psychologist_child_xref(MySQLModel):
 class consultation(MySQLModel):
     cnslt_id = PrimaryKeyField()
     child = ForeignKeyField(child, to_field="child_id")
-    psyc = ForeignKeyField(psychologist, to_field="psyc_id")
     fee = DoubleField()
     paid = CharField()
     length = DoubleField()
-    approved = CharField()
+    finished = CharField()
 
     class Meta:
         db_table = "consultation"

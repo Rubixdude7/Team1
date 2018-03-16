@@ -66,6 +66,10 @@
                             First name: {{ child.child_nm_fst }}<br>
                             Last name: {{ child.child_nm_lst }}<br>
                             Age: {{ querydb.getAge(child) }}<br>
+                            {% if not child.child_id in updatedQuestions and child.q_comp_dtm != None %}
+                                    Questions completed on: {{ child.q_comp_dtm }}<br>
+                            {% endif %}
+                            Shit here: {{ querydb.postConsult(child.child_id) }}
 
 
 
@@ -78,26 +82,27 @@
                                     </form>
                                     <form>
                                         <br>
-                                        <button style="background-color: orange" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-warning">
+                                        <button class="btn-warning btn" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-warning">
                                             Edit Answers!
                                         </button>
                                     </form>
                                 {% elif child.q_comp_dtm == None %}
                                     <form>
-                                        <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-danger">
+                                        <button class="btn-danger btn" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-danger">
                                             Questionnaire Needs Completed!
                                         </button>
                                     </form>
                                 {% endif %}
 
                                 {% if child.child_id in updatedQuestions %}
-                                    <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView', child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-danger">
+                                    <br>
+                                    <button class="btn-danger btn" onclick="location.href='{{ url_for('questionsUserView', child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-danger">
                                         Answer New Questions!
                                     </button>
                                 {% endif %}
 
                                 {% if not child.child_id in updatedQuestions and child.q_comp_dtm != None %}
-                                    <br>Questions completed on: {{ child.q_comp_dtm }}<br>
+                                    <br>
                                     <button onclick="location.href='{{ url_for('schedule', child_id=child.child_id) }}'" type="button" class="btn btn-success">Schedule Consultation</button>
                                 {% endif %}
                             {% endif %}

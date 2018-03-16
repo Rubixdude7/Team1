@@ -74,10 +74,17 @@ window.onload = progress;
 
         <div id = "box" class="box">
         <p id="childName">Your Child: {{ child_name }}</p>
+        {% if checkComplete  == None %}
     <progress id ="progress" value=" ((100/pagination.get_page_count()) *(page - 1)) |round|int }}" max="100"> </progress>
 
               <p> Progress: {{  ((100/pagination.get_page_count()) *(page - 1)) |round|int }} % </p>
+        {% endif %}
+        {% if checkComplete  == None %}
             <h1 class="title">Question List</h1>
+
+        {% else %}
+            <h1 class="title">Edit Questions</h1>
+        {% endif %}
             <hr>
 
        <form method="post" id="mainForm" onsubmit="return validateFormMultiple()" action="{{ url_for('questionsUserView2', page=page + 1,child_id=child_id, child_name=child_name, totalPage=pagination.get_page_count() + 1, totalQuestions=totalQuestions) }}" name="myForm" onsubmit="" onload="pagination()">

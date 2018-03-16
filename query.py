@@ -542,7 +542,6 @@ class query(object):
                 if slot['psyc_id'] == cnslt['psyc_id']:
                     # Does this consultation cut into this slot?
                     if slot['st'] < cnslt['time_end'] and slot['end'] > cnslt['time_st']:
-                        print('Cutting appt from availability slot')
                         # Yes. The question is: in what WAY does it cut it?
                         if cnslt['time_st'] <= slot['st'] and cnslt['time_end'] < slot['end']:
                             # It just bites off a piece on the left?
@@ -640,6 +639,14 @@ class query(object):
                            address_2=address_2, city=city, providence=providence, zip=zip)
 
         c.save()
+
+    def postConsult(self, child_id):
+        end = db.consultation.select(db.consult_time.time_end).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()
+        if(end < datetime.datetime.today()):
+            return True
+        else:
+            return False
+
 
     #End of Gabe's code
 
