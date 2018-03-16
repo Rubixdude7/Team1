@@ -463,17 +463,16 @@ def approvePayments():
 
 @app.route('/staffconsultations/approvals', methods=['GET', 'POST'])
 def getPaymentChanges():
-    boxes = request.form.getlist('check')
     consultations = request.form.getlist('consult_id')
-    print("Boxes: ", boxes)
-    print("Consultations: ", consultations)
-    for i, b in enumerate(boxes):
-        print("B: ", b)
-        print("I: ", i)
-        print("Consult ID: ", consultations[i])
-        if b == 'on':
-            print("Marking paid: ", consultations[i])
-            querydb.markConsultApproved(consultations[i])
+    for c in consultations:
+        print(c)
+        try:
+            b = request.form.get(str(c))
+            if b == 'on':
+                print("Marking paid: ", c)
+                querydb.markConsultApproved(c)
+        except:
+            print('Check box was off')
     return index()
 
 # End Brody
