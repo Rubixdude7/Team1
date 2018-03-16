@@ -681,12 +681,20 @@ class query(object):
         c.save()
 
     def postConsult(self, child_id):
-        end = db.consultation.select(db.consult_time.time_end).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()
-        if(end < datetime.datetime.today()):
-            return True
-        else:
-            return False
+        end = db.consultation.select(db.consult_time.time_end).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()[0]
+        if end is not None:
+            l = list(end)
 
+            if l.pop(0) < datetime.datetime.today():
+                return True
+            else:
+                return False
+        else:
+            return True
+
+    def haveTime(self, child_id):
+        end = db.consultation.select(db.consult_time.time_end).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()[0]
+        return end
 
     #End of Gabe's code
 
