@@ -3,7 +3,7 @@
 {% block content %}
     <script>
         var global1 = false;
-        window.onload = progress;
+        window.onload = progress();
         $(document).ready(function () {
             $("#next").click(function () {
                 $.ajax({
