@@ -457,7 +457,7 @@ def savePaginateAnswers():
 
 
 @app.route('/staffconsultations', methods=['GET', 'POST'])
-@roles_required('user')
+@roles_required('staff')
 def approvePayments():
     consultations = querydb.getDescendingConsultations()
     children = []
