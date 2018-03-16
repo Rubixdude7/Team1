@@ -435,15 +435,18 @@ class query(object):
             'weekday': ['m', 't', 'w', 'th', 'f', 's', 'su'].index(t[3])
         } for t in tuples]
 
-    def getAllAvailabilities(self):
-        tuples = db.calendar.select(db.psychologist.psyc_id, db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
-                            .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
-                            .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
-                            .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
-                            .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
-                            .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
-                            .where(db.user.active & (db.role.role_nm == 'psyc') & (db.calendar.void_ind == 'n'))\
-                            .tuples()
+    def getAllAvailabilities(self, psyc_id='all'):
+        q = db.calendar.select(db.psychologist.psyc_id, db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
+                       .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
+                       .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
+                       .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                       .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                       .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)
+        if psyc_id == 'all':
+            q = q.where(db.user.active & (db.role.role_nm == 'psyc') & (db.calendar.void_ind == 'n'))
+        else:
+            q = q.where(db.user.active & (db.role.role_nm == 'psyc') & (db.calendar.void_ind == 'n') & (db.psychologist.psyc_id == psyc_id))
+        tuples = q.tuples()
         return [{
             'psyc_id': t[0],
             'avail_id': t[1],
@@ -508,8 +511,8 @@ class query(object):
         } for t in tuples]
         return result
 
-    def getAllSlotsThatCanBeBooked(self):
-        avail_list = self.getAllAvailabilities()
+    def getAllSlotsThatCanBeBooked(self, psyc_id='all'):
+        avail_list = self.getAllAvailabilities(psyc_id)
 
         slots = []
 
