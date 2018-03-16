@@ -99,9 +99,12 @@
                                     </button>
                                 {% endif %}
 
-                                {% if not child.child_id in updatedQuestions and child.q_comp_dtm != None and querydb.postConsult(child.child_id) == True and querydb.haveTime(child.child_id) != None %}
+                                {% if not child.child_id in updatedQuestions and child.q_comp_dtm != None and querydb.postConsult(child.child_id) %}
                                     <br>
                                     <button onclick="location.href='{{ url_for('schedule', child_id=child.child_id) }}'" type="button" class="btn btn-success">Schedule Consultation</button>
+                                {% else %}
+                                    <br>
+                                    Next Appointment: {{ querydb.haveTime(child.child_id) }}
                                 {% endif %}
                             {% endif %}
 

@@ -39,11 +39,11 @@
                         <li>
                             <a href="{{ url_for('index') }}">HOME</a>
                         </li>
-                        <li>
+                        <!--<li>
                             <a href="{{ url_for('videoConf') }}">VIDEOCONF</a>
-                        </li>
+                        </li>-->
                         {% if current_user.is_authenticated and current_user.is_in_role("user") %}
-                                <li>
+                            <li>
                                 <a href="{{ url_for('parent') }}">PARENTS</a>
                             </li>
                         {% endif %}
@@ -60,7 +60,7 @@
                         {% endif %}
                         {% if current_user.is_authenticated and current_user.is_in_role("staff") %}
                             <li>
-                                <a href="{{ url_for('staff') }}">STAFF</a>
+                                <a href="{{ url_for('approvePayments') }}">OFFICE</a>
                             </li>
                         {% endif %}
                         {% if current_user.is_authenticated %}

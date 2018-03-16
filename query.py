@@ -681,20 +681,31 @@ class query(object):
         c.save()
 
     def postConsult(self, child_id):
-        end = db.consultation.select(db.consult_time.time_end).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()[0]
-        if end is not None:
-            l = list(end)
+        try:
+            end = db.consultation.select(db.consult_time.time_end).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()[0]
+            if end is not None:
+                l = list(end)[0]
 
-            if l.pop(0) < datetime.datetime.today():
-                return True
+                print(l)
+
+                if l < datetime.datetime.today():
+                    print('true')
+                    return True
+                else:
+                    print('fale')
+                    return False
             else:
-                return False
-        else:
+                print('true 2')
+                return True
+        except IndexError:
+            print('true 3')
             return True
 
+
     def haveTime(self, child_id):
-        end = db.consultation.select(db.consult_time.time_end).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()[0]
-        return end
+        start = db.consultation.select(db.consult_time.time_st).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()[0]
+        start = list(start)[0]
+        return start
 
     #End of Gabe's code
 
