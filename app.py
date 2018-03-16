@@ -237,8 +237,9 @@ def questionsUserView():
     totalQuestions = request.args.get('totalQuestions')
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
-    c = querydb.findChild(child_id)
 
+    c = querydb.findChild(child_id)
+    checkComplete = c.q_comp_dtm
     # brody
     if c is None:
         return redirect(url_for('parent'))
@@ -263,7 +264,7 @@ def questionsUserView():
         totalQuestions = len(questions) #for progress bar
         totalQuestions = int(totalQuestions)
 
-    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name, answers=answers, totalQuestions=totalQuestions)
+    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name, answers=answers, totalQuestions=totalQuestions, checkComplete=checkComplete)
 
 
 @app.route('/questionsUserView2/', methods=['GET', 'POST'])
@@ -279,6 +280,7 @@ def questionsUserView2(): #post QuestionUserView
 
     #validation
     c = querydb.findChild(child_id)
+    checkComplete = c.q_comp_dtm
     if c is None:
         return redirect(url_for('parent'))
     elif c.user.user_id != current_user.id:
@@ -311,7 +313,7 @@ def questionsUserView2(): #post QuestionUserView
         return redirect(url_for('parent'))
 
     return object_list("questionsUserView.html", paginate_by=paginate, query=questions, context_variable='questions',
-                       child_id=child_id, child_name=child_name, answers=answers, totalQuestions=totalQuestions)
+                       child_id=child_id, child_name=child_name, answers=answers, totalQuestions=totalQuestions, checkComplete=checkComplete)
 
 
 @app.route('/viewAnswers/')
