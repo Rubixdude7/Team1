@@ -12,12 +12,13 @@
                             {% if consultation.paid == 'y' %}
                                 Start Time: {{ times[loop.index0].time_st }}<br>
                                 End Time: {{ times[loop.index0].time_end }}<br>
-                                Approved: <input type="checkbox" name="box" checked disabled><br>
+                                Approved: <input type="checkbox" name="check" checked disabled><br>
+                                <input type="hidden" name="check" value="off">
                                 <input type="hidden" name="consult_id" value={{ consultation.cnslt_id }}>
                             {% else %}
                                 Start Time: {{ times[loop.index0].time_st }}<br>
                                 End Time: {{ times[loop.index0].time_end }}<br>
-                                Approved: <input type="checkbox" name="box" ><br>
+                                Approved: <input type="checkbox" name="check"><br>
                                 <input type="hidden" name="consult_id" value={{ consultation.cnslt_id }}>
                             {% endif %}
                         </p>
