@@ -1,5 +1,7 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, Markup
+
+import sqlalchemy.exc
+from flask import Flask, render_template, request, redirect, url_for, Markup, jsonify, json
 import datetime
 from flask_sqlalchemy import SQLAlchemy
 from playhouse.flask_utils import object_list
@@ -10,7 +12,7 @@ from flask_user import login_required, roles_required, UserManager, UserMixin, S
 from flask_user.forms import RegisterForm
 from flask_mail import Mail
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateTimeField, Form, SelectField, SubmitField
+from wtforms import StringField, DateTimeField, Form, SelectField, SubmitField, RadioField
 from wtforms.validators import DataRequired
 from flask import redirect, url_for
 from werkzeug.utils import secure_filename
@@ -18,15 +20,19 @@ from wtforms import StringField, DateField
 from wtforms.validators import DataRequired, ValidationError
 import query
 import models
+import math
 from flask import flash, render_template, request, redirect
+from jose import jwt
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
 # DEV Jason's database
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://mgqmsvhuvgtovyte:Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU@42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com/db42576e98688b4ab28226a87601334c89'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://mgqmsvhuvgtovyte:Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU@42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com/db42576e98688b4ab28226a87601334c89'
 # Production Brandon's databasee
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # TODO make sure this is ok, this gets rid of the warning in the terminal
+app.config[
+    'SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d'
+app.config[
+    'SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # TODO make sure this is ok, this gets rid of the warning in the terminal
 app.config['CSRF_ENABLED'] = True
 app.config['USER_APP_NAME'] = 'Passion'
 app.config['USER_AFTER_REGISTER_ENDPOINT'] = 'user.login'
@@ -39,7 +45,6 @@ mail = Mail(app)
 
 
 class User(db.Model, UserMixin):
-
     id = db.Column('user_id', db.BigInteger, primary_key=True)
 
     # User authentication information
@@ -63,7 +68,8 @@ class User(db.Model, UserMixin):
         return self.active
 
     def is_in_role(self, r):
-        role_nm = db.session.query(Role.name).join(UserRoles, (Role.id == UserRoles.role_id) & (UserRoles.user_id == self.id)).all()
+        role_nm = db.session.query(Role.name).join(UserRoles, (Role.id == UserRoles.role_id) & (
+                    UserRoles.user_id == self.id)).all()
         rs = False
         for rn in role_nm:
             if r == rn[0]:
@@ -122,6 +128,7 @@ def _after_register_hook(sender, user, **extra):
     db.session.add(user_role)
     db.session.commit()
 
+
 #           BRANDON         #
 
 
@@ -145,49 +152,42 @@ def page_not_found(e):
     return render_template('500.html'), 500
 
 
+@app.errorhandler(sqlalchemy.exc.OperationalError)
+def handle_bad_request(e):
+    flash("TELL BRANDON!!! HE IS TRYING TO SEE IF THIS FIXES THE ERROR THAT HE CAUGHT!!! "
+          "SOME BACKGROUND, THIS HAPPENS BECAUSE OF AN ERROR WITH OUT DB TIMING OUT"
+          "THE FIX IS TO REFRESH THE PAGE AND IN THE FUTURE THAT IS WHAT WILL HAPPEND"
+          "BUT FOR NOW WE NEED TO SEND YOU HOME TO SEE IF THE ERROR IS EVEN BEING CAUGHT"
+          "SO TELL BRANDON!!!!!")
+    return redirect(url_for('index'))
+
+
 @app.route('/')
 def index():
-    #slider = querydb.get_slider()
     page_num = 1
     if 'page_num' in request.args:
         page_num = int(request.args['page_num'])
     return render_template("index.html", blog_posts=querydb.getAllBlogPosts(page_num, 10), page_num=page_num)
-    #return render_template("index.html", slides=slider[0], desc=slider[1])
-
-
-@app.route('/slide-edit/<int:s_id>', methods=['GET', 'POST'])
-@roles_required('admin')
-def slide_edit(s_id):
-    return render_template('slide_edit.html', slide=querydb.get_slide(s_id), s_id=s_id)
-
-
-@app.route('/slide-update/<int:s_id>', methods=['GET', 'POST'])
-@roles_required('admin')
-def slide_update(s_id):
-    querydb.update_slide(s_id, request.files.get('image', None), request.form.get('desc', None), request.form.get('alt', None))
-    return redirect(url_for('admin'))
 
 
 @app.route('/consultation', methods=['GET', 'POST'])
 @login_required
 def consultation():
-    cnslt = dict()
-    cnslt['psyc'] = request.form.get('psyc', None)
-    cnslt['len_fee'] = request.form.get('length', None)
-    cnslt['date'] = request.form.get('date', None)
-    cnslt['hour'] = request.form.get('hour', None)
-    cnslt['min'] = request.form.get('min', None)
-    cnslt['child_id'] = request.args.get('child_id')
-    print(cnslt)
-    querydb.get_psyc_cnslt(cnslt)
+    req = {
+        'child_id': request.json['child_id'],
+        'psyc_id': request.json['psyc_id'],
+        'len': request.json['len'],
+        'st_dt': request.json['st_dt']
+    }
 
-    params = querydb.get_consultation()
-    return render_template("consultation.html", psycs=params[0], len_fee=params[1])
+    status = querydb.schecule_cnslt(req)
+
+    return jsonify({'status': status[0], 'message': status[1]})
 
 
 #           END BRANDON         #
 
-
+#    Begin Jared
 @app.route('/editQuestion', methods=['GET', 'POST'])
 def editQuestion():
     q_id = request.args.get('q_id')
@@ -196,7 +196,7 @@ def editQuestion():
     if form.validate_on_submit():
         newQuestion = form.question.data
         querydb.editQuestion(q_id, newQuestion)
-        # flash('Your changes have been saved.')
+        flash('Your changes have been saved.')
         return redirect(url_for('questions'))
     return render_template('editQuestion.html', title='Edit Question',
                            form=form, question=getQuestion)
@@ -206,6 +206,7 @@ def editQuestion():
 def questiondeactivate():
     q_id = request.args.get('q_id')
     querydb.deactivateQuestion(q_id)
+    flash('Your blog post has been deactivated!')
     return redirect(url_for('questions'))
 
 
@@ -213,6 +214,7 @@ def questiondeactivate():
 def questionreactivate():
     q_id = request.args.get('q_id')
     querydb.reactivateQuestion(q_id)
+    flash('Your blog post has been reactivated!')
     return redirect(url_for('questions'))
 
 
@@ -220,25 +222,26 @@ def questionreactivate():
 def questionDelete():
     q_id = request.args.get('q_id')
     querydb.questionDelete(q_id)
+    flash('Question has been deleted!')
     return redirect(url_for('questions'))
 
 
 @app.route('/questions/')
 @login_required
-def questions():
+def questions():  # TODO Breaks if there are no quesions in db
     questions = querydb.getAllQuestions()
     return object_list("questions.html", paginate_by=3, query=questions, context_variable='questions')
-
-
 
 
 @app.route('/questionsUserView/', methods=['GET', 'POST'])
 @login_required
 def questionsUserView():
+    totalQuestions = request.args.get('totalQuestions')
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
-    c = querydb.findChild(child_id)
 
+    c = querydb.findChild(child_id)
+    checkComplete = c.q_comp_dtm
     # brody
     if c is None:
         return redirect(url_for('parent'))
@@ -251,76 +254,69 @@ def questionsUserView():
             savePaginateAnswers()
     # end brody
 
-
-
-    questions = querydb.getAllQuestions()
+    questions = querydb.getAllQuestionsForUsers()
     # Brody code
     answers = []
     for q in questions:
         answers.append(querydb.getAnswer(q.q_id, child_id))
     # end Brody code
-    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name, answers=answers)
+    if totalQuestions is None:
+        totalQuestions = len(questions)  # for progress bar
+        totalQuestions = int(totalQuestions)
+
+    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions',
+                       child_id=child_id, child_name=child_name, answers=answers, totalQuestions=totalQuestions,
+                       checkComplete=checkComplete)
 
 
 @app.route('/questionsUserView2/', methods=['GET', 'POST'])
 @login_required
-def questionsUserView2():
-
+def questionsUserView2():  # post QuestionUserView
+    # getargs
+    totalQuestions = request.args.get('totalQuestions')
+    totalQuestions = int(totalQuestions)
     page = request.args.get('page')
     totalPage = request.args.get('totalPage')
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
+
+    # validation
     c = querydb.findChild(child_id)
+    checkComplete = c.q_comp_dtm
     if c is None:
         return redirect(url_for('parent'))
     elif c.user.user_id != current_user.id:
         return redirect(url_for('parent'))
+
+    # how much each page should paginate by, change for differet number of questions per page(please change this value for other question views if you change)
     paginate = 3
-    questions = querydb.getAllQuestions()
+    questions = querydb.getAllQuestionsForUsers()
     # Brody code
     answers = []
     for q in questions:
         answers.append(querydb.getAnswer(q.q_id, child_id))
-    print("Page: ", page)
-    print("Paginate by: ", paginate)
     if page is not None:
-        answers = answers[(paginate * (int(page)-1)): len(answers)]
-    print("Answers: ", answers)
+        answers = answers[(paginate * (int(page) - 1)): len(answers)]
     # End Brody code
 
     questionAnswerList = request.form.getlist('fname')
 
-    print("QA list: ", questionAnswerList)
     questionIdList = request.form.getlist('qField')
     childId = request.form.get('cField')
 
-    q_id = request.args.get('q_id')
-
     # Brody says: q = answer, q2 = questionId
     for (q, q2) in zip(questionAnswerList, questionIdList):
-        print("Q", q)
-        print("Q2", q2)
         # lack of this if was causing false "completed" question forms
         if q is not '':
             querydb.addQuestionAnswers(q, current_user.id, q2, childId)
+
     if page == totalPage:
         querydb.checkComp(child_id)
         return redirect(url_for('parent'))
+
     return object_list("questionsUserView.html", paginate_by=paginate, query=questions, context_variable='questions',
-                       child_id=child_id, child_name=child_name, answers=answers)
-
-
-@app.route('/questionsEditQuestions/')
-@login_required
-def questionsEditQuestions():
-    child_id = request.args.get('child_id')
-    child_name = request.args.get('child_name')
-    print(child_id)
-    questions = querydb.checkNewQuestions(child_id)
-
-    return object_list("questionsEditQuestions.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
-
-
+                       child_id=child_id, child_name=child_name, answers=answers, totalQuestions=totalQuestions,
+                       checkComplete=checkComplete)
 
 
 @app.route('/viewAnswers/')
@@ -328,14 +324,10 @@ def questionsEditQuestions():
 def viewAnswers():
     child_id = request.args.get('child_id')
     child_name = request.args.get('child_name')
-    print(child_name)
     questions = querydb.getAllQuestionAnswers()
     #  count = querydb.paginate(page_num) --still working on pagination
-    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions', child_id=child_id, child_name=child_name)
-
-
-
-
+    return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions',
+                       child_id=child_id, child_name=child_name)
 
 
 @app.route('/parent_seeanswers')
@@ -365,7 +357,6 @@ def add_questions():
 
 @app.route('/post_add_questions', methods=['GET', 'POST'])
 def post_questions():
-    # question = request.args.get('question')
     question = request.form.get('question')
     print(question)
     print(current_user.id)
@@ -374,15 +365,37 @@ def post_questions():
     return redirect(url_for('questions'))
 
 
-#Gabe
+@app.route('/post_edit_questionAnswers', methods=['GET', 'POST'])
+def post_editQuestions():
+    questionAnswerList = request.form.getlist('fname')
+    questionIdList = request.form.getlist('qField')
+    childId = request.form.get('cField')
+
+    for (q, q2) in zip(questionAnswerList, questionIdList):
+        print(current_user.id)
+        print(questionAnswerList)
+        querydb.addQuestionAnswers(q, current_user.id, q2, childId)
+
+    return redirect(url_for('parent'))
+
+
+@app.route('/videoConf')
+def videoConf():
+    return render_template('videoConf.html')
+
+
+#   End Jared
+
+# Gabe
 @app.route('/parent')
 @login_required
 @roles_required('user')
 def parent():
-
+    updatedQuestions = querydb.checkNewQuestions(current_user.id)
     return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name,
-                           children = querydb.getChildren(current_user.id),
-                           contact_info=querydb.contactID(current_user.id), querydb=querydb)
+                           children=querydb.getChildren(current_user.id),
+                           contact_info=querydb.contactID(current_user.id), querydb=querydb,
+                           updatedQuestions=updatedQuestions)
 
 
 @app.route('/parent/contact')
@@ -394,32 +407,17 @@ def contact():
 @app.route('/parent/contact', methods=['GET', 'POST'])
 @roles_required('user')
 def editContact():
-    contact_id=querydb.contactID(current_user.id)
-    querydb.updateContact(current_user.id, contact_id,request.form.get('phone_no'), request.form.get('address_1'),
+    contact_id = querydb.contactID(current_user.id)
+    querydb.updateContact(current_user.id, contact_id, request.form.get('phone_no'), request.form.get('address_1'),
                           request.form.get('address_2'), request.form.get('city'), request.form.get('providence'),
                           request.form.get('zip'))
     return parent()
-#End Gabe
+
+
+# End Gabe
 
 
 # Start Brody's code
-@app.route('/child/<int:child_id>')
-def child(child_id=None):
-    r = querydb.role(current_user.id)
-    if r == 'user' or r == 'admin' or r == 'staff' or r == 'psyc':
-        child_info = querydb.findChild(child_id)
-        if child_info is None:
-            return redirect(url_for('index'))
-        born = datetime.datetime.strptime(child_info.child_dob.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
-        today = datetime.date.today()
-        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
-        if age < 0:
-            return redirect(url_for('index'))
-        else:
-            updatedQuestions = querydb.checkNewQuestions(child_id)
-            return render_template('child.html', child_info=child_info, child_age=age, updatedQuestions=updatedQuestions)
-    else:
-        return redirect(url_for('index'))
 
 @app.route('/childform')
 @roles_required('user')
@@ -427,54 +425,67 @@ def childform():
     return render_template('childform.html')
 
 
-@app.route('/childform', methods=['post'])
+@app.route('/childform', methods=['POST'])
 @roles_required('user')
 def addChild():
     born = datetime.datetime.strptime(request.form.get('dateofbirth'), "%Y-%m-%d")
     today = datetime.date.today()
     age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
-    if age < 2 or age > 125:
+    if age < 0:
+        flash('Error with childs age', 'error')
         return parent()
-    querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'), request.form.get('dateofbirth'))
+    if age > 100:
+        flash('Error with childs age', 'error')
+        return parent()
+
+    querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'),
+                     request.form.get('dateofbirth'))
     return parent()
 
 
 @app.route('/post_add_questionAnswers', methods=['GET', 'POST'])
 def savePaginateAnswers():
-
     questionAnswerList = request.form.getlist('fname')
     questionIdList = request.form.getlist('qField')
     childId = request.form.get('cField')
-    q_id = request.args.get('q_id')
-
 
     # Brody says: q = answer, q2 = questionId
-    for (q,q2) in zip (questionAnswerList, questionIdList):
-      # lack of this if was causing false "completed" question forms
-      if q is not '':
-          querydb.addQuestionAnswers(q, current_user.id, q2, childId)
+    for (q, q2) in zip(questionAnswerList, questionIdList):
+        # lack of this if was causing false "completed" question forms
+        if q is not '':
+            querydb.addQuestionAnswers(q, current_user.id, q2, childId)
+
+
+@app.route('/staffconsultations', methods=['GET', 'POST'])
+@roles_required('user')
+def approvePayments():
+    consultations = querydb.getDescendingConsultations()
+    children = []
+    times = []
+    for c in consultations:
+        print("Consultation ID: ", c.cnslt_id)
+        children.append(querydb.getChildNameFromID(c.child))
+        times.append(querydb.getConsultationTime(c.cnslt_id))
+    return render_template('staffconsultations.html', children=children, consultations=consultations, times=times)
+
+
+@app.route('/staffconsultations/approvals', methods=['GET', 'POST'])
+def getPaymentChanges():
+    consultations = request.form.getlist('consult_id')
+    for c in consultations:
+        print(c)
+        try:
+            b = request.form.get(str(c))
+            if b == 'on':
+                print("Marking paid: ", c)
+                querydb.markConsultApproved(c)
+        except:
+            print('Check box was off')
+    return index()
 
 
 # End Brody
 
-@app.route('/post_edit_questionAnswers', methods=['GET', 'POST'])
-def post_editQuestions():
-    questionAnswerList = request.form.getlist('fname')
-    questionIdList = request.form.getlist('qField')
-    childId = request.form.get('cField')
-    q_id = request.args.get('q_id')
-
-    for (q, q2) in zip(questionAnswerList, questionIdList):
-        print(current_user.id)
-        print(questionAnswerList)
-        querydb.addQuestionAnswers(q, current_user.id, q2, childId)
-
-    # question = request.args.get('question')
-    # question=request.form.get('question')
-    # print(question);
-    # querydb.addQuestion(question, current_user.id)
-
-    return redirect(url_for('parent'))
 
 # Start Jason's code
 
@@ -510,7 +521,8 @@ class ClientEditForm(FlaskForm):
 
 
 class SearchBar(FlaskForm):
-    search = StringField('Search', default='Search')
+    radio = RadioField('Items Per Page', choices=[('5', 5), ('10', 10), ('15', 15)], default='5')
+    search = StringField('Search', render_kw={"placeholder": "Search"})
     submit = SubmitField('Submit')
 
 
@@ -519,15 +531,21 @@ class SearchBar(FlaskForm):
 @roles_required('admin')
 def admin():
     page_num = 1
+    items_per_page = 5
     if 'page_num' in request.args:
         page_num = int(request.args['page_num'])
     form = SearchBar()
     if form.validate_on_submit():
-        users = querydb.getSearchedUsers(form.search.data, page_num, 5)
-        num_of_pages = round(querydb.getSearchedUserCount(form.search.data) / 5)
+        items_per_page = form.radio.data
+        form.radio.default = items_per_page
+        users = querydb.getSearchedUsers(form.search.data, page_num, int(items_per_page))
+        num_of_pages = math.ceil(querydb.getSearchedUserCount(form.search.data) / int(items_per_page))
     else:
-        users = querydb.getAllUsers(page_num, 5)
-        num_of_pages = round(querydb.getUserCount() / 5)
+        if 'items_per_page' in request.args:
+            items_per_page = request.args['items_per_page']
+        form.radio.default = items_per_page
+        users = querydb.getAllUsers(page_num, int(items_per_page))
+        num_of_pages = math.ceil(querydb.getUserCount() / int(items_per_page))
     roles = list()
     usersandroles = dict()
     for u in users:
@@ -541,8 +559,9 @@ def admin():
             usersandroles[u.email] = 'Psychologist'
         if r == 'staff':
             usersandroles[u.email] = 'Office Staff'
+        form.process()
     return render_template('admin/admin.html', users=users, roles=roles, usersandroles=usersandroles, form=form
-                           , page_num=page_num, num_of_pages=num_of_pages)
+                           , page_num=page_num, num_of_pages=num_of_pages, items_per_page=items_per_page)
 
 
 @app.route('/edit', methods=['GET', 'POST'])
@@ -592,7 +611,7 @@ def edit():
         querydb.updateUserRole(u_id, newRole)
         if isUserOrPsyc:
             querydb.updateEmail(u_id, form.email.data)
-            querydb.updateName(u_id,form.fName.data,form.lName.data)
+            querydb.updateName(u_id, form.fName.data, form.lName.data)
             querydb.updateContact(u_id, c_id, form.phone.data, form.address_1.data, form.address_2.data,
                                   form.city.data, form.province.data, form.zip.data)
         flash('Your changes have been saved.')
@@ -616,11 +635,40 @@ def delete():
 
 # Begin Charlie's code
 
+@app.route('/api/calendar')
+@app.route('/api/calendar/psyc/<int:psyc_id>')
+def api_calendar(psyc_id='all'):
+    slots = querydb.getAllSlotsThatCanBeBooked(psyc_id)
+    for s in slots:
+        # Adjust month number for javascript
+        s['st']['month'] -= 1
+        s['end']['month'] -= 1
+    return jsonify(slots)
+
+
+@app.route('/api/availabilities')
+@roles_required('psyc')
+def api_availabilities():
+    psyc_id = querydb.getPsycId(current_user.id)
+    avails = querydb.getAvailabilities(psyc_id)
+    return jsonify(avails)
+
+
 @app.route('/my_psikolog_page')
 @roles_required('psyc')
 def my_psikolog_page():
     psyc_id = querydb.getPsycId(current_user.id)
     return redirect(url_for('psikolog', id=psyc_id))
+
+
+@app.route('/schedule')
+@roles_required('user')
+def schedule():  # TODO make sure only child of that parent can get here
+    child_id = request.args.get('child_id')
+    return render_template('schedule.html',
+                           psyc_names=querydb.getPsychologistNames(),
+                           len_fee=querydb.get_len_fee(), child_id=child_id)
+
 
 @app.route('/psikolog/')
 @app.route('/psikolog/<int:id>')
@@ -645,20 +693,21 @@ def psikolog(id=None):
 
             # Fetch the psychologist's avatar
             avatar_url = querydb.getAvatar(id)
-            
-            availabilities = querydb.getAvailabilities(id)
 
-            return render_template('psikolog.html', psyc_info=psyc_info, blog_posts=blog_posts, can_edit=can_edit, avatar_url=avatar_url, availabilities=availabilities)
+            return render_template('psikolog/psikolog_page.html', psyc_info=psyc_info, blog_posts=blog_posts,
+                                   can_edit=can_edit, avatar_url=avatar_url)
 
     # Either no id was given or no psychologist was found.
     # In both cases, show a list of psychologists.
     return render_template('list_psikolog.html', psychologist_links=querydb.psychologistLinks())
+
 
 @app.route('/psikolog/<int:psyc_id>/<int:year>/<int:month>/<int:day>')
 def view_day(psyc_id, year, month, day):
     psyc = querydb.lookupPsychologist(psyc_id)
     avails = querydb.getAvailabilitiesForDay(psyc_id, year, month, day)
     return render_template('view_day.html', psyc=psyc, year=year, month=month, day=day, avails=avails)
+
 
 @app.route('/psikolog/write_blog_post', methods=['GET', 'POST'])
 @roles_required('psyc')
@@ -673,6 +722,7 @@ def write_blog_post():
         flash('Your blog post has been published.')
         return redirect(url_for('psikolog', id=psyc_id))
 
+
 @app.route('/psikolog/change_avatar', methods=['GET', 'POST'])
 @roles_required('psyc')
 def change_avatar():
@@ -684,6 +734,7 @@ def change_avatar():
         flash('Avatar updated.')
         return redirect(url_for('psikolog', id=psyc_id))
 
+
 @app.route('/psikolog/edit_qualifications', methods=['GET', 'POST'])
 @roles_required('psyc')
 def edit_qualifications():
@@ -694,14 +745,22 @@ def edit_qualifications():
         querydb.updateQualifications(psyc_id, request.form['qualifications'])
         flash('Qualifications updated.')
         return redirect(url_for('psikolog', id=psyc_id))
-        
+
+
 @app.route('/psikolog/edit_availability_list')
+@app.route('/psikolog/edit_availability_list/<int:page>')
 @roles_required('psyc')
-def edit_availability_list():
+def edit_availability_list(page=1):
+    if page < 1:
+        page = 1
+
     psyc_id = querydb.getPsycId(current_user.id)
-    availabilities = querydb.getAvailabilities(psyc_id)
-    weekdays = querydb.getWeekDays()
-    return render_template('edit_availability_list.html', psyc_id=psyc_id, availabilities=availabilities, weekdays=weekdays)
+    avail_list = querydb.getAvailabilities(psyc_id, page=page)
+    weekdays = querydb.getWeekDayList()
+
+    return render_template('edit_availability_list.html', psyc_id=psyc_id, avails=avail_list, weekdays=weekdays,
+                           page=page)
+
 
 @app.route('/psikolog/delete_availability/<int:avail_id>')
 @roles_required('psyc')
@@ -710,6 +769,7 @@ def delete_availability(avail_id):
     querydb.deleteAvailability(avail_id, psyc_id)
     flash('Availability time has been deleted.')
     return redirect(url_for('edit_availability_list'))
+
 
 @app.route('/psikolog/add_availability', methods=['GET', 'POST'])
 @roles_required('psyc')
@@ -722,13 +782,14 @@ def add_availability():
         time_st = request.form['time_st']
         time_end = request.form['time_end']
         weekday = request.form['weekday']
-        
+
         querydb.addAvailability(psyc_id, time_st, time_end, weekday)
-        
+
         flash('Your new availability time has been created.')
-        
+
         return redirect(url_for('edit_availability_list'))
-        
+
+
 @app.route('/psikolog/edit_availability/<int:avail_id>', methods=['GET', 'POST'])
 @roles_required('psyc')
 def edit_availability(avail_id):
@@ -747,19 +808,21 @@ def edit_availability(avail_id):
             flash('Availability time has been updated.')
         else:
             flash('Failed to add availability time.  "Time Start" must be earlier than "Time End".', category='error')
-        
+
         return redirect(url_for('edit_availability_list'))
+
 
 # End Charlie's code
 
-#Nolan's Code
+# Nolan's Code
 
 @app.route('/staff')
 @roles_required('staff')
 def staff():
-    return render_template('staff.html', children = querydb.getVerifiedChildren())
+    return render_template('staff.html', children=querydb.getVerifiedChildren())
 
-#End Nolan's Code
+
+# End Nolan's Code
 
 
 if __name__ == '__main__':
