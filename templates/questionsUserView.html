@@ -3,7 +3,7 @@
 {% block content %}
     <script>
         var global1 = false;
-        window.onload = progress();
+
         $(document).ready(function () {
             $("#next").click(function () {
                 $.ajax({
@@ -47,12 +47,12 @@
             }
         }
 
-        function progress() {
+        $(document).ready(function() {
 
             var numItems = document.getElementsByClassName("question").length;
             var x = document.getElementById('progress');
             x.value = {{  ((100/pagination.get_page_count()) *(page - 1)) |round|int }};
-        }
+        });
 
         function buttonClick(theButton) {
             global1 = true;
