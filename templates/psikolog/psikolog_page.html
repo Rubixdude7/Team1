@@ -4,6 +4,22 @@
 
 {% block title %}{{ psyc_info.full_name }}{% endblock %}
 
+{% block head %}
+    {{ super() }}
+    {{ calendar.script_tag() }}
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+        var cal = new calendarModule.Calendar("#calendar");
+        cal.setup();
+        $.getJSON("/api/calendar/psyc/{{ psyc_info.psyc_id }}", function(data){
+            cal.setAvailabilities(data);
+            cal.refresh();
+        });
+    });
+    </script>
+{% endblock %}
+
 {% block content %}
 <main id="psyc-page">
     <div class="box">
@@ -17,6 +33,10 @@
         <p class="psyc-bio">
             {{ psyc_info.qualifications }}
         </p>
+    </div>
+
+    <div class="box">
+        {{ calendar.calendar('calendar', 'calendar-planning') }}
     </div>
 </main>
 {% endblock %}

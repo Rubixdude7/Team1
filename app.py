@@ -424,7 +424,12 @@ def addChild():
     today = datetime.date.today()
     age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
     if age < 0:
+        flash('Error with childs age','error')
         return parent()
+    if age > 100:
+        flash('Error with childs age', 'error')
+        return parent()
+
     querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'), request.form.get('dateofbirth'))
     return parent()
 
@@ -594,8 +599,9 @@ def delete():
 # Begin Charlie's code
 
 @app.route('/api/calendar')
-def api_calendar():
-    slots = querydb.getAllSlotsThatCanBeBooked()
+@app.route('/api/calendar/psyc/<int:psyc_id>')
+def api_calendar(psyc_id='all'):
+    slots = querydb.getAllSlotsThatCanBeBooked(psyc_id)
     for s in slots:
         #Adjust month number for javascript
         s['st']['month'] -= 1
@@ -646,10 +652,8 @@ def psikolog(id=None):
 
             # Fetch the psychologist's avatar
             avatar_url = querydb.getAvatar(id)
-            
-            availabilities = querydb.getAvailabilities(id)
 
-            return render_template('psikolog/psikolog_page.html', psyc_info=psyc_info, blog_posts=blog_posts, can_edit=can_edit, avatar_url=avatar_url, availabilities=availabilities)
+            return render_template('psikolog/psikolog_page.html', psyc_info=psyc_info, blog_posts=blog_posts, can_edit=can_edit, avatar_url=avatar_url)
 
     # Either no id was given or no psychologist was found.
     # In both cases, show a list of psychologists.

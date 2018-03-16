@@ -1,159 +1,155 @@
-<!-- put these at top otherwise it doesn't show year for some reason-->
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<script src="{{ url_for('static', filename='scripts/question.js') }}" type="text/jscript"></script>
-<!-- This script source is currently messing up 2018 @ js function, dont know why  -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 {% extends "base.html" %}
 {% block title %}Questions{% endblock %}
 {% block content %}
- <script>
+    <script>
+        var global1 = false;
+        window.onload = progress;
+        $(document).ready(function () {
+            $("#next").click(function () {
+                $.ajax({
+                    url: "./?page={{ page + 1 }}", success: function (result) {
+                        $("body").html(result);
+                    }
+                });
+            });
+        });
+        $(document).ready(function () {
+            $("#prev").click(function () {
+                $.ajax({
+                    url: "./?page={{ page - 1 }}", success: function (result) {
+                        $("body").html(result);
+                    }
+                });
+            });
+        });
 
-$(document).ready(function(){
-    $("#next").click(function(){
-        $.ajax({url: "./?page={{ page + 1 }}", success: function(result){
-            $("body").html(result);
-        }});
-    });
-});
-$(document).ready(function(){
-    $("#prev").click(function(){
-        $.ajax({url: "./?page={{ page - 1 }}", success: function(result){
-            $("body").html(result);
-        }});
-    });
-});
-var global1 = false;
- function validateFormMultiple() {
-    var x = document.getElementsByName('fname');
-    if (global1 == false) { //only validate if the next button is being used
-        for (i = 0; i < x.length; i++) {
-            if (x[i].value == "") {
-                alert('All fields must be filled');
-                return false;
+        function validateFormMultiple() {
+            var x = document.getElementsByName('fname');
+            if (global1 == false) { //only validate if the next button is being used
+                for (i = 0; i < x.length; i++) {
+                    if (x[i].value == "") {
+                        alert('All fields must be filled');
+                        return false;
+                    }
+
+                }
             }
+            if (global1 == true) {
+                var frm = document.getElementById("mainForm")
+                if (frm) {
 
+                    frm.action = "{{ url_for('questionsUserView2', child_id=child_id,page=page - 1,child_name=child_name,totalPage=pagination.get_page_count() + 1,totalQuestions=totalQuestions)|safe }}";
+
+
+                }
+                global = false;
+                return true;
+            }
         }
-    }
-     if (global1 == true) {
 
-         var frm = document.getElementById("mainForm")
-    if(frm)
-    {
+        function progress() {
 
-        frm.action = "{{ url_for('questionsUserView2', child_id=child_id,page=page - 1,child_name=child_name,totalPage=pagination.get_page_count() + 1,totalQuestions=totalQuestions)|safe }}";
+            var numItems = document.getElementsByClassName("question").length;
+            var x = document.getElementById('progress');
+            x.value = {{  ((100/pagination.get_page_count()) *(page - 1)) |round|int }};
+        }
 
+        function buttonClick(theButton) {
+            global1 = true;
 
-
-    }
-         global = false;
-         return true;
-     }
-  }
-  function progress() {
-
-    var numItems = document.getElementsByClassName("question").length;
-    var x = document.getElementById('progress');
-    x.value = {{  ((100/pagination.get_page_count()) *(page - 1)) |round|int }};
-}
+            return true;
+        }
 
 
+    </script>
 
-window.onload = progress;
+    <main id="questionsUserView">
 
- function buttonClick(theButton){
-     global1 = true;
+        <div id="box" class="box">
+            <p id="childName">Your Child: {{ child_name }}</p>
+            {% if checkComplete  == None %}
+                <progress id="progress" value=" ((100/pagination.get_page_count()) *(page - 1)) |round|int }}"
+                          max="100"></progress>
 
-    return true;
-}
+                <p> Progress: {{ ((100/pagination.get_page_count()) *(page - 1)) |round|int }} % </p>
+            {% endif %}
+            {% if checkComplete  == None %}
+                <h1 class="title">Question List</h1>
 
-
-</script>
-
-    <main>
-
-        <div id = "box" class="box">
-        <p id="childName">Your Child: {{ child_name }}</p>
-        {% if checkComplete  == None %}
-    <progress id ="progress" value=" ((100/pagination.get_page_count()) *(page - 1)) |round|int }}" max="100"> </progress>
-
-              <p> Progress: {{  ((100/pagination.get_page_count()) *(page - 1)) |round|int }} % </p>
-        {% endif %}
-        {% if checkComplete  == None %}
-            <h1 class="title">Question List</h1>
-
-        {% else %}
-            <h1 class="title">Edit Questions</h1>
-        {% endif %}
+            {% else %}
+                <h1 class="title">Edit Questions</h1>
+            {% endif %}
             <hr>
 
-       <form method="post" id="mainForm" onsubmit="return validateFormMultiple()" action="{{ url_for('questionsUserView2', page=page + 1,child_id=child_id, child_name=child_name, totalPage=pagination.get_page_count() + 1, totalQuestions=totalQuestions) }}" name="myForm" onsubmit="" onload="pagination()">
-         <input type="hidden" name="cField" value="{{ child_id }}")>
-            {% for u in questions %}
-                <!-- question list -->
+            <form method="post" id="mainForm" onsubmit="return validateFormMultiple()"
+                  action="{{ url_for('questionsUserView2', page=page + 1,child_id=child_id, child_name=child_name, totalPage=pagination.get_page_count() + 1, totalQuestions=totalQuestions) }}"
+                  name="myForm" onsubmit="" onload="pagination()">
+                <input type="hidden" name="cField" value="{{ child_id }}" )>
+                {% for u in questions %}
+                    <!-- question list -->
 
-             {% if page > 1 %}
+                    {% if page > 1 %}
 
 
-            {% endif %}
+                    {% endif %}
 
-               <div class="question">
+                    <div class="question">
 
-                <p id="questiontitle"><b><u>{{ u.question }}</u></b></p>
-                    <!-- Brody code -->
-                   {% if answers[loop.index0] != None or '' %}
-                        <input type="text" name="fname" value="{{ answers[loop.index0] }}")>
-                   {% else %}
-                        <input type="text" name="fname")>
-                   {% endif %}
-                    <!-- end Brody Code -->
-                <input type="hidden" name="qField" value="{{ u.q_id }}")>
+                        <p id="questiontitle"><b><u>{{ u.question }}</u></b></p>
+                        <!-- Brody code -->
+                        {% if answers[loop.index0] != None or '' %}
+                            <input type="text" name="fname" value="{{ answers[loop.index0] }}" )>
+                        {% else %}
+                            <input type="text" name="fname" )>
+                        {% endif %}
+                        <!-- end Brody Code -->
+                        <input type="hidden" name="qField" value="{{ u.q_id }}" )>
 
-            <br>
+                        <br>
 
-            <span id="error" style="color:red"></span>
-            <!-- END QUESTION -->
-            </div>
+                        <span id="error" style="color:red"></span>
+                        <!-- END QUESTION -->
+                    </div>
 
+                    <br>
+                {% endfor %}
                 <br>
-            {% endfor %}
-            <br>
-            <br>
+                <br>
 
-            {% if page > 1 %}
-                 <input class="btn btn-warning"  type="submit" name="checkButton" value="Previous" onsubmit="return validateFormMultiple()" onclick="return buttonClick(this)">
-             <!--    <button style="background-color: orange" onclick="location.href='{{ url_for('questionsUserView2', page=page - 1,child_id=child_id, child_name=child_name) }}';" type="button">
+                {% if page > 1 %}
+                    <input class="btn btn-warning" type="submit" name="checkButton" value="Previous"
+                           onsubmit="return validateFormMultiple()" onclick="return buttonClick(this)">
+                    <!--    <button style="background-color: orange" onclick="location.href='{{ url_for('questionsUserView2', page=page - 1,child_id=child_id, child_name=child_name) }}';" type="button">
                                            Previous Page
 
                                         </button> -->
 
 
-            {% endif %}
-              {% if pagination.get_page_count() > page %}
-<!--
+                {% endif %}
+                {% if pagination.get_page_count() > page %}
+                    <!--
                   <button style="background-color: red" onclick="location.href='{{ url_for('questionsUserView2', page=page + 1,child_id=child_id, child_name=child_name) }}';" type="button">
                                            Next Page
 
                                         </button>
 -->
-                 <input class="btn btn-success" type="submit" name="checkButton" value="NextPage" onsubmit="return validateFormMultiple()">
+                    <input class="btn btn-success" type="submit" name="checkButton" value="NextPage"
+                           onsubmit="return validateFormMultiple()">
 
 
-            {% endif %}
-        <!--Only show submit button if last page  -->
-            {% if pagination.get_page_count() == page %}
+                {% endif %}
+                <!--Only show submit button if last page  -->
+                {% if pagination.get_page_count() == page %}
 
-                <br>
-                <br>
-                <input class="btn btn-success" type="submit" value="Submit Answers" onsubmit="return validateFormMultiple()">
+                    <br>
+                    <br>
+                    <input class="btn btn-success" type="submit" value="Submit Answers"
+                           onsubmit="return validateFormMultiple()">
 
-            {% else %}
-            {% endif %}
+                {% else %}
+                {% endif %}
 
-        </form>
+            </form>
         </div>
     </main>
 {% endblock %}
- <!-- JQUERY Library for Jared Lewis-->
-
-    <!--End -->

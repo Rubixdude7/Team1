@@ -435,15 +435,18 @@ class query(object):
             'weekday': ['m', 't', 'w', 'th', 'f', 's', 'su'].index(t[3])
         } for t in tuples]
 
-    def getAllAvailabilities(self):
-        tuples = db.calendar.select(db.psychologist.psyc_id, db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
-                            .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
-                            .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
-                            .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
-                            .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
-                            .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
-                            .where(db.user.active & (db.role.role_nm == 'psyc') & (db.calendar.void_ind == 'n'))\
-                            .tuples()
+    def getAllAvailabilities(self, psyc_id='all'):
+        q = db.calendar.select(db.psychologist.psyc_id, db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
+                       .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
+                       .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
+                       .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                       .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                       .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)
+        if psyc_id == 'all':
+            q = q.where(db.user.active & (db.role.role_nm == 'psyc') & (db.calendar.void_ind == 'n'))
+        else:
+            q = q.where(db.user.active & (db.role.role_nm == 'psyc') & (db.calendar.void_ind == 'n') & (db.psychologist.psyc_id == psyc_id))
+        tuples = q.tuples()
         return [{
             'psyc_id': t[0],
             'avail_id': t[1],
@@ -508,8 +511,8 @@ class query(object):
         } for t in tuples]
         return result
 
-    def getAllSlotsThatCanBeBooked(self):
-        avail_list = self.getAllAvailabilities()
+    def getAllSlotsThatCanBeBooked(self, psyc_id='all'):
+        avail_list = self.getAllAvailabilities(psyc_id)
 
         slots = []
 
@@ -532,18 +535,22 @@ class query(object):
                     slots.append({
                         'psyc_id': a['psyc_id'],
                         'st': st,
-                        'end': end
+                        'end': end,
+                        'valid': True # For pruning later
                     })
 
         # Now the tough part -- cut out all the appointments and vacations
         cnslt_list = self.getConsultations()
         for cnslt in cnslt_list:
             for slot in slots:
-                if slot['psyc_id'] == cnslt['psyc_id']:
+                if slot['valid'] and slot['psyc_id'] == cnslt['psyc_id']:
                     # Does this consultation cut into this slot?
                     if slot['st'] < cnslt['time_end'] and slot['end'] > cnslt['time_st']:
                         # Yes. The question is: in what WAY does it cut it?
-                        if cnslt['time_st'] <= slot['st'] and cnslt['time_end'] < slot['end']:
+                        if cnslt['time_st'] <= slot['st'] and cnslt['time_end'] >= slot['end']:
+                            # It eats the whole thing?
+                            slot['valid'] = False
+                        elif cnslt['time_st'] <= slot['st'] and cnslt['time_end'] < slot['end']:
                             # It just bites off a piece on the left?
                             slot['st'] = cnslt['time_end']
                         elif cnslt['time_st'] > slot['st'] and cnslt['time_end'] >= slot['end']:
@@ -551,8 +558,12 @@ class query(object):
                             slot['end'] = cnslt['time_st']
                         elif cnslt['time_st'] > slot['st'] and cnslt['time_end'] < slot['end']:
                             # It bites off the middle?
-                            slots.append({'psyc_id': slot['psyc_id'], 'st': cnslt['time_end'], 'end': slot['end']})
+                            slots.append({'psyc_id': slot['psyc_id'], 'st': cnslt['time_end'], 'end': slot['end'], 'valid': True})
                             slot['end'] = cnslt['time_st']
+
+        slots = list(filter(lambda s: s['valid'], slots))
+        for s in slots:
+            del s['valid']
 
         for slot in slots:
             slot['st'] = {
@@ -700,13 +711,30 @@ class query(object):
         time_st = datetime.datetime.strptime(time_st, '%Y-%m-%d %H:%M')
         time_end = time_st + datetime.timedelta(hours=float(args['len']))
 
-        cnslt = db.consultation(child_id=args['child_id'], fee=fee, paid='n', length=args['len'], finished='n')
-        cnslt.save()
+        # Make sure this time is actually available.
+        slots = self.getAllSlotsThatCanBeBooked(int(args['psyc_id']))
+        # Find a slot that fits the requested time.
+        ok = False
+        for s in slots:
+            s_st = datetime.datetime(s['st']['year'], s['st']['month'], s['st']['day'], s['st']['hour'],
+                                     s['st']['minute'])
+            s_end = datetime.datetime(s['end']['year'], s['end']['month'], s['end']['day'], s['end']['hour'],
+                                      s['end']['minute'])
 
-        cnslt_tm = db.consult_time(cnslt_id=cnslt.cnslt_id, psyc_id=args['psyc_id'], time_st=time_st, time_end=time_end, approved='y')
-        cnslt_tm.save()
+            if time_st >= s_st and time_end <= s_end:
+                ok = True
+                break
 
-        return True, "Your appointment has been made, contact office staff for payment processing."
+        if ok:
+            cnslt = db.consultation(child_id=args['child_id'], fee=fee, paid='n', length=args['len'], finished='n')
+            cnslt.save()
+
+            cnslt_tm = db.consult_time(cnslt_id=cnslt.cnslt_id, psyc_id=args['psyc_id'], time_st=time_st, time_end=time_end, approved='y')
+            cnslt_tm.save()
+
+            return True, "Your appointment has been made, contact office staff for payment processing."
+        else:
+            return False, "An invalid time range was specified."
 
 
 
