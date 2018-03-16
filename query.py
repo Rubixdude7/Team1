@@ -640,6 +640,13 @@ class query(object):
 
         c.save()
 
+    def postConsult(self, child_id):
+        end = db.consultation.select(db.consult_time.time_end).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()
+        if(end < datetime.datetime.today()):
+            return True
+        else:
+            return False
+
 
     #End of Gabe's code
 

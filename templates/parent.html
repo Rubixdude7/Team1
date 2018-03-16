@@ -69,6 +69,7 @@
                             {% if not child.child_id in updatedQuestions and child.q_comp_dtm != None %}
                                     Questions completed on: {{ child.q_comp_dtm }}<br>
                             {% endif %}
+                            Shit here: {{ querydb.postConsult(child.child_id) }}
 
 
 
