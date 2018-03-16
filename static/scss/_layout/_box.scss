@@ -259,3 +259,13 @@ img.avatar {
     height: 128px;
     border: 1px solid #999;
 }
+
+.psyc-info{
+  width: calc(100% - 148px);
+}
+
+#psyc-page{
+  .box:first-child{
+    display: flex;
+  }
+}

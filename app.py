@@ -224,7 +224,7 @@ def questionDelete():
 
 @app.route('/questions/')
 @login_required
-def questions():
+def questions(): #TODO Breaks if there are no quesions in db
     questions = querydb.getAllQuestions()
     return object_list("questions.html", paginate_by=3, query=questions, context_variable='questions')
 

@@ -406,6 +406,14 @@ img.avatar {
   border: 1px solid #999;
 }
 
+.psyc-info {
+  width: calc(100% - 148px);
+}
+
+#psyc-page .box:first-child, #psyc-page .flash:first-child {
+  display: flex;
+}
+
 .table {
   background-color: white;
   color: #363636;
