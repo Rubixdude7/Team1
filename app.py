@@ -481,7 +481,7 @@ def getPaymentChanges():
                 querydb.markConsultApproved(c)
         except:
             print('Check box was off')
-    return index()
+    return redirect(url_for('approvePayments'))
 
 
 # End Brody
