@@ -424,7 +424,12 @@ def addChild():
     today = datetime.date.today()
     age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
     if age < 0:
+        flash('Error with childs age','error')
         return parent()
+    if age > 100:
+        flash('Error with childs age', 'error')
+        return parent()
+
     querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'), request.form.get('dateofbirth'))
     return parent()
 
