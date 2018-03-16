@@ -196,7 +196,7 @@ select{
 
 
 .select{
-  display: inline-block;
+  display: inline-block !important;
   position: relative;
 
   select:not([multiple]) {

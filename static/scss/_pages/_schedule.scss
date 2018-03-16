@@ -26,7 +26,16 @@
     width: 80%;
     position: relative;
     transition: all 1s ease-in-out;
-    max-height: 100vh;
+
+  .popup-title{
+    max-height: 20vh;
+  }
+
+  .popup-contents{
+    max-height: 80vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
 }
 
 .popup h2 {
@@ -52,7 +61,7 @@
 #overlay-checkbox:checked ~ .overlay{
   visibility: visible;
   opacity: 1;
-  z-index: 16;
+  z-index: 100;
 }
 
 #overlay-checkbox{
@@ -69,9 +78,6 @@
 
 //narrow
 @media screen and (max-width: 1000px) {
-    .popup {
-        width: 80%;
-    }
     .popup .close {
         top: 40px;
         right: 30px;
@@ -92,23 +98,44 @@
   //position: relative;
   //z-index: 10;
   transition: .5s ease-in-out;
-  margin: 1em;
+  margin: 0;
+  box-sizing: border-box;
+
   display: flex;
   justify-content: space-between;
+
+  /*NARROW SCREEN*/
+  @media only screen and (max-width: 1000px) {
+    flex-direction: column;
+    align-items: center;
+
+    &>div{
+      margin: .5em 0;
+    }
+
+    div:nth-child(5){
+      width: 100%;
+
+      input{
+        width: 100%;
+      }
+    }
+  }
 
   div{
     display: flex;
     align-items: center;
   }
 
-  label{
+  .time-st-label{
     font-weight: bold;
-
+    margin-right: .3em;
   }
 }
 
 .book:checked + .book-dtls{
   max-height: 100em;
+  padding: 1em;
   overflow: visible;
   opacity: 1;
   z-index: 10;
@@ -121,7 +148,7 @@
 .book-psyc{
   margin: .5em;
 
-  div{
+  &>div{
     display: flex;
     justify-content: space-between;
   }
@@ -131,6 +158,11 @@
     display: inline-block;
     padding: 0;
     margin: 0;
+
+    /*WIDE SCREEN*/
+    @media only screen and (min-width: 1001px) {
+      padding: 0 .3em 0 0;
+    }
   }
 
 }

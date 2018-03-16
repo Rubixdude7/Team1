@@ -317,7 +317,7 @@ select {
 }
 
 .select {
-  display: inline-block;
+  display: inline-block !important;
   position: relative;
 }
 
@@ -1188,7 +1188,16 @@ body > div {
   width: 80%;
   position: relative;
   transition: all 1s ease-in-out;
-  max-height: 100vh;
+}
+
+.popup .popup-title {
+  max-height: 20vh;
+}
+
+.popup .popup-contents {
+  max-height: 80vh;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .popup h2 {
@@ -1214,7 +1223,7 @@ body > div {
 #overlay-checkbox:checked ~ .overlay {
   visibility: visible;
   opacity: 1;
-  z-index: 16;
+  z-index: 100;
 }
 
 #overlay-checkbox {
@@ -1229,9 +1238,6 @@ body > div {
 }
 
 @media screen and (max-width: 1000px) {
-  .popup {
-    width: 80%;
-  }
   .popup .close {
     top: 40px;
     right: 30px;
@@ -1250,9 +1256,27 @@ body > div {
   overflow: hidden;
   opacity: 0;
   transition: .5s ease-in-out;
-  margin: 1em;
+  margin: 0;
+  box-sizing: border-box;
   display: flex;
   justify-content: space-between;
+  /*NARROW SCREEN*/
+}
+
+@media only screen and (max-width: 1000px) {
+  .book-dtls {
+    flex-direction: column;
+    align-items: center;
+  }
+  .book-dtls > div {
+    margin: .5em 0;
+  }
+  .book-dtls div:nth-child(5) {
+    width: 100%;
+  }
+  .book-dtls div:nth-child(5) input {
+    width: 100%;
+  }
 }
 
 .book-dtls div {
@@ -1260,12 +1284,14 @@ body > div {
   align-items: center;
 }
 
-.book-dtls label {
+.book-dtls .time-st-label {
   font-weight: bold;
+  margin-right: .3em;
 }
 
 .book:checked + .book-dtls {
   max-height: 100em;
+  padding: 1em;
   overflow: visible;
   opacity: 1;
   z-index: 10;
@@ -1279,7 +1305,7 @@ body > div {
   margin: .5em;
 }
 
-.book-psyc div {
+.book-psyc > div {
   display: flex;
   justify-content: space-between;
 }
@@ -1288,6 +1314,13 @@ body > div {
   display: inline-block;
   padding: 0;
   margin: 0;
+  /*WIDE SCREEN*/
+}
+
+@media only screen and (min-width: 1001px) {
+  .book-psyc h5 {
+    padding: 0 .3em 0 0;
+  }
 }
 
 .book-len {
