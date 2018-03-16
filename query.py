@@ -176,6 +176,13 @@ class query(object):
             consultation.save()
         except:
             print("Couldn't find consultation")
+
+    def getConsultationTime(self, consult_id):
+        try:
+            time = db.consult_time.get(db.consult_time.cnslt == consult_id)
+            return time
+        except:
+            print('Could not find that time')
     # End Brody's code
 
 # Start Jason's code

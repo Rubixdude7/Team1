@@ -10,10 +10,14 @@
                         <p>
                             Name: {{ children[loop.index0].child_nm_fst }} {{ children[loop.index0].child_nm_lst }} <br>
                             {% if consultation.paid == 'y' %}
-                                Consultation: <input type="checkbox" name="box" checked disabled><br>
+                                Start Time: {{ times[loop.index0].time_st }}<br>
+                                End Time: {{ times[loop.index0].time_end }}<br>
+                                Approved: <input type="checkbox" name="box" checked disabled><br>
                                 <input type="hidden" name="consult_id" value={{ consultation.cnslt_id }}>
                             {% else %}
-                                Consultation: <input type="checkbox" name="box" ><br>
+                                Start Time: {{ times[loop.index0].time_st }}<br>
+                                End Time: {{ times[loop.index0].time_end }}<br>
+                                Approved: <input type="checkbox" name="box" ><br>
                                 <input type="hidden" name="consult_id" value={{ consultation.cnslt_id }}>
                             {% endif %}
                         </p>

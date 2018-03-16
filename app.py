@@ -449,13 +449,15 @@ def savePaginateAnswers():
 
 
 @app.route('/staffconsultations')
-@roles_required('staff')
+@roles_required('user')
 def approvePayments():
     consultations = querydb.getDescendingConsultations()
     children = []
+    times = []
     for c in consultations:
         children.append(querydb.getChildNameFromID(c.child))
-    return render_template('staffconsultations.html', children=children, consultations=consultations)
+        times.append(querydb.getConsultationTime(c.cnslt_id))
+    return render_template('staffconsultations.html', children=children, consultations=consultations, times=times)
 
 
 @app.route('/staffconsultations/approvals', methods=['POST'])
@@ -465,7 +467,6 @@ def getPaymentChanges():
     for i, b in enumerate(boxes):
         if b == 'on':
             querydb.markConsultApproved(consultations[i])
-            print('Got here!')
     return redirect(url_for('index'))
 
 # End Brody
