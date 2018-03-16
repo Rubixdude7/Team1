@@ -535,18 +535,22 @@ class query(object):
                     slots.append({
                         'psyc_id': a['psyc_id'],
                         'st': st,
-                        'end': end
+                        'end': end,
+                        'valid': True # For pruning later
                     })
 
         # Now the tough part -- cut out all the appointments and vacations
         cnslt_list = self.getConsultations()
         for cnslt in cnslt_list:
             for slot in slots:
-                if slot['psyc_id'] == cnslt['psyc_id']:
+                if slot['valid'] and slot['psyc_id'] == cnslt['psyc_id']:
                     # Does this consultation cut into this slot?
                     if slot['st'] < cnslt['time_end'] and slot['end'] > cnslt['time_st']:
                         # Yes. The question is: in what WAY does it cut it?
-                        if cnslt['time_st'] <= slot['st'] and cnslt['time_end'] < slot['end']:
+                        if cnslt['time_st'] <= slot['st'] and cnslt['time_end'] >= slot['end']:
+                            # It eats the whole thing?
+                            slot['valid'] = False
+                        elif cnslt['time_st'] <= slot['st'] and cnslt['time_end'] < slot['end']:
                             # It just bites off a piece on the left?
                             slot['st'] = cnslt['time_end']
                         elif cnslt['time_st'] > slot['st'] and cnslt['time_end'] >= slot['end']:
@@ -554,8 +558,12 @@ class query(object):
                             slot['end'] = cnslt['time_st']
                         elif cnslt['time_st'] > slot['st'] and cnslt['time_end'] < slot['end']:
                             # It bites off the middle?
-                            slots.append({'psyc_id': slot['psyc_id'], 'st': cnslt['time_end'], 'end': slot['end']})
+                            slots.append({'psyc_id': slot['psyc_id'], 'st': cnslt['time_end'], 'end': slot['end'], 'valid': True})
                             slot['end'] = cnslt['time_st']
+
+        slots = list(filter(lambda s: s['valid'], slots))
+        for s in slots:
+            del s['valid']
 
         for slot in slots:
             slot['st'] = {
