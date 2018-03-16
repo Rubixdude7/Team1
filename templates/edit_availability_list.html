@@ -13,7 +13,7 @@
 <main id="your-availability-list">
     <div class="box">
         
-        <p class="pull-left"><a href="{{ url_for('add_availability') }}"><i class="fa fa-plus"></i> Add Availability</a></p>
+        <p class="pull-left btn btn-success"><a href="{{ url_for('add_availability') }}" style="text-decoration: none"><i class="fa fa-plus"></i> Add Availability</a></p>
         <p class="pull-right">
             <a href="{{ url_for('edit_availability_list', page=page-1) }}"><i class="fa fa-arrow-left"></i><span class="sr-only">Previous Page</span></a>
             <a href="{{ url_for('edit_availability_list', page=page+1) }}"><span class="sr-only">Next Page</span><i class="fa fa-arrow-right"></i></a>

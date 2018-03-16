@@ -345,6 +345,10 @@ class query(object):
 
         return cloudinary.CloudinaryImage(public_id, version=version).build_url()
 
+    def allowed_file(self, filename):
+        return '.' in filename and \
+               filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
+
     def updateAvatar(self, psyc_id, avatar_file):
         if not self.allowed_file(avatar_file.filename):
             return False
@@ -683,8 +687,11 @@ class query(object):
     def postConsult(self, child_id):
         try:
             end = db.consultation.select(db.consult_time.time_end).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()[0]
+            print('getting end')
             if end is not None:
                 l = list(end)[0]
+
+                print('in end if')
 
                 print(l)
 

@@ -16,14 +16,16 @@
             </div>
             <div class="form-control-2">
                 <label for="weekday">Weekday</label><br />
-                <select name="weekday" required="required">
-                    {% for wkd in ['su', 'm', 't', 'w', 'th', 'f', 's'] %}
-                        <option value="{{ wkd }}">{{ weekdays[wkd] }}</option>
-                    {% endfor %}
-                </select>
+                <div class="select">
+                    <select name="weekday" required="required">
+                        {% for wkd in ['su', 'm', 't', 'w', 'th', 'f', 's'] %}
+                            <option value="{{ wkd }}">{{ weekdays[wkd] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
             <div class="form-control-2">
-                <button type="submit"><i class="fa fa-plus" aria-hidden="true"></i> Add Availability Time</button>
+                <button class="btn btn-success" type="submit"><i class="fa fa-plus" aria-hidden="true"></i> Add Availability Time</button>
             </div>
         </form>
     </div>
