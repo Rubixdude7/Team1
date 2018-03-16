@@ -219,7 +219,8 @@ input:checked + .btn-outline-info {
   border-color: #28a745;
 }
 
-.btn-outline-success:hover {
+.btn-outline-success:hover,
+input:checked + .btn-outline-success {
   color: #fff;
   background-color: #28a745;
   border-color: #28a745;
@@ -1250,6 +1251,13 @@ body > div {
   opacity: 0;
   transition: .5s ease-in-out;
   margin: 1em;
+  display: flex;
+  justify-content: space-between;
+}
+
+.book-dtls div {
+  display: flex;
+  align-items: center;
 }
 
 .book-dtls label {
@@ -1271,14 +1279,15 @@ body > div {
   margin: .5em;
 }
 
+.book-psyc div {
+  display: flex;
+  justify-content: space-between;
+}
+
 .book-psyc h5 {
   display: inline-block;
   padding: 0;
   margin: 0;
-}
-
-.book-psyc label {
-  float: right;
 }
 
 .book-len {

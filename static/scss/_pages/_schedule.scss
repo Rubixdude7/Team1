@@ -93,6 +93,13 @@
   //z-index: 10;
   transition: .5s ease-in-out;
   margin: 1em;
+  display: flex;
+  justify-content: space-between;
+
+  div{
+    display: flex;
+    align-items: center;
+  }
 
   label{
     font-weight: bold;
@@ -114,16 +121,17 @@
 .book-psyc{
   margin: .5em;
 
+  div{
+    display: flex;
+    justify-content: space-between;
+  }
+
+
   h5{
     display: inline-block;
     padding: 0;
     margin: 0;
   }
-
-  label{
-    float: right;
-  }
-
 
 }
 
