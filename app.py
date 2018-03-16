@@ -448,26 +448,33 @@ def savePaginateAnswers():
           querydb.addQuestionAnswers(q, current_user.id, q2, childId)
 
 
-@app.route('/staffconsultations')
+@app.route('/staffconsultations', methods=['GET', 'POST'])
 @roles_required('user')
 def approvePayments():
     consultations = querydb.getDescendingConsultations()
     children = []
     times = []
     for c in consultations:
+        print("Consultation ID: ", c.cnslt_id)
         children.append(querydb.getChildNameFromID(c.child))
         times.append(querydb.getConsultationTime(c.cnslt_id))
     return render_template('staffconsultations.html', children=children, consultations=consultations, times=times)
 
 
-@app.route('/staffconsultations/approvals', methods=['POST'])
+@app.route('/staffconsultations/approvals', methods=['GET', 'POST'])
 def getPaymentChanges():
-    boxes = request.form.getlist('box')
+    boxes = request.form.getlist('check')
     consultations = request.form.getlist('consult_id')
+    print("Boxes: ", boxes)
+    print("Consultations: ", consultations)
     for i, b in enumerate(boxes):
+        print("B: ", b)
+        print("I: ", i)
+        print("Consult ID: ", consultations[i])
         if b == 'on':
+            print("Marking paid: ", consultations[i])
             querydb.markConsultApproved(consultations[i])
-    return redirect(url_for('index'))
+    return index()
 
 # End Brody
 
