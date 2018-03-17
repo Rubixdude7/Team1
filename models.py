@@ -162,7 +162,7 @@ class question_answers(MySQLModel):
     q = ForeignKeyField(questions, to_field="q_id")
     answer = CharField()
     qa_crea_dtm = DateTimeField()
-    qa_upd_dtm = DateTimeField(null=True)
+    qa_upt_dtm = DateTimeField()
     void_ind = CharField()
 
     class Meta:
