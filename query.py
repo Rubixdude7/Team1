@@ -68,6 +68,12 @@ class query(object):
         return questionsUpdated
 
     def addQuestionAnswers(self, questionAnswer, user, q_id, childId):
+
+        print("EG")
+        print(questionAnswer)
+        print(user)
+        print(q_id)
+        print(childId)
         # Begin Brody
         '''
             This should now prevent additional rows from being
@@ -75,13 +81,21 @@ class query(object):
         '''
         alreadyExists = query.getAnswer(self, q_id, childId)
         if alreadyExists is None:
+            print(alreadyExists)
+            print("GIG")
             # Begin Jared
             current = db.child.get(db.child.child_id == childId)
-            current.q_comp_dtm = None
-            current.save()
+            print(current)
 
-            q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(), q=q_id,
+            current.save()
+            print("testing")
+            print("ans", questionAnswer)
+            print("q_id", q_id)
+            print("child", childId)
+            print("qacreatedtn", datetime.datetime.now())
+            q = db.question_answers(answer=questionAnswer, qa_crea_dtm=datetime.datetime.now(), q=q_id,
                                     child=childId, void_ind='n')
+            print("be", q)
             q.save()
             # End Jared
         elif alreadyExists == questionAnswer:
@@ -91,7 +105,7 @@ class query(object):
             query.voidAnswer(self, q_id, childId)
             # Begin Jared
             current = db.child.get(db.child.child_id == childId)
-            current.q_comp_dtm = None
+
             current.save()
 
             q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(),
@@ -151,7 +165,7 @@ class query(object):
     def getAnswer(self, question_id, child_id):
         try:
             a = db.question_answers.get(db.question_answers.q == question_id, db.question_answers.child == child_id, db.question_answers.void_ind == 'n')
-            print(a.answer)
+            print("ABSWE", a.answer)
             return a.answer
         except:
             return None

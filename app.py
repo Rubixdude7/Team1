@@ -257,7 +257,9 @@ def questionsUserView():
     questions = querydb.getAllQuestionsForUsers()
     # Brody code
     answers = []
+    print("big")
     for q in questions:
+        print(q)
         answers.append(querydb.getAnswer(q.q_id, child_id))
     # end Brody code
     if totalQuestions is None:
@@ -300,16 +302,15 @@ def questionsUserView2():  # post QuestionUserView
     # End Brody code
 
     questionAnswerList = request.form.getlist('fname')
-
+    print(questionAnswerList)
     questionIdList = request.form.getlist('qField')
     childId = request.form.get('cField')
-
+    print(questionIdList)
     # Brody says: q = answer, q2 = questionId
     for (q, q2) in zip(questionAnswerList, questionIdList):
         # lack of this if was causing false "completed" question forms
         if q is not '':
             querydb.addQuestionAnswers(q, current_user.id, q2, childId)
-
     if page == totalPage:
         querydb.checkComp(child_id)
         return redirect(url_for('parent'))
