@@ -299,7 +299,7 @@ def create_tables_and_seed_if_necessary():
         for name in roles_needed:
             role.create(role_nm=name)
         
-        # If there are no users, make a default admin
+        # If there are no users, make default users for each role
         if user.select().count() == 0:
             admin = user.create(username='PassionAdmin',
                                 password='$2b$12$WGvSy4WqRbMogeSQBzQt8uMzLIfPm0swohryo469ShterBWJTk5SK',
@@ -312,3 +312,39 @@ def create_tables_and_seed_if_necessary():
             # Give them the admin role
             admin_role = role.select().where(role.role_nm == 'admin').get()
             user_roles.create(user=admin.user_id, role=admin_role.role_id)
+            
+            staff = user.create(username='PassionStaff',
+                                password='$2b$12$WGvSy4WqRbMogeSQBzQt8uMzLIfPm0swohryo469ShterBWJTk5SK',
+                                email='passion.kon.psi@gmail.com',
+                                confirmed_at=datetime.datetime.now(),
+                                active=1,
+                                first_name='Passion',
+                                last_name='Staff')
+            
+            # Give them the admin role
+            staff_role = role.select().where(role.role_nm == 'staff').get()
+            user_roles.create(user=staff.user_id, role=staff_role.role_id)
+            
+            psyc = user.create(username='PassionPsyc',
+                               password='$2b$12$WGvSy4WqRbMogeSQBzQt8uMzLIfPm0swohryo469ShterBWJTk5SK',
+                               email='passion.kon.psi@gmail.com',
+                               confirmed_at=datetime.datetime.now(),
+                               active=1,
+                               first_name='Passion',
+                               last_name='Psyc')
+            
+            # Give them the admin role
+            psyc_role = role.select().where(role.role_nm == 'psyc').get()
+            user_roles.create(user=psyc.user_id, role=psyc_role.role_id)
+            
+            u = user.create(username='PassionUser',
+                            password='$2b$12$WGvSy4WqRbMogeSQBzQt8uMzLIfPm0swohryo469ShterBWJTk5SK',
+                            email='passion.kon.psi@gmail.com',
+                            confirmed_at=datetime.datetime.now(),
+                            active=1,
+                            first_name='Passion',
+                            last_name='User')
+            
+            # Give them the admin role
+            u_role = role.select().where(role.role_nm == 'user').get()
+            user_roles.create(user=u.user_id, role=u_role.role_id)
