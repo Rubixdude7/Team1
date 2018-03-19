@@ -28,6 +28,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
 # DEV Jason's database
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://mgqmsvhuvgtovyte:Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU@42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com/db42576e98688b4ab28226a87601334c89'
+# DEV sqlite (local)
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local.db'
 # Production Brandon's databasee
 app.config[
     'SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d'
@@ -109,7 +111,7 @@ querydb = query.query()
 def _db_connect():
     if models.db.is_closed():
         models.db.connect()
-
+        models.create_tables_and_seed_if_necessary()
 
 # This hook ensures that the connection is closed when we've finished
 # processing the request.
@@ -654,6 +656,11 @@ def api_availabilities():
     avails = querydb.getAvailabilities(psyc_id)
     return jsonify(avails)
 
+@app.route('/api/blog/<psyc_id>')
+def api_blog(psyc_id):
+    page_num = int(request.args['page_num'])
+    page_size = int(request.args['page_size'])
+    return jsonify(querydb.apiBlog(psyc_id, page_num, page_size))
 
 @app.route('/my_psikolog_page')
 @roles_required('psyc')

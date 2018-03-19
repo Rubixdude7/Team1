@@ -1,3 +1,4 @@
+import datetime
 from peewee import *
 
 __author__ = "Brandon Duke"
@@ -12,12 +13,17 @@ Contains classes that are models for tables in the database
 """
 
 """ the database connection string """
+allow_auto_seed = False
+
 # DEV Jason's
 #db = MySQLDatabase("db42576e98688b4ab28226a87601334c89", host="42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com", port=3306, user="mgqmsvhuvgtovyte", passwd="Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU")
 
+# DEV2 sqlite (local)
+#db = SqliteDatabase("local.db")
+#allow_auto_seed = True
+
 # Production Brandon's
 db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d", host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh", passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
-
 
 class MySQLModel(Model):
     """A base model that will use our MySQL database"""
@@ -241,3 +247,68 @@ class slider(MySQLModel):
 
     class Meta:
         db_table = "slider"
+
+
+MODELS = [blog,
+          calendar,
+          child,
+          consult_time,
+          consultation,
+          consultation_fee,
+          consultation_length,
+          contact,
+          day_typ_cd,
+          notes,
+          psychologist,
+          psychologist_child_xref,
+          question_answers,
+          questions,
+          review,
+          role,
+          user,
+          user_roles]
+
+# This function does nothing if the db is already populated.
+def create_tables_and_seed_if_necessary():
+    if allow_auto_seed:
+        db.create_tables(MODELS, safe=True)
+        
+        # Figure out which day_typ_cd entities we need
+        dtc_needed = {
+            'm': 'Senin',
+            't': 'Selasa',
+            'w': 'Rabu',
+            'th': 'Kamis',
+            'f': 'Jumat',
+            's': 'Sabtu',
+            'su': 'Minggu'
+        }
+        for dtc in day_typ_cd.select():
+            if dtc.day_typ_cd in dtc_needed:
+                del dtc_needed[dtc.day_typ_cd]
+                
+        # Make them
+        for k, v in dtc_needed.items():
+            day_typ_cd.create(day_typ_cd=k, day=v)
+        
+        # Same thing for roles
+        roles_needed = [ 'admin', 'staff', 'psyc', 'user' ]
+        for r in role.select():
+            if r.role_nm in roles_needed:
+                roles_needed.remove(r.role_nm)
+        for name in roles_needed:
+            role.create(role_nm=name)
+        
+        # If there are no users, make a default admin
+        if user.select().count() == 0:
+            admin = user.create(username='PassionAdmin',
+                                password='$2b$12$WGvSy4WqRbMogeSQBzQt8uMzLIfPm0swohryo469ShterBWJTk5SK',
+                                email='passion.kon.psi@gmail.com',
+                                confirmed_at=datetime.datetime.now(),
+                                active=1,
+                                first_name='Passion',
+                                last_name='Admin')
+            
+            # Give them the admin role
+            admin_role = role.select().where(role.role_nm == 'admin').get()
+            user_roles.create(user=admin.user_id, role=admin_role.role_id)
