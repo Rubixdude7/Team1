@@ -19,11 +19,11 @@ allow_auto_seed = False
 #db = MySQLDatabase("db42576e98688b4ab28226a87601334c89", host="42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com", port=3306, user="mgqmsvhuvgtovyte", passwd="Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU")
 
 # DEV2 sqlite (local)
-#db = SqliteDatabase("local.db")
-#allow_auto_seed = True
+db = SqliteDatabase("local.db")
+allow_auto_seed = True
 
 # Production Brandon's
-db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d", host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh", passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
+#db = MySQLDatabase("db9a6e80b2e34b41f3bd8da871003e804d", host="9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com", port=3306, user="bgrwfoetjnrliplh", passwd="GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw")
 
 class MySQLModel(Model):
     """A base model that will use our MySQL database"""
@@ -321,7 +321,7 @@ def create_tables_and_seed_if_necessary():
                                 first_name='Passion',
                                 last_name='Staff')
             
-            # Give them the admin role
+            # Give them the staff role
             staff_role = role.select().where(role.role_nm == 'staff').get()
             user_roles.create(user=staff.user_id, role=staff_role.role_id)
             
@@ -333,9 +333,12 @@ def create_tables_and_seed_if_necessary():
                                first_name='Passion',
                                last_name='Psyc')
             
-            # Give them the admin role
+            # Give them the psyc role
             psyc_role = role.select().where(role.role_nm == 'psyc').get()
             user_roles.create(user=psyc.user_id, role=psyc_role.role_id)
+            
+            # Add a psychologist entity for them too
+            psychologist.create(user=psyc.user_id, photo='', qualifications='A good psychologist.')
             
             u = user.create(username='PassionUser',
                             password='$2b$12$WGvSy4WqRbMogeSQBzQt8uMzLIfPm0swohryo469ShterBWJTk5SK',
@@ -345,6 +348,6 @@ def create_tables_and_seed_if_necessary():
                             first_name='Passion',
                             last_name='User')
             
-            # Give them the admin role
+            # Give them the user role
             u_role = role.select().where(role.role_nm == 'user').get()
             user_roles.create(user=u.user_id, role=u_role.role_id)
