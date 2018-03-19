@@ -1,5 +1,45 @@
 {% extends "base.html" %}
+
 {% block title %}Home{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript" src="/static/scripts/pagination.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var blog = $('#blog');
+            
+            $('#pagination').pagination({
+                dataSource: '/api/blog/all',
+                locator: 'posts',
+                pageSize: 3,
+                totalNumberLocator: function(response) {
+                    return response.total;
+                },
+                alias: {
+                    pageNumber: 'page_num',
+                    pageSize: 'page_size'
+                },
+                callback: function(data, pagination) {
+                    var html = '';
+                    
+                    for (var i = 0; i < data.length; i++) {
+                        var post = data[i];
+                        
+                        html += '<article>';
+                        html += '<h3>' + post.subject + '</h3>';
+                        html += '<p class="blog-date">posted ' + post.date_posted + '</p>';
+                        html += '<p>' + post.text + '</p>';
+                        html += '</article>';
+                    }
+                    
+                    blog.html(html);
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
 {% block content %}
 <main id="mainHome">
 
@@ -21,28 +61,16 @@
     -->
     
     <div class="box">
-        <ul class="pagination">
-            {% if page_num > 1 %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('index', page_num=page_num - 1) }}">Previous Page</a>
-                </li>
-            {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link" href="#">Previous Page</a>
-                </li>
-            {% endif %}
-            <li class="page-item">
-                <a class="page-link" href="{{ url_for('index', page_num=page_num + 1) }}">Next Page</a>
-            </li>
-        </ul>
-        <div class="blog">
-            {% for post in blog_posts %}
-                <article>
-                    <h3>{{ post['title'] }}</h3>
-                    <p class="blog-date">posted {{ post['date_posted'] }} by <a href="{{ url_for('psikolog', id=post['psyc_id']) }}">{{ post['author'] }}</a></p>
-                    <p>{{ post['contents'] }}</p>
-                </article>
-            {% endfor %}
+        <div id="pagination" class="pagination">
+        </div>
+        <div id="blog" class="blog">
+            {#
+            <article>
+                <h3>{{ post['title'] }}</h3>
+                <p class="blog-date">posted {{ post['date_posted'] }} by <a href="{{ url_for('psikolog', id=post['psyc_id']) }}">{{ post['author'] }}</a></p>
+                <p>{{ post['contents'] }}</p>
+            </article>
+            #}
         </div>
     </div>
 </main>

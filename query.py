@@ -404,6 +404,37 @@ class query(object):
         psyc = db.psychologist.select().where(db.psychologist.psyc_id == psyc_id).get()
         psyc.qualifications = qualifications
         psyc.save()
+        
+    def apiBlog(self, psyc_id, page_num, page_size):
+        # Limit api calls to fetch a max of 20 pages
+        if page_size > 20:
+            page_size = 20
+        
+        # Check whether the caller wants a specific psychologist
+        psyc_cond = None
+        if psyc_id == 'all':
+            psyc_cond = db.psychologist.psyc_id.is_null(False)
+        else:
+            psyc_cond = db.psychologist.psyc_id == int(psyc_id)
+        
+        # Perform the query
+        query = db.blog.select(db.blog.psyc.alias('psyc_id'), db.blog.crea_dtm, db.blog.subject, db.blog.text)\
+                       .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
+                       .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                       .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
+                       .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
+                       .where(db.user.active & (db.role.role_nm == 'psyc') & (db.blog.void_ind == 'n') & psyc_cond)\
+                       .order_by(db.blog.crea_dtm.desc())
+        
+        return {
+            'total': query.count(),
+            'posts': [{
+                'psyc_id': post.psyc_id,
+                'date_posted': post.crea_dtm,
+                'subject': post.subject,
+                'text': post.text
+            } for post in query.paginate(page_num, page_size)]
+        }
 
     def addPsychologistIfNotExist(self, u_id):
         # Check if user already has psychologist row
