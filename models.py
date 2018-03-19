@@ -46,7 +46,7 @@ class child(MySQLModel):
     child_nm_fst = CharField()
     child_nm_lst = CharField(null=True)
     child_dob = DateTimeField()
-    q_comp_dtm = DateTimeField()
+    q_comp_dtm = DateTimeField(null=True)
 
     class Meta:
         db_table = "child"
@@ -103,7 +103,7 @@ class consult_time(MySQLModel):
     psyc = ForeignKeyField(psychologist, to_field="psyc_id")
     time_st = DateTimeField()
     time_end = DateTimeField()
-    approved = CharField()
+    approved = CharField(null=True)
 
     class Meta:
         db_table = "consult_time"
@@ -115,8 +115,8 @@ class notes(MySQLModel):
     note = CharField()
     user_id_crea = BigIntegerField()
     crea_dtm = DateTimeField()
-    user_id_upd = BigIntegerField()
-    updt_dtm = DateTimeField()
+    user_id_upd = BigIntegerField(null=True)
+    updt_dtm = DateTimeField(null=True)
     void_ind = CharField()
 
     class Meta:
@@ -147,8 +147,8 @@ class questions(MySQLModel):
     question = CharField()
     user_id_crea = BigIntegerField()
     crea_dtm = DateTimeField()
-    user_id_upd = BigIntegerField()
-    upd_dtm = DateTimeField()
+    user_id_upd = BigIntegerField(null=True)
+    upd_dtm = DateTimeField(null=True)
     active = CharField()
     void_ind = CharField()
 
@@ -162,7 +162,7 @@ class question_answers(MySQLModel):
     q = ForeignKeyField(questions, to_field="q_id")
     answer = CharField()
     qa_crea_dtm = DateTimeField()
-    qa_upt_dtm = DateTimeField()
+    qa_upt_dtm = DateTimeField(null=True)
     void_ind = CharField()
 
     class Meta:
@@ -175,8 +175,8 @@ class blog(MySQLModel):
     subject = CharField()
     text = CharField()
     crea_dtm = DateTimeField()
-    user_id_upd = BigIntegerField()
-    updt_dtm = DateTimeField()
+    user_id_upd = BigIntegerField(null=True)
+    updt_dtm = DateTimeField(null=True)
     void_ind = CharField()
 
     class Meta:
