@@ -1,7 +1,12 @@
-.paginationjs-pages ul {
-    margin: 0;
-    padding: 0;
-    text-align: center;
+.paginationjs {
+    margin: auto;
+}
+
+.paginationjs-pages {
+    ul {
+        margin: 0;
+        padding: 0;
+    }
     
     li {
         list-style-type: none;

@@ -20,6 +20,10 @@
                     pageNumber: 'page_num',
                     pageSize: 'page_size'
                 },
+                beforeRender: function(isForced) {
+                    // Insert a spinner
+                    blog.html('<div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>');
+                },
                 callback: function(data, pagination) {
                     var html = '';
                     
