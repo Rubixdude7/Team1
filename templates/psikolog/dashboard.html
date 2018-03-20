@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Parent Profile{% endblock %}
+{% block content %}
+<main>
+    <div class="flex">
+        <div class="side-column">
+            <div class="box">
+                <p><img src="{{ avatar_url }}" style="width:100%"></p>
+                <a href="{{ url_for('change_avatar') }}" class="btn btn-outline-info"><i class="fas fa-image" aria-hidden="true"></i> Change Your Picture</a>
+            </div>
+        </div>
+        <div class="main-column">
+            <div class="box">
+                <h1 class="title">Dashboard</h1>
+                <hr>
+                
+                <p>Bio: {{ psyc_info.qualifications }} <a href="{{ url_for('edit_qualifications') }}" class="btn btn-outline-info"><i class="fas fa-edit"></i> Edit</a></p>
+            </div>
+            <div class="box">
+                <h3>Blog Editor</h3>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+
+{% endblock %}

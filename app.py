@@ -709,6 +709,13 @@ def psikolog(id=None):
     # In both cases, show a list of psychologists.
     return render_template('list_psikolog.html', psychologist_links=querydb.psychologistLinks())
 
+@app.route('/psikolog/dashboard')
+@roles_required('psyc')
+def psikolog_dashboard():
+    psyc_id = querydb.getPsycId(current_user.id)
+    psyc_info = querydb.lookupPsychologist(psyc_id)
+    avatar_url = querydb.getAvatar(psyc_id)
+    return render_template('psikolog/dashboard.html', psyc_info=psyc_info, avatar_url=avatar_url)
 
 @app.route('/psikolog/<int:psyc_id>/<int:year>/<int:month>/<int:day>')
 def view_day(psyc_id, year, month, day):
@@ -740,7 +747,7 @@ def change_avatar():
         psyc_id = querydb.getPsycId(current_user.id)
         querydb.updateAvatar(psyc_id, request.files['avatar'])
         flash('Avatar updated.')
-        return redirect(url_for('psikolog', id=psyc_id))
+        return redirect(url_for('psikolog_dashboard'))
 
 
 @app.route('/psikolog/edit_qualifications', methods=['GET', 'POST'])
@@ -752,7 +759,7 @@ def edit_qualifications():
         psyc_id = querydb.getPsycId(current_user.id)
         querydb.updateQualifications(psyc_id, request.form['qualifications'])
         flash('Qualifications updated.')
-        return redirect(url_for('psikolog', id=psyc_id))
+        return redirect(url_for('psikolog_dashboard'))
 
 
 @app.route('/psikolog/edit_availability_list')

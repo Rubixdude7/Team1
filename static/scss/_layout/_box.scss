@@ -269,3 +269,29 @@ img.avatar {
     display: flex;
   }
 }
+
+/* Columns */
+.flex {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.side-column {
+    margin: 0 0.5em;
+    flex: 1;
+}
+
+.main-column {
+    margin: 0 0.5em;
+    flex: 1.615;
+}
+
+@media only screen and (max-width: 749) {
+    .side-column {
+        width: 100%;
+    }
+    
+    .main-column {
+        width: 100%;
+    }
+}
