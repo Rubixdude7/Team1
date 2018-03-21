@@ -735,7 +735,7 @@ def write_blog_post():
         psyc_id = querydb.getPsycId(current_user.id)
         querydb.createBlogPost(current_user.id, psyc_id, subject, text)
         flash('Your blog post has been published.')
-        return redirect(url_for('psikolog', id=psyc_id))
+        return redirect(url_for('psikolog_dashboard'))
 
 
 @app.route('/psikolog/change_avatar', methods=['GET', 'POST'])
@@ -804,6 +804,25 @@ def add_availability():
 
         return redirect(url_for('edit_availability_list'))
 
+@app.route('/psikolog/edit_blog_post/<int:blog_id>', methods=['GET', 'POST'])
+@roles_required('psyc')
+def edit_blog_post(blog_id):
+    psyc_id = querydb.getPsycId(current_user.id)
+    
+    if request.method == 'GET':
+        post = querydb.getBlogPost(blog_id)
+        if post.psyc.psyc_id != psyc_id:
+            flash('You do not own that blog post.', 'error')
+            return redirect(url_for('psikolog_dashboard'))
+        
+        return render_template('psikolog/edit_blog_post.html', post=post)
+    else:
+        subject = request.form['subject']
+        text = request.form['text']
+        
+        querydb.updateBlogPost(blog_id, current_user.id, psyc_id, subject, text)
+        flash('Successfully updated blog post.')
+        return redirect(url_for('psikolog_dashboard'))
 
 @app.route('/psikolog/edit_availability/<int:avail_id>', methods=['GET', 'POST'])
 @roles_required('psyc')

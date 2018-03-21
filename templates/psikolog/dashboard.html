@@ -5,8 +5,12 @@
 {% block head %}
     {{ super() }}
     <script type="text/javascript" src="/static/scripts/pagination.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.14/moment-timezone-with-data.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
+            moment.locale('id'); // Switch to Indonesian locale
+            
             var blog = $('#blog-list');
             
             $('#blog-pagination').pagination({
@@ -32,9 +36,9 @@
                         
                         html += '<tr>';
                         html += '<td>' + post.subject + '</td>';
-                        html += '<td>' + post.date_posted + '</td>';
+                        html += '<td>' + moment.tz(post.date_posted, 'Asia/Jakarta').format('LLL (z)') + '</td>';
                         html += '<td>';
-                        html += '<a href="#"><i class="fas fa-edit" aria-hidden="true"></i><span class="sr-only">Edit</span></a>';
+                        html += '<a href="/psikolog/edit_blog_post/' + post.blog_id.toString() + '"><i class="fas fa-edit" aria-hidden="true"></i><span class="sr-only">Edit</span></a>';
                         html += '</td>';
                         html += '</li>';
                     }

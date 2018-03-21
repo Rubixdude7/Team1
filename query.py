@@ -399,6 +399,21 @@ class query(object):
                             updt_dtm=now,
                             void_ind='n')
         blog_post.save()
+    
+    def getBlogPost(self, blog_id):
+        post = db.blog.select().where((db.blog.blog_id == blog_id) & (db.blog.void_ind == 'n')).get()
+        return post
+
+    def updateBlogPost(self, blog_id, u_id, psyc_id, subject, text):
+        text = bleach.clean(text, tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', u'p'])
+        now = datetime.datetime.now()
+        
+        blog_post = db.blog.select().where((db.blog.void_ind == 'n') & (db.blog.blog_id == blog_id) & (db.blog.psyc == psyc_id)).get()
+        blog_post.subject = subject
+        blog_post.text = text
+        blog_post.user_id_upd = u_id
+        blog_post.updt_dtm = now
+        blog_post.save()
 
     def updateQualifications(self, psyc_id, qualifications):
         psyc = db.psychologist.select().where(db.psychologist.psyc_id == psyc_id).get()
