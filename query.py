@@ -414,6 +414,11 @@ class query(object):
         blog_post.user_id_upd = u_id
         blog_post.updt_dtm = now
         blog_post.save()
+    
+    def deleteBlogPost(self, blog_id, psyc_id):
+        blog_post = db.blog.select().where((db.blog.void_ind == 'n') & (db.blog.blog_id == blog_id) & (db.blog.psyc == psyc_id)).get()
+        blog_post.void_ind = 'y'
+        blog_post.save()
 
     def updateQualifications(self, psyc_id, qualifications):
         psyc = db.psychologist.select().where(db.psychologist.psyc_id == psyc_id).get()

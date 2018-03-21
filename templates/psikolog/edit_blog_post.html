@@ -15,8 +15,11 @@
         toolbar: 'undo redo | bold italic | link unlink'
     });
 </script>
-<main id="psyc-page">
+<main id="edit-blog">
     <div class="box">
+        <h1 class="title">Editing "{{ post.subject }}"</h1>
+        <hr>
+        <p class="right"><button class="btn btn-danger" onclick="$('#overlay-checkbox').prop('checked', true);"><i class="fas fa-trash" aria-hidden="true"></i> Delete This Blog Post</button></p>
         <form action="{{ url_for('edit_blog_post', blog_id=post.blog_id) }}" method="post" enctype="multipart/form-data">
             <div class="form-control-1">
                 <label for="subject">Subject</label><br />
@@ -28,6 +31,23 @@
             </div>
             <button type="submit"><i class="fas fa-save" aria-hidden="true"></i> Save Changes</button>
         </form>
+    </div>
+    
+
+    <input type="checkbox" id="overlay-checkbox">
+    <div class="overlay">
+        <div class="popup">
+            <div class="popup-title">
+                <h2>Delete This Blog Post?</h2>
+                <hr>
+                <label for="overlay-checkbox" class="close">&times;</label>
+            </div>
+            <div class="popup-contents">
+                <p>Do you really want to delete this blog post?</p>
+                <a href="{{ url_for('delete_blog_post', blog_id=post.blog_id) }}" class="btn btn-danger"><i class="fas fa-trash" aria-hidden="true"></i> Yes, Delete It</a>
+                <button class="btn btn-outline-info" onclick="$('#overlay-checkbox').prop('checked', false);"><i class="fas fa-ban" aria-hidden="true"></i> Cancel</button>
+            </div>
+        </div>
     </div>
 </main>
 {% endblock %}

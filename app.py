@@ -737,6 +737,13 @@ def write_blog_post():
         flash('Your blog post has been published.')
         return redirect(url_for('psikolog_dashboard'))
 
+@app.route('/psikolog/delete_blog_post/<int:blog_id>')
+@roles_required('psyc')
+def delete_blog_post(blog_id):
+    psyc_id = querydb.getPsycId(current_user.id)
+    querydb.deleteBlogPost(blog_id, psyc_id)
+    flash('Blog post successfully deleted.')
+    return redirect(url_for('psikolog_dashboard'))
 
 @app.route('/psikolog/change_avatar', methods=['GET', 'POST'])
 @roles_required('psyc')
