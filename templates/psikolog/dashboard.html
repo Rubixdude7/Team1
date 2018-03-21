@@ -1,5 +1,49 @@
 {% extends "base.html" %}
+
 {% block title %}Parent Profile{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript" src="/static/scripts/pagination.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var blog = $('#blog-list');
+            
+            $('#blog-pagination').pagination({
+                dataSource: '/api/blog/{{ psyc_info.psyc_id }}',
+                locator: 'posts',
+                pageSize: 10,
+                totalNumberLocator: function(response) {
+                    return response.total;
+                },
+                alias: {
+                    pageNumber: 'page_num',
+                    pageSize: 'page_size'
+                },
+                beforeRender: function(isForced) {
+                    // Insert a spinner
+                    blog.html('<div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>');
+                },
+                callback: function(data, pagination) {
+                    var html = '';
+                    
+                    for (var i = 0; i < data.length; i++) {
+                        var post = data[i];
+                        
+                        html += '<li>';
+                        html += post.subject;
+                        html +=' <a href="#"><i class="fas fa-edit" aria-hidden="true"></i><span class="sr-only">Edit</span></a>';
+                        html +=' <a href="#"><i class="fas fa-trash" aria-hidden="true"></i><span class="sr-only">Delete</span></a>';
+                        html += '</li>';
+                    }
+                    
+                    blog.html(html);
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
 {% block content %}
 <main>
     <div class="flex">
@@ -18,6 +62,8 @@
             </div>
             <div class="box">
                 <h3>Blog Editor</h3>
+                <div id="blog-pagination" class="pagination"></div>
+                <ul id="blog-list"></ul>
             </div>
         </div>
     </div>

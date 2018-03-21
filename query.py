@@ -418,7 +418,7 @@ class query(object):
             psyc_cond = db.psychologist.psyc_id == int(psyc_id)
         
         # Perform the query
-        query = db.blog.select(db.blog.psyc.alias('psyc_id'), db.blog.crea_dtm, db.blog.subject, db.blog.text)\
+        query = db.blog.select(db.blog.psyc.alias('psyc_id'), db.blog.blog_id, db.blog.crea_dtm, db.blog.subject, db.blog.text)\
                        .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
                        .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
                        .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
@@ -430,6 +430,7 @@ class query(object):
             'total': query.count(),
             'posts': [{
                 'psyc_id': post.psyc_id,
+                'blog_id': post.blog_id,
                 'date_posted': post.crea_dtm,
                 'subject': post.subject,
                 'text': post.text
