@@ -286,12 +286,20 @@ img.avatar {
     flex: 1.615;
 }
 
-@media only screen and (max-width: 749) {
+.flex-one {
+    flex: 1;
+}
+
+@media only screen and (max-width: 400) {
     .side-column {
         width: 100%;
     }
     
     .main-column {
+        width: 100%;
+    }
+    
+    .flex-one {
         width: 100%;
     }
 }
