@@ -58,6 +58,13 @@
                 <p><img src="{{ avatar_url }}" style="width:100%"></p>
                 <a href="{{ url_for('change_avatar') }}" class="btn btn-outline-info"><i class="fas fa-image" aria-hidden="true"></i> Change Your Picture</a>
             </div>
+            <div class="box">
+                <h5>Tools</h5>
+                <ul>
+                    <li><a href="{{ url_for('user.profile') }}">Account Settings</a></li>
+                    <li><a href="{{ url_for('edit_availability_list') }}">Weekly Availability</a></li>
+                </ul>
+            </div>
         </div>
         <div class="main-column">
             <div class="box">
