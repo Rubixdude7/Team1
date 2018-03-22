@@ -120,6 +120,7 @@ main {
     margin: 0; }
 
 .btn {
+  text-decoration: none;
   display: inline-block;
   font-weight: 400;
   text-align: center;
