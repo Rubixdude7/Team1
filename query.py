@@ -617,8 +617,10 @@ class query(object):
 
         slots = []
 
+        wib = pytz.timezone('Asia/Jakarta')
+        
         # Let's say the calendar is only valid up to 30 days ahead of today.
-        today = datetime.date.today()
+        today = pytz.utc.localize(datetime.datetime.utcnow()).astimezone(wib)
         for day_offset in range(31):
             day = today + datetime.timedelta(day_offset)
 
@@ -629,8 +631,8 @@ class query(object):
                 a_wkd = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
 
                 if wkd == a_wkd:
-                    st = datetime.datetime.combine(day, a['time_st'])
-                    end = datetime.datetime.combine(day, a['time_end'])
+                    st = datetime.datetime.combine(day.date(), a['time_st'], wib)
+                    end = datetime.datetime.combine(day.date(), a['time_end'], wib)
 
                     # Add this availability to the result
                     slots.append({
