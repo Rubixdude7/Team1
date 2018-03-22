@@ -5,9 +5,13 @@
 {% block head %}
     {{ super() }}
     <script type="text/javascript" src="/static/scripts/pagination.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.14/moment-timezone-with-data.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             var blog = $('#blog');
+            
+            moment.locale('id'); // Indonesian date locale
             
             $('#pagination').pagination({
                 dataSource: '/api/blog/all',
@@ -32,7 +36,7 @@
                         
                         html += '<article>';
                         html += '<h3>' + post.subject + '</h3>';
-                        html += '<p class="blog-date">posted ' + post.date_posted + '</p>';
+                        html += '<p class="blog-date">posted ' + moment.tz(post.date_posted, 'Asia/Jakarta').format('LLL z') + '</p>';
                         html += '<p>' + post.text + '</p>';
                         html += '</article>';
                     }
