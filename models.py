@@ -237,6 +237,15 @@ class user_roles(MySQLModel):
     class Meta:
         db_table = "user_roles"
 
+class vacation(MySQLModel):
+    vac_id = PrimaryKeyField()
+    psyc = ForeignKeyField(psychologist, to_field="psyc_id")
+    vac_st = DateTimeField()
+    vac_end = DateTimeField()
+    annual = BooleanField()
+    
+    class Meta:
+        db_table = "vacation"
 
 class slider(MySQLModel):
     slider_id = PrimaryKeyField()
@@ -266,7 +275,8 @@ MODELS = [blog,
           review,
           role,
           user,
-          user_roles]
+          user_roles,
+          vacation]
 
 # This function does nothing if the db is already populated.
 def create_tables_and_seed_if_necessary():
