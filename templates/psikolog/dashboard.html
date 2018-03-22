@@ -36,7 +36,7 @@
                         
                         html += '<tr>';
                         html += '<td>' + post.subject + '</td>';
-                        html += '<td>' + moment.tz(post.date_posted, 'Asia/Jakarta').format('LLL (z)') + '</td>';
+                        html += '<td>' + moment.tz(post.date_posted, 'Asia/Jakarta').format('LLL z') + '</td>';
                         html += '<td>';
                         html += '<a href="/psikolog/edit_blog_post/' + post.blog_id.toString() + '"><i class="fas fa-edit" aria-hidden="true"></i><span class="sr-only">Edit</span></a>';
                         html += '</td>';

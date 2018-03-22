@@ -4,6 +4,7 @@ from flask import Markup
 import bleach
 import models as db
 import datetime
+import pytz
 from peewee import *
 import cloudinary
 import cloudinary.uploader
@@ -390,7 +391,7 @@ class query(object):
 
     def createBlogPost(self, u_id, psyc_id, subject, text):
         text = bleach.clean(text, tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', u'p'])
-        now = datetime.datetime.now()
+        now = pytz.utc.localize(datetime.datetime.utcnow())
         blog_post = db.blog(psyc=psyc_id,
                             subject=subject,
                             text=text,
@@ -406,7 +407,7 @@ class query(object):
 
     def updateBlogPost(self, blog_id, u_id, psyc_id, subject, text):
         text = bleach.clean(text, tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', u'p'])
-        now = datetime.datetime.now()
+        now = pytz.utc.localize(datetime.datetime.utcnow())
         
         blog_post = db.blog.select().where((db.blog.void_ind == 'n') & (db.blog.blog_id == blog_id) & (db.blog.psyc == psyc_id)).get()
         blog_post.subject = subject

@@ -29,7 +29,8 @@
                 <label for="text">Text</label><br />
                 <textarea name="text" placeholder="The contents of your blog post go here.">{{ post.text|safe }}</textarea>
             </div>
-            <button type="submit"><i class="fas fa-save" aria-hidden="true"></i> Save Changes</button>
+            <button type="submit" class="btn btn-success"><i class="fas fa-save" aria-hidden="true"></i> Save Changes</button>
+            <a href="{{ url_for('psikolog_dashboard') }}" class="btn btn-outline-info"><i class="fas fa-ban" aria-hidden="true"></i> Cancel</a>
         </form>
     </div>
     

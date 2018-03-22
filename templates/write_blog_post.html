@@ -15,7 +15,7 @@
         toolbar: 'undo redo | bold italic | link unlink'
     });
 </script>
-<main id="psyc-page">
+<main id="write-blog-post">
     <div class="box">
         <form action="{{ url_for('write_blog_post') }}" method="post" enctype="multipart/form-data">
             <div class="form-control-1">
@@ -26,7 +26,8 @@
                 <label for="text">Text</label><br />
                 <textarea name="text" placeholder="The contents of your blog post go here."></textarea>
             </div>
-            <button type="submit"><i class="fa fa-plus" aria-hidden="true"></i> Publish</button>
+            <button type="submit" class="btn btn-success"><i class="fa fa-plus" aria-hidden="true"></i> Publish</button>
+            <a href="{{ url_for('psikolog_dashboard') }}" class="btn btn-outline-info"><i class="fas fa-ban" aria-hidden="true"></i> Cancel</a>
         </form>
     </div>
 </main>
