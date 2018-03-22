@@ -20,7 +20,7 @@ body {
   font-family: roboto;
   src: url(roboto-regular.ttf); }
 /*FONT*/
-* {
+body {
   font-family: 'roboto';
   color: #2F2F2F; }
 
