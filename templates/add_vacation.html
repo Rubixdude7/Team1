@@ -19,7 +19,7 @@
                 <div class="select">
                     <select name="vac_st_month">
                         {%- for i, name in indonesian_locale().months['format']['wide'].items() %}
-                        <option value="{{ i + 1 }}">{{ name }}</option>
+                        <option value="{{ i }}">{{ name }}</option>
                         {%- endfor %}
                     </select>
                 </div>
@@ -47,7 +47,7 @@
                 <div class="select">
                     <select name="vac_end_month">
                         {%- for i, name in indonesian_locale().months['format']['wide'].items() %}
-                        <option value="{{ i + 1 }}">{{ name }}</option>
+                        <option value="{{ i }}">{{ name }}</option>
                         {%- endfor %}
                     </select>
                 </div>

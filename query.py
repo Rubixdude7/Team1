@@ -551,6 +551,23 @@ class query(object):
             q = q.paginate(page, 20)
         
         return q
+
+    def getVacation(self, psyc_id, vac_id):
+        q = db.vacation.select()\
+                       .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.vacation.psyc)\
+                       .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                       .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                       .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
+                       .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id) & (db.vacation.vac_id == vac_id))\
+                       .get()
+        return q
+    
+    def updateVacation(self, psyc_id, vac_id, vac_st, vac_end, annual):
+        vac = getVacation(psyc_id, vac_id)
+        vac.vac_st = vac_st.replace(tzinfo=None)
+        vac.vac_end = vac_end.replace(tzinfo=None)
+        vac.annual = annual
+        vac.save()
         
     def addVacation(self, psyc_id, vac_st, vac_end, annual):
         # Turn into a naive datetime

@@ -835,6 +835,61 @@ def add_vacation():
 
         return redirect(url_for('edit_vacation_list'))
 
+@app.route('/psikolog/edit_vacation/<int:vac_id>', methods=['GET', 'POST'])
+@roles_required('psyc')
+def edit_vacation(vac_id):
+    wib = pytz.timezone('Asia/Jakarta')
+    
+    if request.method == 'GET':
+        psyc_id = querydb.getPsycId(current_user.id)
+        
+        vac = querydb.getVacation(psyc_id, vac_id)
+        
+        # Convert times to WIB timezone
+        vac = {
+            'vac_id': vac.vac_id,
+            'vac_st': pytz.utc.localize(vac.vac_st).astimezone(wib),
+            'vac_end': pytz.utc.localize(vac.vac_end).astimezone(wib)
+        }
+        
+        return render_template('edit_vacation.html',
+                               vac=vac,
+                               current_year=datetime.datetime.now().year)
+    elif request.method == 'POST':
+        psyc_id = querydb.getPsycId(current_user.id)
+        
+        vac_st_day = int(request.form['vac_st_day'], 10)
+        vac_st_month = int(request.form['vac_st_month'], 10)
+        vac_st_year = int(request.form['vac_st_year'], 10)
+        vac_st_hour, vac_st_minute = request.form['vac_st_time'].split(':')
+        vac_st_hour = int(vac_st_hour, 10)
+        vac_st_minute = int(vac_st_minute, 10)
+        vac_st = wib.localize(datetime.datetime(vac_st_year,
+                                                vac_st_month,
+                                                vac_st_day,
+                                                vac_st_hour,
+                                                vac_st_minute))
+        vac_st = vac_st.astimezone(pytz.utc)
+        
+        vac_end_day = int(request.form['vac_end_day'], 10)
+        vac_end_month = int(request.form['vac_end_month'], 10)
+        vac_end_year = int(request.form['vac_end_year'], 10)
+        vac_end_hour, vac_end_minute = request.form['vac_end_time'].split(':')
+        vac_end_hour = int(vac_end_hour, 10)
+        vac_end_minute = int(vac_end_minute, 10)
+        vac_end = wib.localize(datetime.datetime(vac_end_year,
+                                                 vac_end_month,
+                                                 vac_end_day,
+                                                 vac_end_hour,
+                                                 vac_end_minute))
+        vac_end = vac_end.astimezone(pytz.utc)
+
+        querydb.updateVacation(psyc_id, vac_id, vac_st, vac_end, False)
+
+        flash('Your vacation has been updated.')
+
+        return redirect(url_for('edit_vacation_list'))
+
 @app.route('/psikolog/edit_vacation_list')
 @app.route('/psikolog/edit_vacation_list/<int:page>')
 def edit_vacation_list(page=1):
