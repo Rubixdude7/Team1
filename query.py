@@ -535,6 +535,26 @@ class query(object):
             'end': { 'hour': t[2].hour, 'minute': t[2].minute },
             'weekday': ['m', 't', 'w', 'th', 'f', 's', 'su'].index(t[3])
         } for t in tuples]
+        
+
+    def getVacations(self, psyc_id, page=0):
+        q = db.vacation.select()\
+                       .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.vacation.psyc)\
+                       .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                       .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                       .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
+                       .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id))
+
+        if page >= 1:
+            q = q.paginate(page, 20)
+        
+        return q
+        
+    def addVacation(self, psyc_id, vac_st, vac_end, annual):
+        # Turn into a naive datetime
+        vac_st = vac_st.replace(tzinfo=None)
+        vac_end = vac_end.replace(tzinfo=None)
+        db.vacation.create(psyc=psyc_id, vac_st=vac_st, vac_end=vac_end, annual=annual)
 
     def getAllAvailabilities(self, psyc_id='all'):
         q = db.calendar.select(db.psychologist.psyc_id, db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% import "psikolog/calendar.html" as calendar %}
+
+{% block title %}Vacation Times{% endblock %}
+
+{% block content %}
+<main id="vacation-times">
+    <div class="box">
+        
+        <p class="pull-left"><a href="{{ url_for('add_vacation') }}" class="btn btn-success"><i class="fas fa-coffee"></i> Add Vacation</a></p>
+        <p class="pull-right">
+            <a href="{{ url_for('edit_vacation_list', page=page-1) }}"><i class="fas fa-arrow-left"></i><span class="sr-only">Previous Page</span></a>
+            <a href="{{ url_for('edit_vacation_list', page=page+1) }}"><span class="sr-only">Next Page</span><i class="fas fa-arrow-right"></i></a>
+        </p>
+        <div class="clear-both"></div>
+        <table border="1" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Annual?</th>
+                    <th>Controls</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vac in vac_list %}
+                <tr>
+                    <td>{{ display_datetime(vac.vac_st) }}</td>
+                    <td>{{ display_datetime(vac.vac_end) }}</td>
+                    <td>{{ vac.annual }}</td>
+                    <td>
+                        {#
+                        <a href="{{ url_for('edit_vacation', vac_id=vac['vac_id']) }}"><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">Edit</span></a>
+                        <a href="{{ url_for('delete_vacation', vac_id=vac['vac_id']) }}"><i class="fa fa-trash" aria-hidden="true"></i><span class="sr-only">Delete</span></a>
+                        #}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+{% endblock %}

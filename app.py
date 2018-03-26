@@ -1,6 +1,8 @@
 import os
 
 import sqlalchemy.exc
+import babel
+import pytz
 from flask import Flask, render_template, request, redirect, url_for, Markup, jsonify, json
 import datetime
 from flask_sqlalchemy import SQLAlchemy
@@ -638,6 +640,16 @@ def delete():
 
 # Begin Charlie's code
 
+@app.template_global()
+def display_datetime(dt):
+    wib = pytz.timezone('Asia/Jakarta')
+    pytz.utc.localize(dt).astimezone(wib)
+    return babel.dates.format_datetime(dt, format='full', tzinfo=wib, locale='id_ID')
+
+@app.template_global()
+def indonesian_locale():
+    return babel.Locale('id', 'ID')
+
 @app.route('/api/calendar')
 @app.route('/api/calendar/psyc/<int:psyc_id>')
 def api_calendar(psyc_id='all'):
@@ -783,6 +795,56 @@ def edit_availability_list(page=1):
     return render_template('edit_availability_list.html', psyc_id=psyc_id, avails=avail_list, weekdays=weekdays,
                            page=page)
 
+@app.route('/psikolog/add_vacation', methods=['GET', 'POST'])
+@roles_required('psyc')
+def add_vacation():
+    if request.method == 'GET':
+        return render_template('add_vacation.html', current_year=datetime.datetime.now().year)
+    elif request.method == 'POST':
+        psyc_id = querydb.getPsycId(current_user.id)
+        
+        vac_st_day = int(request.form['vac_st_day'], 10)
+        vac_st_month = int(request.form['vac_st_month'], 10)
+        vac_st_year = int(request.form['vac_st_year'], 10)
+        vac_st_hour, vac_st_minute = request.form['vac_st_time'].split(':')
+        vac_st_hour = int(vac_st_hour, 10)
+        vac_st_minute = int(vac_st_minute, 10)
+        vac_st = pytz.timezone('Asia/Jakarta').localize(datetime.datetime(vac_st_year,
+                                                                          vac_st_month,
+                                                                          vac_st_day,
+                                                                          vac_st_hour,
+                                                                          vac_st_minute))
+        vac_st = vac_st.astimezone(pytz.utc)
+        
+        vac_end_day = int(request.form['vac_end_day'], 10)
+        vac_end_month = int(request.form['vac_end_month'], 10)
+        vac_end_year = int(request.form['vac_end_year'], 10)
+        vac_end_hour, vac_end_minute = request.form['vac_end_time'].split(':')
+        vac_end_hour = int(vac_end_hour, 10)
+        vac_end_minute = int(vac_end_minute, 10)
+        vac_end = pytz.timezone('Asia/Jakarta').localize(datetime.datetime(vac_end_year,
+                                                                           vac_end_month,
+                                                                           vac_end_day,
+                                                                           vac_end_hour,
+                                                                           vac_end_minute))
+        vac_end = vac_end.astimezone(pytz.utc)
+
+        querydb.addVacation(psyc_id, vac_st, vac_end, False)
+
+        flash('Your vacation has been added to the system.')
+
+        return redirect(url_for('edit_vacation_list'))
+
+@app.route('/psikolog/edit_vacation_list')
+@app.route('/psikolog/edit_vacation_list/<int:page>')
+def edit_vacation_list(page=1):
+    if page < 1:
+        page = 1
+    
+    psyc_id = querydb.getPsycId(current_user.id)
+    vac_list = querydb.getVacations(psyc_id, page=page)
+    
+    return render_template('edit_vacation_list.html', page=page, vac_list=vac_list)
 
 @app.route('/psikolog/delete_availability/<int:avail_id>')
 @roles_required('psyc')

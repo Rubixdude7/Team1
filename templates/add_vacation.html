@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Add Vacation{% endblock %}
+{% block content %}
+<main id="edit">
+    <div class="box">
+        <h1 class="title"><i class="fas fa-coffee" aria-hidden="true"></i> Add Vacation</h1>
+        <hr>
+        <form action="{{ url_for('add_vacation') }}" method="post">
+            <h4>Vacation Start</h4>
+            <p>Date</p>
+            <div class="form-control-1">
+                <div class="select">
+                    <select name="vac_st_day">
+                        {%- for i in range(31) %}
+                        <option value="{{ i + 1 }}">{{ '%02d'|format(i + 1) }}</option>
+                        {%- endfor %}
+                    </select>
+                </div>
+                <div class="select">
+                    <select name="vac_st_month">
+                        {%- for i, name in indonesian_locale().months['format']['wide'].items() %}
+                        <option value="{{ i + 1 }}">{{ name }}</option>
+                        {%- endfor %}
+                    </select>
+                </div>
+                <div class="select">
+                    <select name="vac_st_year">
+                        <option value="{{ current_year }}">{{ current_year }}</option>
+                        <option value="{{ current_year + 1 }}">{{ current_year + 1 }}</option>
+                    </select>
+                </div>
+            </div>
+            <p>Time</p>
+            <div class="form-control-2">
+                <div class="input-box"><input type="time" name="vac_st_time" class="noborder"></input> WIB</div>
+            </div>
+            <h4>Vacation End</h4>
+            <p>Date</p>
+            <div class="form-control-2">
+                <div class="select">
+                    <select name="vac_end_day">
+                        {%- for i in range(31) %}
+                        <option value="{{ i + 1 }}">{{ '%02d'|format(i + 1) }}</option>
+                        {%- endfor %}
+                    </select>
+                </div>
+                <div class="select">
+                    <select name="vac_end_month">
+                        {%- for i, name in indonesian_locale().months['format']['wide'].items() %}
+                        <option value="{{ i + 1 }}">{{ name }}</option>
+                        {%- endfor %}
+                    </select>
+                </div>
+                <div class="select">
+                    <select name="vac_end_year">
+                        <option value="{{ current_year }}">{{ current_year }}</option>
+                        <option value="{{ current_year + 1 }}">{{ current_year + 1 }}</option>
+                    </select>
+                </div>
+            </div>
+            <p>Time</p>
+            <div class="form-control-2">
+                <div class="input-box"><input type="time" name="vac_end_time" class="noborder"></input> WIB</div>
+            </div>
+            <!--
+            <h4>Options</h4>
+            <div class="form-control-2">
+                <label>
+                    <input type="checkbox" name="annual">
+                    Annual?
+                </label>
+            </div>
+            -->
+            <div class="form-control-2">
+                <button class="btn btn-success" type="submit"><i class="fas fa-plus" aria-hidden="true"></i> Add Vacation</button>
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}
