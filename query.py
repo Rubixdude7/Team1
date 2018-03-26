@@ -539,13 +539,20 @@ class query(object):
         } for t in tuples]
         
 
-    def getVacations(self, psyc_id, page=0):
+    def getVacations(self, psyc_id='all', page=0):
+        psyc_cond = None
+        
+        if psyc_id == 'all':
+            psyc_cond = db.psychologist.psyc_id.is_null(False)
+        else:
+            psyc_cond = db.psychologist.psyc_id == psyc_id
+        
         q = db.vacation.select()\
                        .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.vacation.psyc)\
                        .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
                        .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
                        .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
-                       .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id))
+                       .where(db.user.active & (db.role.role_nm == 'psyc') & psyc_cond)
 
         if page >= 1:
             q = q.paginate(page, 20)
@@ -657,7 +664,7 @@ class query(object):
         slots = []
 
         wib = pytz.timezone('Asia/Jakarta')
-        
+                
         # Let's say the calendar is only valid up to 30 days ahead of today.
         today = pytz.utc.localize(datetime.datetime.utcnow()).astimezone(wib)
         for day_offset in range(31):
@@ -670,8 +677,8 @@ class query(object):
                 a_wkd = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
 
                 if wkd == a_wkd:
-                    st = datetime.datetime.combine(day.date(), a['time_st'], wib)
-                    end = datetime.datetime.combine(day.date(), a['time_end'], wib)
+                    st = datetime.datetime.combine(day.date(), a['time_st'], tzinfo=wib).astimezone(pytz.utc).replace(tzinfo=None)
+                    end = datetime.datetime.combine(day.date(), a['time_end'], tzinfo=wib).astimezone(pytz.utc).replace(tzinfo=None)
 
                     # Add this availability to the result
                     slots.append({
@@ -682,6 +689,8 @@ class query(object):
                     })
 
         # Now the tough part -- cut out all the appointments and vacations
+        
+        # First do appointments
         cnslt_list = self.getConsultations()
         for cnslt in cnslt_list:
             for slot in slots:
@@ -702,27 +711,52 @@ class query(object):
                             # It bites off the middle?
                             slots.append({'psyc_id': slot['psyc_id'], 'st': cnslt['time_end'], 'end': slot['end'], 'valid': True})
                             slot['end'] = cnslt['time_st']
+        
+        # Second do vacations
+        vac_list = self.getVacations()
+        for vac in vac_list:
+            for slot in slots:
+                if slot['valid'] and slot['psyc_id'] == vac.psyc_id:
+                    # Does this consultation cut into this slot?
+                    if slot['st'] < vac.vac_end and slot['end'] > vac.vac_st:
+                        # Yes. The question is: in what WAY does it cut it?
+                        if vac.vac_st <= slot['st'] and vac.vac_end >= slot['end']:
+                            # It eats the whole thing?
+                            slot['valid'] = False
+                        elif vac.vac_st <= slot['st'] and vac.vac_end < slot['end']:
+                            # It just bites off a piece on the left?
+                            slot['st'] = vac.vac_end
+                        elif vac.vac_st > slot['st'] and vac.vac_end >= slot['end']:
+                            # It bites off a piece on the right?
+                            slot['end'] = vac.vac_st
+                        elif vac.vac_st > slot['st'] and vac.vac_end < slot['end']:
+                            # It bites off the middle?
+                            slots.append({'psyc_id': slot['psyc_id'], 'st': vac.vac_end, 'end': slot['end'], 'valid': True})
+                            slot['end'] = vac.vac_st
 
         slots = list(filter(lambda s: s['valid'], slots))
         for s in slots:
             del s['valid']
 
         for slot in slots:
+            st = pytz.utc.localize(slot['st']).astimezone(wib)
             slot['st'] = {
-                'year': slot['st'].year,
-                'month': slot['st'].month,
-                'day': slot['st'].day,
-                'hour': slot['st'].hour,
-                'minute': slot['st'].minute,
-                'weekday': slot['st'].weekday()
+                'year': st.year,
+                'month': st.month,
+                'day': st.day,
+                'hour': st.hour,
+                'minute': st.minute,
+                'weekday': st.weekday()
             }
+            
+            end = pytz.utc.localize(slot['end']).astimezone(wib)
             slot['end'] = {
-                'year': slot['end'].year,
-                'month': slot['end'].month,
-                'day': slot['end'].day,
-                'hour': slot['end'].hour,
-                'minute': slot['end'].minute,
-                'weekday': slot['end'].weekday()
+                'year': end.year,
+                'month': end.month,
+                'day': end.day,
+                'hour': end.hour,
+                'minute': end.minute,
+                'weekday': end.weekday()
             }
         
         return slots
