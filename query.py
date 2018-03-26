@@ -5,6 +5,7 @@ import bleach
 import models as db
 import datetime
 import pytz
+import babel
 from peewee import *
 import cloudinary
 import cloudinary.uploader
@@ -391,7 +392,7 @@ class query(object):
 
     def createBlogPost(self, u_id, psyc_id, subject, text):
         text = bleach.clean(text, tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', u'p'])
-        now = pytz.utc.localize(datetime.datetime.utcnow())
+        now = pytz.utc.localize(datetime.datetime.utcnow()).replace(tzinfo=None)
         blog_post = db.blog(psyc=psyc_id,
                             subject=subject,
                             text=text,
@@ -407,7 +408,7 @@ class query(object):
 
     def updateBlogPost(self, blog_id, u_id, psyc_id, subject, text):
         text = bleach.clean(text, tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', u'p'])
-        now = pytz.utc.localize(datetime.datetime.utcnow())
+        now = pytz.utc.localize(datetime.datetime.utcnow()).replace(tzinfo=None)
         
         blog_post = db.blog.select().where((db.blog.void_ind == 'n') & (db.blog.blog_id == blog_id) & (db.blog.psyc == psyc_id)).get()
         blog_post.subject = subject
@@ -447,12 +448,13 @@ class query(object):
                        .where(db.user.active & (db.role.role_nm == 'psyc') & (db.blog.void_ind == 'n') & psyc_cond)\
                        .order_by(db.blog.crea_dtm.desc())
         
+        wib = pytz.timezone('Asia/Jakarta')
         return {
             'total': query.count(),
             'posts': [{
                 'psyc_id': post.psyc_id,
                 'blog_id': post.blog_id,
-                'date_posted': post.crea_dtm,
+                'date_posted': babel.dates.format_datetime(pytz.utc.localize(post.crea_dtm).astimezone(wib), format='full', tzinfo=wib, locale='id_ID'),
                 'subject': post.subject,
                 'text': post.text
             } for post in query.paginate(page_num, page_size)]
