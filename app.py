@@ -829,6 +829,11 @@ def add_vacation():
                                                                            vac_end_minute))
         vac_end = vac_end.astimezone(pytz.utc)
 
+        if vac_st > vac_end:
+            temp = vac_end
+            vac_end = vac_st
+            vac_st = temp
+            
         querydb.addVacation(psyc_id, vac_st, vac_end, False)
 
         flash('Your vacation has been added to the system.')
@@ -883,6 +888,11 @@ def edit_vacation(vac_id):
                                                  vac_end_hour,
                                                  vac_end_minute))
         vac_end = vac_end.astimezone(pytz.utc)
+
+        if vac_st > vac_end:
+            temp = vac_end
+            vac_end = vac_st
+            vac_st = temp
 
         querydb.updateVacation(psyc_id, vac_id, vac_st, vac_end, False)
 
