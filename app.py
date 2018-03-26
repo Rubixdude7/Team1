@@ -890,8 +890,17 @@ def edit_vacation(vac_id):
 
         return redirect(url_for('edit_vacation_list'))
 
+@app.route('/psikolog/delete_vacation/<int:vac_id>')
+@roles_required('psyc')
+def delete_vacation(vac_id):
+    psyc_id = querydb.getPsycId(current_user.id)
+    querydb.deleteVacation(psyc_id, vac_id)
+    flash('Vacation deleted.')
+    return redirect(url_for('edit_vacation_list'))
+
 @app.route('/psikolog/edit_vacation_list')
 @app.route('/psikolog/edit_vacation_list/<int:page>')
+@roles_required('psyc')
 def edit_vacation_list(page=1):
     if page < 1:
         page = 1

@@ -581,6 +581,9 @@ class query(object):
         vac_st = vac_st.replace(tzinfo=None)
         vac_end = vac_end.replace(tzinfo=None)
         db.vacation.create(psyc=psyc_id, vac_st=vac_st, vac_end=vac_end, annual=annual)
+        
+    def deleteVacation(self, psyc_id, vac_id):
+        db.vacation.delete().where((db.vacation.psyc == psyc_id) & (db.vacation.vac_id == vac_id)).execute()
 
     def getAllAvailabilities(self, psyc_id='all'):
         q = db.calendar.select(db.psychologist.psyc_id, db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
