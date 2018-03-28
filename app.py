@@ -644,7 +644,7 @@ def delete():
 def display_datetime(dt):
     wib = pytz.timezone('Asia/Jakarta')
     pytz.utc.localize(dt).astimezone(wib)
-    return babel.dates.format_datetime(dt, format='EEEE, d MMM yyyy hh:mm a (z)', tzinfo=wib, locale='id_ID')
+    return babel.dates.format_datetime(dt, format='EEEE, d MMMM yyyy hh:mm a (z)', tzinfo=wib, locale='id_ID')
 
 @app.template_global()
 def indonesian_locale():
