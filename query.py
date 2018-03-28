@@ -459,6 +459,30 @@ class query(object):
                 'text': post.text
             } for post in query.paginate(page_num, page_size)]
         }
+    
+    def apiAppointments(self, psyc_id, page_num, page_size):
+        if page_size > 10:
+            page_size = 10
+        elif page_size < 1:
+            page_size = 1
+        
+        # Perform the query
+        query = db.consult_time.select(db.consult_time.time_st, db.consult_time.time_end, db.child.child_nm_fst.alias('first_name'), db.child.child_nm_lst.alias('last_name'))\
+                               .join(db.psychologist, JOIN_INNER, db.consult_time.psyc == db.psychologist.psyc_id)\
+                               .join(db.consultation, JOIN_INNER, db.consultation.cnslt_id == db.consult_time.cnslt)\
+                               .join(db.child, JOIN_INNER, db.consultation.child == db.child.child_id)\
+                               .where(db.psychologist.psyc_id == psyc_id)\
+                               .order_by(db.consult_time.time_st.desc())
+        
+        wib = pytz.timezone('Asia/Jakarta')
+        return {
+            'total': query.count(),
+            'appointments': [{
+                'time_st': babel.dates.format_datetime(pytz.utc.localize(appt.time_st).astimezone(wib), format='EEEE, d MMMM yyyy hh:mm a (z)', tzinfo=wib, locale='id_ID'),
+                'time_end': babel.dates.format_datetime(pytz.utc.localize(appt.time_end).astimezone(wib), format='EEEE, d MMMM yyyy hh:mm a (z)', tzinfo=wib, locale='id_ID'),
+                'name': '{0} {1}'.format(appt.first_name, appt.last_name)
+            } for appt in query.paginate(page_num, page_size)]
+        }
 
     def addPsychologistIfNotExist(self, u_id):
         # Check if user already has psychologist row

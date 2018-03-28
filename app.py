@@ -689,6 +689,20 @@ def schedule():  # TODO make sure only child of that parent can get here
                            psyc_names=querydb.getPsychologistNames(),
                            len_fee=querydb.get_len_fee(), child_id=child_id)
 
+@app.route('/api/appointments')
+@roles_required('psyc')
+def api_appointments():
+    psyc_id = querydb.getPsycId(current_user.id)
+    
+    page_num = int(request.args['page_num'])
+    page_size = int(request.args['page_size'])
+    
+    return jsonify(querydb.apiAppointments(psyc_id, page_num, page_size))
+
+@app.route('/psikolog/appointments')
+@roles_required('psyc')
+def psikolog_appointments():
+    return render_template('psikolog/appointments.html')
 
 @app.route('/psikolog/')
 @app.route('/psikolog/<int:id>')

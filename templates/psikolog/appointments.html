@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Your Appointments{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript" src="/static/scripts/pagination.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var apptList = $('#appointment-list');
+            
+            $('#pagination').pagination({
+                dataSource: '/api/appointments',
+                locator: 'appointments',
+                pageSize: 10,
+                totalNumberLocator: function(response) {
+                    return response.total;
+                },
+                alias: {
+                    pageNumber: 'page_num',
+                    pageSize: 'page_size'
+                },
+                beforeRender: function(isForced) {
+                    // Insert a spinner
+                    apptList.html('<div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>');
+                },
+                callback: function(data, pagination) {
+                    var html = '';
+                    
+                    for (var i = 0; i < data.length; i++) {
+                        var appt = data[i];
+                        
+                        html += '<tr>';
+                        html += '<td>' + appt.time_st + '</td>';
+                        html += '<td>' + appt.time_end + '</td>';
+                        html += '<td>' + appt.date + '</td>';
+                        html += '</tr>';
+                    }
+                    
+                    apptList.html(html);
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+<main id="psikolog-appointments">
+    <div class="box">
+        <div class="pagination" id="pagination"></div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Patient Name</th>
+                    <th>Time Start</th>
+                    <th>Time End</th>
+                </tr>
+            </thead>
+            <tbody id="appointment-list">
+            </tbody>
+        </table>
+    </div>
+</main>
+
+
+
+{% endblock %}
