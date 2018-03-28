@@ -934,6 +934,8 @@ class query(object):
         #time_st = time_st[0] + "-" + time_st[1] + "-" + time_st[2] + " " + time_st[3] + ":" + time_st[4]
         #Fix exception in firefox
         time_st = "%d-%02d-%02d %02d:%02d" % (time_st[0], time_st[1], time_st[2], time_st[3], time_st[4])
+        
+        wib = pytz.timezone('Asia/Jakarta')
         time_st = datetime.datetime.strptime(time_st, '%Y-%m-%d %H:%M')
         time_end = time_st + datetime.timedelta(hours=float(args['len']))
 
@@ -955,7 +957,7 @@ class query(object):
             cnslt = db.consultation(child_id=args['child_id'], fee=fee, paid='n', length=args['len'], finished='n')
             cnslt.save()
 
-            cnslt_tm = db.consult_time(cnslt_id=cnslt.cnslt_id, psyc_id=args['psyc_id'], time_st=time_st, time_end=time_end, approved='y')
+            cnslt_tm = db.consult_time(cnslt_id=cnslt.cnslt_id, psyc_id=args['psyc_id'], time_st=wib.localize(time_st).astimezone(pytz.utc).replace(tzinfo=None), time_end=wib.localize(time_end).astimezone(pytz.utc).replace(tzinfo=None), approved='y')
             cnslt_tm.save()
 
             return True, "Your appointment has been made, contact office staff for payment processing."
