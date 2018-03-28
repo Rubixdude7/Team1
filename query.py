@@ -454,7 +454,7 @@ class query(object):
             'posts': [{
                 'psyc_id': post.psyc_id,
                 'blog_id': post.blog_id,
-                'date_posted': babel.dates.format_datetime(pytz.utc.localize(post.crea_dtm).astimezone(wib), format='full', tzinfo=wib, locale='id_ID'),
+                'date_posted': babel.dates.format_datetime(pytz.utc.localize(post.crea_dtm).astimezone(wib), format='EEEE, d MMM yyyy hh:mm a (z)', tzinfo=wib, locale='id_ID'),
                 'subject': post.subject,
                 'text': post.text
             } for post in query.paginate(page_num, page_size)]
