@@ -155,8 +155,8 @@ class questions(MySQLModel):
     crea_dtm = DateTimeField()
     user_id_upd = BigIntegerField(null=True)
     upd_dtm = DateTimeField(null=True)
-    active = CharField()
-    void_ind = CharField()
+    active = CharField(default='')
+    void_ind = CharField(default='n')
 
     class Meta:
         db_table = "questions"
