@@ -9,6 +9,11 @@ import babel
 from peewee import *
 import cloudinary
 import cloudinary.uploader
+from _sha256 import sha256
+from uuid import uuid4 #this is in place of js's guid
+from jose import jws
+from jose import jwt
+
 
 
 class query(object):
@@ -887,6 +892,10 @@ class query(object):
         start = db.consultation.select(db.consult_time.time_st).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()[0]
         start = list(start)[0]
         return start
+
+    def generateToken(self, content):
+        signed = jws.sign(payload=content, key='5c2ccb9d-a143-e5b8-cd1d-0ee4dbf6666c', algorithm='HS256')
+        return signed
 
     #End of Gabe's code
 

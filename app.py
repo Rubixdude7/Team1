@@ -25,6 +25,11 @@ import models
 import math
 from flask import flash, render_template, request, redirect
 from jose import jwt
+import urllib.request
+import urllib.parse
+from _sha256 import sha256
+from uuid import uuid4 #this is in place of js's guid
+import time
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
@@ -392,14 +397,10 @@ def post_editQuestions():
     return redirect(url_for('parent'))
 
 
-@app.route('/videoConf')
-def videoConf():
-    return render_template('videoConf.html')
-
 
 #   End Jared
 
-# Gabe
+# Start Gabe
 @app.route('/parent')
 @login_required
 @roles_required('user')
@@ -425,6 +426,34 @@ def editContact():
                           request.form.get('address_2'), request.form.get('city'), request.form.get('providence'),
                           request.form.get('zip'))
     return parent()
+
+
+@app.route('/videoConf')
+def videoConf():
+    url = 'https://interviews.skype.com/api/interviews'
+    content = {"jti": str(uuid4()),
+                        "iss": "7b36897b-f594-6f25-fb8d-440c854a2c24",
+                        "iat": str(int(time.time())),
+                        "sub": str(sha256()),
+                        "exp": str(int(time.time() + 10))}
+
+    print(querydb.generateToken(content)) #prints the token
+
+    data = urllib.parse.urlencode(content, encoding='utf-8')
+    print(data) #prints the encoded content
+    data = data.encode('ascii')
+    print(data) #prints the ascii encoded content
+
+    headers = {'User-Agent': 'Mozilla/5.0', 'Content-Type': 'application/json',
+               'Authorization': 'Bearer' + querydb.generateToken(content)}
+
+    req = urllib.request.Request(url=url, data=data, headers=headers)
+    response = urllib.request.urlopen(req) #this is where it breaks, the request is sent but we never get the response
+    the_page = response.read().decode("utf-8")
+    print(the_page)
+    return render_template('videoConf.html')
+
+
 
 
 # End Gabe
