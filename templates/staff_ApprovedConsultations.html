@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Unpaid Consultations{% endblock %}
+{% block title %}Paid Consultations{% endblock %}
 {% block content %}
 <main>
     <div>
     <div class="box">
-        <h1 class="title">Pending Consultations</h1>
+        <h1 class="title">Approved Consultations</h1>
     </div>
-    <form action="/staffconsultations/approvals" method="post">
+    <form action="/staffconsultations/approved" method="post">
         {% for consultation in consultations %}
                 <li class="list-group-item" style="list-style: none">
                     <div class="box">
@@ -14,7 +14,7 @@
                             Name: {{ children[loop.index0].child_nm_fst }} {{ children[loop.index0].child_nm_lst }} <br>
                             Start Time: {{ times[loop.index0].time_st }}<br>
                             End Time: {{ times[loop.index0].time_end }}<br>
-                            Approved: <input type="checkbox" name="{{ consultation.cnslt_id }}"><br>
+                            Approved: <input type="checkbox" checked disabled><br>
                             <input type="hidden" name="consult_id" value={{ consultation.cnslt_id }}>
                         </p>
                     </div>

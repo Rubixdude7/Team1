@@ -187,9 +187,16 @@ class query(object):
         except:
             return None
 
-    def getDescendingConsultations(self):
+    def getUnpaidConsultations(self):
         try:
-            consultations = db.consultation.select().order_by(db.consultation.paid.desc())
+            consultations = db.consultation.select().where(db.consultation.paid == 'n').order_by(db.consultation.cnslt_id.desc())
+            return consultations
+        except:
+            return None
+
+    def getPaidConsultations(self):
+        try:
+            consultations = db.consultation.select().where(db.consultation.paid == 'y').order_by(db.consultation.cnslt_id.desc())
             return consultations
         except:
             return None

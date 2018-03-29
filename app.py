@@ -501,7 +501,7 @@ def savePaginateAnswers():
 @app.route('/staffconsultations', methods=['GET', 'POST'])
 @roles_required('staff')
 def approvePayments():
-    consultations = querydb.getDescendingConsultations()
+    consultations = querydb.getUnpaidConsultations()
     children = []
     times = []
     for c in consultations:
@@ -509,6 +509,19 @@ def approvePayments():
         children.append(querydb.getChildNameFromID(c.child))
         times.append(querydb.getConsultationTime(c.cnslt_id))
     return render_template('staffconsultations.html', children=children, consultations=consultations, times=times)
+
+
+@app.route('/staff_ApprovedConsultations', methods=['GET', 'POST'])
+@roles_required('staff')
+def viewApprovedConsultations():
+    consultations = querydb.getPaidConsultations()
+    children = []
+    times = []
+    for c in consultations:
+        print("Consultation ID: ", c.cnslt_id)
+        children.append(querydb.getChildNameFromID(c.child))
+        times.append(querydb.getConsultationTime(c.cnslt_id))
+    return render_template('staff_ApprovedConsultations.html', children=children, consultations=consultations, times=times)
 
 
 @app.route('/staffconsultations/approvals', methods=['GET', 'POST'])
