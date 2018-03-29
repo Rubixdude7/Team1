@@ -2,9 +2,11 @@
 {% block title %}Questions{% endblock %}
 {% block content %}
     <script>
+    {% if questions %}
         var global1 = false;
 
         $(document).ready(function () {
+
             $("#next").click(function () {
                 $.ajax({
                     url: "./?page={{ page + 1 }}", success: function (result) {
@@ -60,12 +62,16 @@
             return true;
         }
 
-
+{% endif %}
     </script>
 
     <main id="questionsUserView">
 
         <div id="box" class="box">
+            {% if not questions %}
+            <p>Sorry, no questions exist at this time.</p>
+            {%  else %}
+
             <p id="childName">Your Child: {{ child_name }}</p>
             {% if checkComplete  == None %}
                 <progress id="progress" value=" ((100/pagination.get_page_count()) *(page - 1)) |round|int }}"
@@ -150,6 +156,7 @@
                 {% endif %}
 
             </form>
+        {% endif %}
         </div>
     </main>
 {% endblock %}

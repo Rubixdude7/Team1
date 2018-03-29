@@ -234,6 +234,11 @@ def questionDelete():
 @login_required
 def questions():  # TODO Breaks if there are no quesions in db
     questions = querydb.getAllQuestions()
+    if not questions:
+
+        return render_template("questions.html", questions=questions)
+
+
     return object_list("questions.html", paginate_by=3, query=questions, context_variable='questions')
 
 
@@ -261,7 +266,7 @@ def questionsUserView():
     questions = querydb.getAllQuestionsForUsers()
     # Brody code
     answers = []
-    print("big")
+
     for q in questions:
         print(q)
         answers.append(querydb.getAnswer(q.q_id, child_id))
@@ -269,6 +274,9 @@ def questionsUserView():
     if totalQuestions is None:
         totalQuestions = len(questions)  # for progress bar
         totalQuestions = int(totalQuestions)
+    if not questions:
+
+        return render_template("questionsUserView.html", questions=questions)
 
     return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions',
                        child_id=child_id, child_name=child_name, answers=answers, totalQuestions=totalQuestions,

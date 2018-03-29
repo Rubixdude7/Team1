@@ -129,7 +129,10 @@ class query(object):
 
     def getAllQuestions(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd')
-        print(list(questions.tuples()))
+        liste = list(questions.tuples())
+        print(liste)
+        if not liste:
+            print("green")
         return questions
 
     def getAllQuestionsForUsers(self):
