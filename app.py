@@ -569,6 +569,12 @@ class SearchBar(FlaskForm):
 
 
 # Routes
+@app.route('/adminPortal')
+@roles_required('admin')
+def adminPortal():
+    return render_template('admin/adminPortal.html')
+
+
 @app.route('/admin', methods=['GET', 'POST'])
 @roles_required('admin')
 def admin():

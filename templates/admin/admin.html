@@ -3,12 +3,9 @@
 {% block content %}
 <main id="mainHome">
     <div class="box">
-        <h1 class="title">Admin Portal</h1>
+        <h1 class="title">User Management</h1>
     </div>
-
     <div class="box">
-        <h2 class="title">Users</h2>
-        <hr>
         <form action="" method="post">
             {{ form.hidden_tag() }}
             <!--TODO REMOVE AND PUT IN CSS-->
@@ -26,6 +23,8 @@
             <div class = form-control-2>{{ form.search(size=85) }} {{ form.submit(class="btn btn-success") }} </div>
 
         </form>
+        <h2 class="title">Users</h2>
+        <hr>
         <div class="table-wrapper">
             <table class="table">
                 <thead>

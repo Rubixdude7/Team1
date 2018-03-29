@@ -63,11 +63,13 @@
                         {% endif %}
                         {% if current_user.is_authenticated and current_user.is_in_role("admin") %}
                             <li>
-                                <a href="{{ url_for('admin') }}">ADMIN</a>
+                                <a href="{{ url_for('adminPortal') }}">ADMIN</a>
                             </li>
+                            <!--
                             <li>
                                 <a href="{{ url_for('questions') }}">QUESTIONS</a>
                             </li>
+                            -->
                         {% endif %}
                         {% if current_user.is_authenticated and current_user.is_in_role("staff") %}
                             <li>
