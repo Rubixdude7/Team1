@@ -1,8 +1,19 @@
+import calendar
+
+from flask import Markup
+import bleach
 import models as db
 import datetime
+import pytz
+import babel
 from peewee import *
 import cloudinary
 import cloudinary.uploader
+from _sha256 import sha256
+from uuid import uuid4 #this is in place of js's guid
+from jose import jws
+from jose import jwt
+
 
 
 class query(object):
@@ -26,13 +37,12 @@ class query(object):
     def deactivateQuestion(self, q_id):
 
         question = db.questions.get(db.questions.q_id == q_id)
-        question
         question.void_ind = 'y'
         question.save()
 
     def getQuestion(selfs, q_id):
         question = db.questions.get(db.questions.q_id == q_id)
-        return question;
+        return question
 
     def reactivateQuestion(self, q_id):
         question = db.questions.get(db.questions.q_id == q_id)
@@ -45,66 +55,181 @@ class query(object):
         question.void_ind = 'd'
 
         question.save()
+        question.save()
 
     def addQuestion(self, question2, user):
+
         q = db.questions(question=question2, user_id_crea=user, crea_dtm=datetime.datetime.now())
         q.save()
-    def checkNewQuestions(self, child):
-        child = db.child.get(db.child.child_id == child)
-        x = child.q_comp_dtm
-        questionsUpdated = db.questions.select().where(db.questions.crea_dtm > x)
 
+    def checkNewQuestions(self, user_id):
+        questionsUpdated = []
+        c = db.child.select().where(db.child.user == user_id)
+        for child in c:
+            print(child.child_id)
+            x = child.q_comp_dtm
+            if db.questions.select().where(db.questions.crea_dtm > x):
+                questionsUpdated.append(child.child_id)
+
+        print(questionsUpdated)
         return questionsUpdated
+
     def addQuestionAnswers(self, questionAnswer, user, q_id, childId):
 
-        current = db.child.get(db.child.child_id == childId)
-        current.q_comp_dtm = datetime.datetime.now()
-        current.save()
+        print("EG")
+        print(questionAnswer)
+        print(user)
+        print(q_id)
+        print(childId)
+        # Begin Brody
+        '''
+            This should now prevent additional rows from being
+            added unnecessarily, i.e., the answer didn't change for this kid, for this question
+        '''
+        alreadyExists = query.getAnswer(self, q_id, childId)
+        if alreadyExists is None:
+            print(alreadyExists)
+            print("GIG")
+            # Begin Jared
+            current = db.child.get(db.child.child_id == childId)
+            print(current)
 
-        q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(), q=q_id, child=childId)
-        q.save()
+            current.save()
+            print("testing")
+            print("ans", questionAnswer)
+            print("q_id", q_id)
+            print("child", childId)
+            print("qacreatedtn", datetime.datetime.now())
+            q = db.question_answers(answer=questionAnswer, qa_crea_dtm=datetime.datetime.now(), q=q_id,
+                                    child=childId, void_ind='n')
+            print("be", q)
+            q.save()
+            # End Jared
+        elif alreadyExists == questionAnswer:
+            print("Answer already exists and didn't change!")
+        else:
+            print("Updating answer")
+            query.voidAnswer(self, q_id, childId)
+            # Begin Jared
+            current = db.child.get(db.child.child_id == childId)
+
+            current.save()
+
+            q = db.question_answers(answer=questionAnswer, user_id_crea=user, crea_dtm=datetime.datetime.now(),
+                                    q=q_id,
+                                    child=childId, void_ind='n')
+            q.save()
+            # End Jared
+        # End Brody
 
     def paginate(self, num):
         num = db.questions.select()
-        return num;
+        return num
+
+    def checkComp(self, childId):
+        current = db.child.get(db.child.child_id == childId)
+        print('test3r')
+        current.q_comp_dtm = datetime.datetime.now()
+        current.save()
 
     def getAllQuestions(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd')
+        liste = list(questions.tuples())
+        print(liste)
+        if not liste:
+            print("green")
         return questions
 
     def getAllQuestionsForUsers(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd' and db.questions.void_ind == 'n')
-
         return questions
+
     def getAllQuestionAnswers(self, child_id):
-
         questionAnswers = db.question_answers.select().where(db.question_answers.child == child_id)
-
-
         return questionAnswers
-
 
     def editQuestion(self, a, newQuestion):
         current = db.questions.get(db.questions.q_id == a)
         current.question = newQuestion
         current.save()
 
-    # Brody's code
+    #  Brody's code
+
+    def voidAnswer(self, q_id, child_id):
+        q = db.question_answers.get(db.question_answers.q == q_id, db.question_answers.child == child_id, db.question_answers.void_ind == 'n')
+        q.void_ind = 'y'
+        q.save()
 
     def addChild(self, user_id, first, last, dob):
         c = db.child(user_id=user_id, child_nm_fst=first, child_nm_lst=last, child_dob=dob)
         c.save()
 
     def findChild(self, child_id):
-        c = db.child.get(db.child.child_id == child_id)
-        return c
+        try:
+            c = db.child.get(db.child.child_id == child_id)
+            print(c.child_nm_fst)
+            return c
+        except:
+            return None
+
+    def getAnswer(self, question_id, child_id):
+        try:
+            a = db.question_answers.get(db.question_answers.q == question_id, db.question_answers.child == child_id, db.question_answers.void_ind == 'n')
+            print("ABSWE", a.answer)
+            return a.answer
+        except:
+            return None
+
+    def getChildNameFromID(self, child_id):
+        try:
+            child = db.child.get(db.child.child_id == child_id)
+            return child
+        except:
+            return None
+
+    def getDescendingConsultations(self):
+        try:
+            consultations = db.consultation.select().order_by(db.consultation.paid.desc())
+            return consultations
+        except:
+            return None
+
+    def markConsultApproved(self, consult_id):
+        try:
+            consultation = db.consultation.get(db.consultation.cnslt_id == consult_id)
+            consultation.paid = 'y'
+            consultation.save()
+        except:
+            print("Couldn't find consultation")
+
+    def getConsultationTime(self, consult_id):
+        try:
+            time = db.consult_time.get(db.consult_time.cnslt == consult_id)
+            return time
+        except:
+            print('Could not find that time')
     # End Brody's code
 
 # Start Jason's code
 
-    def getAllUsers(self):
-        users = db.user.select().where(db.user.active)
+    def getAllUsers(self, page_num, page_size):
+        users = db.user.select().where(db.user.active).join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user).order_by(db.user_roles.role).paginate(page_num, page_size)
         return users
+
+    def getSearchedUsers(self, search, page_num, page_size):
+        users = db.user.select().where(db.user.active & db.user.email.contains(search)).join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user).order_by(db.user_roles.role).paginate(page_num, page_size)
+
+        # users = db.user.select().where(db.user.active & db.user.email.contains(search)).paginate(page_num, num_of_pages)
+        return users
+
+    def getUserCount(self):
+        usercount = db.user.select().count()
+        return usercount
+
+    def getSearchedUserCount(self, search):
+        usercount = db.user.select().where(db.user.active & db.user.email.contains(search)).count()
+        return usercount
+
 
     def getAllRoles(self):
         roles = db.role.select(db.role.role_nm)
@@ -169,7 +294,7 @@ class query(object):
         except DoesNotExist:
             return None
 
-    def getProvidence(self, contact_id):
+    def getProvince(self, contact_id):
         try:
             c = db.contact.get(db.contact.contact_id == contact_id)
             return c.providence
@@ -217,7 +342,7 @@ class query(object):
                      .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id))\
                      .order_by(db.blog.updt_dtm.desc())
         return blg
-    
+
     def getAllBlogPosts(self, page_num, items_per_page):
         tuples = db.blog.select(db.blog.subject, db.blog.updt_dtm, db.blog.text, db.psychologist.psyc_id, db.user.first_name, db.user.last_name)\
                         .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
@@ -227,11 +352,11 @@ class query(object):
                         .where(db.user.active & (db.role.role_nm == 'psyc'))\
                         .order_by(db.blog.updt_dtm.desc())\
                         .paginate(page_num, items_per_page).tuples()
-        
+
         return [{
             'title': t[0],
             'date_posted': t[1],
-            'contents': t[2], 
+            'contents': Markup(t[2]),
             'psyc_id': t[3],
             'author': '{0} {1}'.format(t[4], t[5])
         } for t in tuples]
@@ -244,6 +369,10 @@ class query(object):
         public_id, version = psyc.photo.split('#')
 
         return cloudinary.CloudinaryImage(public_id, version=version).build_url()
+
+    def allowed_file(self, filename):
+        return '.' in filename and \
+               filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
 
     def updateAvatar(self, psyc_id, avatar_file):
         if not self.allowed_file(avatar_file.filename):
@@ -270,7 +399,8 @@ class query(object):
         return psyc_id
 
     def createBlogPost(self, u_id, psyc_id, subject, text):
-        now = datetime.datetime.now()
+        text = bleach.clean(text, tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', u'p'])
+        now = pytz.utc.localize(datetime.datetime.utcnow()).replace(tzinfo=None)
         blog_post = db.blog(psyc=psyc_id,
                             subject=subject,
                             text=text,
@@ -279,11 +409,89 @@ class query(object):
                             updt_dtm=now,
                             void_ind='n')
         blog_post.save()
+    
+    def getBlogPost(self, blog_id):
+        post = db.blog.select().where((db.blog.blog_id == blog_id) & (db.blog.void_ind == 'n')).get()
+        return post
+
+    def updateBlogPost(self, blog_id, u_id, psyc_id, subject, text):
+        text = bleach.clean(text, tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', u'p'])
+        now = pytz.utc.localize(datetime.datetime.utcnow()).replace(tzinfo=None)
+        
+        blog_post = db.blog.select().where((db.blog.void_ind == 'n') & (db.blog.blog_id == blog_id) & (db.blog.psyc == psyc_id)).get()
+        blog_post.subject = subject
+        blog_post.text = text
+        blog_post.user_id_upd = u_id
+        blog_post.updt_dtm = now
+        blog_post.save()
+    
+    def deleteBlogPost(self, blog_id, psyc_id):
+        blog_post = db.blog.select().where((db.blog.void_ind == 'n') & (db.blog.blog_id == blog_id) & (db.blog.psyc == psyc_id)).get()
+        blog_post.void_ind = 'y'
+        blog_post.save()
 
     def updateQualifications(self, psyc_id, qualifications):
         psyc = db.psychologist.select().where(db.psychologist.psyc_id == psyc_id).get()
         psyc.qualifications = qualifications
         psyc.save()
+        
+    def apiBlog(self, psyc_id, page_num, page_size):
+        # Limit api calls to fetch a max of 20 pages
+        if page_size > 20:
+            page_size = 20
+        
+        # Check whether the caller wants a specific psychologist
+        psyc_cond = None
+        if psyc_id == 'all':
+            psyc_cond = db.psychologist.psyc_id.is_null(False)
+        else:
+            psyc_cond = db.psychologist.psyc_id == int(psyc_id)
+        
+        # Perform the query
+        query = db.blog.select(db.blog.psyc.alias('psyc_id'), db.blog.blog_id, db.blog.crea_dtm, db.blog.subject, db.blog.text)\
+                       .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
+                       .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                       .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
+                       .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
+                       .where(db.user.active & (db.role.role_nm == 'psyc') & (db.blog.void_ind == 'n') & psyc_cond)\
+                       .order_by(db.blog.crea_dtm.desc())
+        
+        wib = pytz.timezone('Asia/Jakarta')
+        return {
+            'total': query.count(),
+            'posts': [{
+                'psyc_id': post.psyc_id,
+                'blog_id': post.blog_id,
+                'date_posted': babel.dates.format_datetime(pytz.utc.localize(post.crea_dtm).astimezone(wib), format='EEEE, d MMMM yyyy hh:mm a (z)', tzinfo=wib, locale='id_ID'),
+                'subject': post.subject,
+                'text': post.text
+            } for post in query.paginate(page_num, page_size)]
+        }
+    
+    def apiAppointments(self, psyc_id, page_num, page_size):
+        if page_size > 10:
+            page_size = 10
+        elif page_size < 1:
+            page_size = 1
+        
+        # Perform the query
+        query = db.consult_time.select(db.consult_time.time_st, db.consult_time.time_end, db.child.child_nm_fst.alias('first_name'), db.child.child_nm_lst.alias('last_name'))\
+                               .join(db.psychologist, JOIN_INNER, db.consult_time.psyc == db.psychologist.psyc_id)\
+                               .join(db.consultation, JOIN_INNER, db.consultation.cnslt_id == db.consult_time.cnslt)\
+                               .join(db.child, JOIN_INNER, db.consultation.child == db.child.child_id)\
+                               .where(db.psychologist.psyc_id == psyc_id)\
+                               .order_by(db.consult_time.time_st.desc())\
+                               .naive()
+        
+        wib = pytz.timezone('Asia/Jakarta')
+        return {
+            'total': query.count(),
+            'appointments': [{
+                'time_st': babel.dates.format_datetime(pytz.utc.localize(appt.time_st).astimezone(wib), format='EEEE, d MMMM yyyy hh:mm a (z)', tzinfo=wib, locale='id_ID'),
+                'time_end': babel.dates.format_datetime(pytz.utc.localize(appt.time_end).astimezone(wib), format='EEEE, d MMMM yyyy hh:mm a (z)', tzinfo=wib, locale='id_ID'),
+                'name': '{0} {1}'.format(appt.first_name, appt.last_name)
+            } for appt in query.paginate(page_num, page_size)]
+        }
 
     def addPsychologistIfNotExist(self, u_id):
         # Check if user already has psychologist row
@@ -319,7 +527,16 @@ class query(object):
 
         print('nope')
         return None
-        
+
+    def getPsychologistNames(self):
+        tuples = db.psychologist.select(db.psychologist.psyc_id, db.user.first_name, db.user.last_name)\
+                               .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                               .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                               .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
+                               .where(db.user.active & (db.role.role_nm == 'psyc'))\
+                               .tuples()
+        return [{ 'psyc_id': t[0], 'first_name': t[1], 'last_name': t[2] } for t in tuples]
+
     def getAvailability(self, avail_id, psyc_id):
         t = db.calendar.select(db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
                        .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
@@ -332,37 +549,126 @@ class query(object):
             'time_end': t[1],
             'weekday': t[2]
         }
-        
-    def getAvailabilities(self, psyc_id):
-        tuples = db.calendar.select(db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
-                            .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
-                            .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
-                            .where((db.psychologist.psyc_id == psyc_id) & (db.calendar.void_ind == 'n'))\
-                            .tuples()
+
+    def getAvailabilities(self, psyc_id, page=0):
+        q = db.calendar.select(db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
+                       .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
+                       .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                       .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                       .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
+                       .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
+                       .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id) & (db.calendar.void_ind == 'n'))
+
+        if page < 1:
+            tuples = q.tuples()
+        else:
+            tuples = q.paginate(page, 20).tuples()
+
         return [{
             'avail_id': t[0],
-            'time_st': t[1],
-            'time_end': t[2],
-            'weekday': t[3]
+            'st': { 'hour': t[1].hour, 'minute': t[1].minute },
+            'end': { 'hour': t[2].hour, 'minute': t[2].minute },
+            'weekday': ['m', 't', 'w', 'th', 'f', 's', 'su'].index(t[3])
         } for t in tuples]
+        
+
+    def getVacations(self, psyc_id='all', page=0):
+        psyc_cond = None
+        
+        if psyc_id == 'all':
+            psyc_cond = db.psychologist.psyc_id.is_null(False)
+        else:
+            psyc_cond = db.psychologist.psyc_id == psyc_id
+        
+        q = db.vacation.select()\
+                       .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.vacation.psyc)\
+                       .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                       .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                       .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
+                       .where(db.user.active & (db.role.role_nm == 'psyc') & psyc_cond)
+
+        if page >= 1:
+            q = q.paginate(page, 20)
+        
+        return q
+
+    def getVacation(self, psyc_id, vac_id):
+        q = db.vacation.select()\
+                       .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.vacation.psyc)\
+                       .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                       .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                       .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)\
+                       .where(db.user.active & (db.role.role_nm == 'psyc') & (db.psychologist.psyc_id == psyc_id) & (db.vacation.vac_id == vac_id))\
+                       .get()
+        return q
     
+    def updateVacation(self, psyc_id, vac_id, vac_st, vac_end, annual):
+        vac = getVacation(psyc_id, vac_id)
+        vac.vac_st = vac_st.replace(tzinfo=None)
+        vac.vac_end = vac_end.replace(tzinfo=None)
+        vac.annual = annual
+        vac.save()
+        
+    def addVacation(self, psyc_id, vac_st, vac_end, annual):
+        # Turn into a naive datetime
+        vac_st = vac_st.replace(tzinfo=None)
+        vac_end = vac_end.replace(tzinfo=None)
+        db.vacation.create(psyc=psyc_id, vac_st=vac_st, vac_end=vac_end, annual=annual)
+        
+    def deleteVacation(self, psyc_id, vac_id):
+        db.vacation.delete().where((db.vacation.psyc == psyc_id) & (db.vacation.vac_id == vac_id)).execute()
+
+    def getAllAvailabilities(self, psyc_id='all'):
+        q = db.calendar.select(db.psychologist.psyc_id, db.calendar.cal_id, db.calendar.time_st, db.calendar.time_end, db.day_typ_cd.day_typ_cd)\
+                       .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
+                       .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
+                       .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                       .join(db.user_roles, JOIN_INNER, db.user_roles.user == db.user.user_id)\
+                       .join(db.role, JOIN_INNER, db.role.role_id == db.user_roles.role)
+        if psyc_id == 'all':
+            q = q.where(db.user.active & (db.role.role_nm == 'psyc') & (db.calendar.void_ind == 'n'))
+        else:
+            q = q.where(db.user.active & (db.role.role_nm == 'psyc') & (db.calendar.void_ind == 'n') & (db.psychologist.psyc_id == psyc_id))
+        tuples = q.tuples()
+        return [{
+            'psyc_id': t[0],
+            'avail_id': t[1],
+            'time_st': t[2],
+            'time_end': t[3],
+            'weekday': t[4]
+        } for t in tuples]
+
+    def getAvailabilitiesForDay(self, psyc_id, year, month, day):
+        wkd_index = datetime.date(year, month, day).weekday()
+        wkd_abbr = ['m', 't', 'w', 'th', 'f', 's', 'su'][wkd_index]
+
+        tuples = db.calendar.select(db.calendar.time_st, db.calendar.time_end)\
+                            .join(db.psychologist, JOIN_INNER, db.psychologist.psyc_id == db.calendar.psyc)\
+                            .join(db.day_typ_cd, JOIN_INNER, db.calendar.day_typ_cd == db.day_typ_cd.day_typ_cd)\
+                            .where((db.psychologist.psyc_id == psyc_id) & (db.calendar.void_ind == 'n') & (db.day_typ_cd.day_typ_cd == wkd_abbr))\
+                            .tuples()
+        return [{
+            'time_st': t[0],
+            'time_end': t[1]
+        } for t in tuples]
+
     def addAvailability(self, psyc_id, time_st, time_end, weekday):
         # Find the weekday in the db
         wkd = db.day_typ_cd.select(db.day_typ_cd.day_typ_cd).where(db.day_typ_cd.day_typ_cd == weekday).tuples()[0][0]
         avail = db.calendar(psyc=psyc_id, time_st=time_st, time_end=time_end, day_typ_cd=wkd, void_ind='n')
         avail.save()
-    
+
     def deleteAvailability(self, avail_id, psyc_id):
         avail = db.calendar.select()\
                            .where((db.calendar.cal_id == avail_id) & (db.calendar.psyc == psyc_id))\
                            .get()
         avail.void_ind = 'y'
         avail.save()
-    
+
     def updateAvailability(self, avail_id, psyc_id, time_st, time_end, weekday):
         # Find the weekday in the db
         wkd = db.day_typ_cd.select(db.day_typ_cd.day_typ_cd).where(db.day_typ_cd.day_typ_cd == weekday).tuples()[0][0]
-        
+
         avail = db.calendar.select()\
                            .where((db.calendar.cal_id == avail_id) & (db.calendar.psyc == psyc_id) & (db.calendar.void_ind == 'n'))\
                            .get()
@@ -370,13 +676,137 @@ class query(object):
         avail.time_end = time_end
         avail.day_typ_cd = wkd
         avail.save()
+
+    def getConsultations(self):
+        tuples = db.consultation.select(db.consult_time.psyc, db.consultation.child, db.consult_time.time_st, db.consult_time.time_end)\
+                                .join(db.consult_time, JOIN_INNER, db.consultation.cnslt_id == db.consult_time.cnslt)\
+                                .join(db.psychologist, JOIN_INNER, db.consult_time.psyc == db.psychologist.psyc_id)\
+                                .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
+                                .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
+                                .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
+                                .where((db.role.role_nm == 'psyc') & db.user.active)\
+                                .tuples()
+        result = [{
+            'psyc_id': t[0],
+            'child_id': t[1],
+            'time_st': t[2],
+            'time_end': t[3]
+        } for t in tuples]
+        return result
+
+    def getAllSlotsThatCanBeBooked(self, psyc_id='all'):
+        avail_list = self.getAllAvailabilities(psyc_id)
+
+        slots = []
+
+        wib = pytz.timezone('Asia/Jakarta')
+                
+        # Let's say the calendar is only valid up to 30 days ahead of today.
+        today = pytz.utc.localize(datetime.datetime.utcnow()).astimezone(wib)
+        for day_offset in range(31):
+            day = today + datetime.timedelta(day_offset)
+
+            # Find all availabilities that match this day, grouped by psychiatrist.
+            wkd = day.weekday()
+            for a in avail_list:
+                # What weekday is this availability for?
+                a_wkd = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
+
+                if wkd == a_wkd:
+                    st = datetime.datetime.combine(day.date(), a['time_st'], tzinfo=wib).astimezone(pytz.utc).replace(tzinfo=None)
+                    end = datetime.datetime.combine(day.date(), a['time_end'], tzinfo=wib).astimezone(pytz.utc).replace(tzinfo=None)
+
+                    # Add this availability to the result
+                    slots.append({
+                        'psyc_id': a['psyc_id'],
+                        'st': st,
+                        'end': end,
+                        'valid': True # For pruning later
+                    })
+
+        # Now the tough part -- cut out all the appointments and vacations
         
+        # First do appointments
+        cnslt_list = self.getConsultations()
+        for cnslt in cnslt_list:
+            for slot in slots:
+                if slot['valid'] and slot['psyc_id'] == cnslt['psyc_id']:
+                    # Does this consultation cut into this slot?
+                    if slot['st'] < cnslt['time_end'] and slot['end'] > cnslt['time_st']:
+                        # Yes. The question is: in what WAY does it cut it?
+                        if cnslt['time_st'] <= slot['st'] and cnslt['time_end'] >= slot['end']:
+                            # It eats the whole thing?
+                            slot['valid'] = False
+                        elif cnslt['time_st'] <= slot['st'] and cnslt['time_end'] < slot['end']:
+                            # It just bites off a piece on the left?
+                            slot['st'] = cnslt['time_end']
+                        elif cnslt['time_st'] > slot['st'] and cnslt['time_end'] >= slot['end']:
+                            # It bites off a piece on the right?
+                            slot['end'] = cnslt['time_st']
+                        elif cnslt['time_st'] > slot['st'] and cnslt['time_end'] < slot['end']:
+                            # It bites off the middle?
+                            slots.append({'psyc_id': slot['psyc_id'], 'st': cnslt['time_end'], 'end': slot['end'], 'valid': True})
+                            slot['end'] = cnslt['time_st']
+        
+        # Second do vacations
+        vac_list = self.getVacations()
+        for vac in vac_list:
+            for slot in slots:
+                if slot['valid'] and slot['psyc_id'] == vac.psyc_id:
+                    # Does this consultation cut into this slot?
+                    if slot['st'] < vac.vac_end and slot['end'] > vac.vac_st:
+                        # Yes. The question is: in what WAY does it cut it?
+                        if vac.vac_st <= slot['st'] and vac.vac_end >= slot['end']:
+                            # It eats the whole thing?
+                            slot['valid'] = False
+                        elif vac.vac_st <= slot['st'] and vac.vac_end < slot['end']:
+                            # It just bites off a piece on the left?
+                            slot['st'] = vac.vac_end
+                        elif vac.vac_st > slot['st'] and vac.vac_end >= slot['end']:
+                            # It bites off a piece on the right?
+                            slot['end'] = vac.vac_st
+                        elif vac.vac_st > slot['st'] and vac.vac_end < slot['end']:
+                            # It bites off the middle?
+                            slots.append({'psyc_id': slot['psyc_id'], 'st': vac.vac_end, 'end': slot['end'], 'valid': True})
+                            slot['end'] = vac.vac_st
+
+        slots = list(filter(lambda s: s['valid'], slots))
+        for s in slots:
+            del s['valid']
+
+        for slot in slots:
+            st = pytz.utc.localize(slot['st']).astimezone(wib)
+            slot['st'] = {
+                'year': st.year,
+                'month': st.month,
+                'day': st.day,
+                'hour': st.hour,
+                'minute': st.minute,
+                'weekday': st.weekday()
+            }
+            
+            end = pytz.utc.localize(slot['end']).astimezone(wib)
+            slot['end'] = {
+                'year': end.year,
+                'month': end.month,
+                'day': end.day,
+                'hour': end.hour,
+                'minute': end.minute,
+                'weekday': end.weekday()
+            }
+        
+        return slots
+
     def getWeekDays(self):
         wkds = db.day_typ_cd.select()
         d = {}
         for wkd in wkds:
             d[wkd.day_typ_cd] = wkd.day
         return d
+
+    def getWeekDayList(self):
+        wkds = self.getWeekDays()
+        return [wkds[d] for d in ['m', 't', 'w', 'th', 'f', 's', 'su']]
 
     def psychologistLinks(self):
         tuples = db.psychologist.select(db.psychologist.psyc_id,
@@ -396,26 +826,15 @@ class query(object):
 
     #Beginnning of Gabe's code
 
-    def getChildren(self, user_id): #ignore this for now, it is a bad attempt at something
+    def getChildren(self, user_id):
         c = db.child.select().where(db.child.user == user_id)
         return c
 
-    def exists(self, contact_id, field):
-        c = db.contact.select().where(db.contact.contact_id == contact_id)
-        if field == 'phone_no' and c.phone_no.exists():
-            return True
-        elif field == 'address_1' and c.address_1.exists():
-            return True
-        elif field == 'address_2' and c.address_2.exists():
-            return True
-        elif field == 'city' and c.city.exists():
-            return True
-        elif field == 'providence' and c.providence.exists():
-            return True
-        elif field == 'zip' and c.zip.exists():
-            return True
-        else:
-            return False
+    def getAge(self, child):
+        born = datetime.datetime.strptime(child.child_dob.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
+        today = datetime.date.today()
+        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+        return age
 
     def contactID(self, user_id):
         try:
@@ -443,6 +862,40 @@ class query(object):
                            address_2=address_2, city=city, providence=providence, zip=zip)
 
         c.save()
+
+    def postConsult(self, child_id):
+        try:
+            end = db.consultation.select(db.consult_time.time_end).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()[0]
+            print('getting end')
+            if end is not None:
+                l = list(end)[0]
+
+                print('in end if')
+
+                print(l)
+
+                if l < datetime.datetime.today():
+                    print('true')
+                    return True
+                else:
+                    print('fale')
+                    return False
+            else:
+                print('true 2')
+                return True
+        except IndexError:
+            print('true 3')
+            return True
+
+
+    def haveTime(self, child_id):
+        start = db.consultation.select(db.consult_time.time_st).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()[0]
+        start = list(start)[0]
+        return start
+
+    def generateToken(self, content):
+        signed = jws.sign(payload=content, key='5c2ccb9d-a143-e5b8-cd1d-0ee4dbf6666c', algorithm='HS256')
+        return signed
 
     #End of Gabe's code
 
@@ -479,50 +932,50 @@ class query(object):
     #End Nolan's Code
 
 # Begin Brandon
-    def get_slides(self):
-        slider_a = []
-        for slide in db.slider.select():
-            slider_a.append({
-                'id': slide.slider_id,
-                'img': slide.img,
-                'version': slide.version,
-                'desc': slide.desc,
-                'alt': slide.alt
-            })
-        return slider_a
 
-    def get_slide(self, s_id):
-        slide = db.slider.get(db.slider.slider_id == s_id)
-        url = cloudinary.CloudinaryImage(slide.img, version=slide.version).image()
-        slide = {
-            'desc': slide.desc,
-            'alt': slide.alt,
-            'img': url
-        }
-        return slide
+    def get_len_fee(self):
+        len_fee = db.consultation_length.select(db.consultation_length.cnslt_len_id, db.consultation_length.length, db.consultation_fee.fee).where(db.consultation_length.void_ind == 'n').join(db.consultation_fee, JOIN_INNER, (db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id) & (db.consultation_fee.void_ind == 'n')).tuples()
+        len_fee = list(len_fee)
 
-    def allowed_file(self, filename):
-        return '.' in filename and \
-               filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
+        return len_fee
 
-    def update_slide(self, s_id, img, desc, alt):
-        slide = db.slider.get(db.slider.slider_id == s_id)
-        if img and self.allowed_file(img.filename):
-            upload = cloudinary.uploader.upload(img, public_id=slide.img)
-            slide.version = upload['version']
-        if desc is not None and desc != "":
-            slide.desc = desc
-        if alt is not None and alt != "":
-            slide.alt = alt
-        slide.save()
+    def schecule_cnslt(self, args):
+        fee = db.consultation_fee.select(db.consultation_fee.fee).where(db.consultation_fee.void_ind == 'n').join(db.consultation_length, JOIN_INNER, (args['len'] == db.consultation_length.length) & (db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id)).tuples()
+        fee = list(fee)[0][0]
+        time_st = list(map(int, args['st_dt'].split("-")))
+        #time_st = time_st[0] + "-" + time_st[1] + "-" + time_st[2] + " " + time_st[3] + ":" + time_st[4]
+        #Fix exception in firefox
+        time_st = "%d-%02d-%02d %02d:%02d" % (time_st[0], time_st[1], time_st[2], time_st[3], time_st[4])
+        
+        wib = pytz.timezone('Asia/Jakarta')
+        time_st = datetime.datetime.strptime(time_st, '%Y-%m-%d %H:%M')
+        time_end = time_st + datetime.timedelta(hours=float(args['len']))
 
-    def get_slider(self):
-        slider_tag = []
-        slider_desc = []
-        for slide in db.slider.select().order_by(db.slider.slider_id.asc()):
-            slider_tag.append(cloudinary.CloudinaryImage(slide.img, version=slide.version).image(alt=slide.alt))
-            slider_desc.append(slide.desc)
-        return slider_tag, slider_desc
+        # Make sure this time is actually available.
+        slots = self.getAllSlotsThatCanBeBooked(int(args['psyc_id']))
+        # Find a slot that fits the requested time.
+        ok = False
+        for s in slots:
+            s_st = datetime.datetime(s['st']['year'], s['st']['month'], s['st']['day'], s['st']['hour'],
+                                     s['st']['minute'])
+            s_end = datetime.datetime(s['end']['year'], s['end']['month'], s['end']['day'], s['end']['hour'],
+                                      s['end']['minute'])
+
+            if time_st >= s_st and time_end <= s_end:
+                ok = True
+                break
+
+        if ok:
+            cnslt = db.consultation(child_id=args['child_id'], fee=fee, paid='n', length=args['len'], finished='n')
+            cnslt.save()
+
+            cnslt_tm = db.consult_time(cnslt_id=cnslt.cnslt_id, psyc_id=args['psyc_id'], time_st=wib.localize(time_st).astimezone(pytz.utc).replace(tzinfo=None), time_end=wib.localize(time_end).astimezone(pytz.utc).replace(tzinfo=None), approved='y')
+            cnslt_tm.save()
+
+            return True, "Your appointment has been made, contact office staff for payment processing."
+        else:
+            return False, "An invalid time range was specified."
+
 
 
 #End Brandon

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ psyc.full_name }} Availability for {{ year }}-{{ month }}-{{ day }}{% endblock %}
+{% block content %}
+<main id="view-day">
+    <div class="box">
+        <h1 class="title">{{ psyc.full_name }} Availability for {{ year }}-{{ month }}-{{ day }}</h1>
+        <hr />
+        <p>On this day, {{ psyc.full_name }} is free at these times:</p>
+        {% for avail in avails %}
+            <p>{{ avail['time_st'] }}&ndash;{{ avail['time_end'] }}</p>
+        {% endfor %}
+        {% if avails|length == 0 %}
+            <p>None</p>
+        {% endif %}
+    </div>
+
+</main>
+{% endblock %}

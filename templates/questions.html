@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <script src="{{ url_for('static', filename='scripts/question.js') }}" type="text/jscript"></script>
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Questions{% endblock %}
 {% block content %}
     <main>
         <div class="box" id="box">
@@ -10,9 +10,13 @@
             <hr>
             {% if current_user.is_authenticated and current_user.is_in_role("admin") %}
                 <form action="{{ url_for('add_questions') }}">
-                    <button class="add"><i class="fa fa-plus"></i> Add Question</button>
+                    <button class="btn btn-success"><i class="fa fa-plus"></i> Add Question</button>
                 </form>
             {% endif %}
+            {% if not questions %}
+            <p>No Questions Exist</p>
+            {%  else %}
+
             {% for u in questions %}
                 <!-- question list -->
                 <div class="question">
@@ -31,24 +35,24 @@
                         {% endif %}
                         <br>
                         <div class="dropdown-content">
-                            <button class="edit" type="button"
+                            <button class="btn btn-warning" type="button"
                                     onclick="location.href='{{ url_for('editQuestion', q_id=u.q_id) }}'"><i
                                     class="fa fa-edit"></i> Edit
                             </button>
                             <br><br>
                             {% if u.void_ind == 'y' %}
-                                <button class="deactivate" type="button"
+                                <button class="btn btn-warning" type="button"
                                         onclick="location.href='{{ url_for('questionreactivate', q_id=u.q_id) }}'"><i
                                         class="fa fa-close"></i> Reactivate
                                 </button>
                             {% else %}
-                                <button class="deactivate" type="button"
+                                <button class="btn btn-warning" type="button"
                                         onclick="location.href='{{ url_for('questiondeactivate', q_id=u.q_id) }}'"><i
                                         class="fa fa-close"></i> Deactivate
                                 </button>
                             {% endif %}
                             <br><br>
-                            <button class="delete" type="button"
+                            <button class="btn btn-danger" type="button"
                                     onclick="location.href='{{ url_for('questionDelete', q_id=u.q_id) }}'"><i
                                     class="fa fa-trash"></i> Delete
                             </button>
@@ -65,11 +69,12 @@
             <br>
             <br>
             {% if page > 1 %}
-                <a id="previous" class="previous" style="font-size:30px;" href="./?page={{ page - 1 }}">Previous</a>
+                <a id="previous" class="btn btn-warning" style="text-decoration: none;" href="./?page={{ page - 1 }}">Previous</a>
             {% endif %}
             {% if pagination.get_page_count() > page %}
-                <a id="next" class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next</a>
+                <a id="next" class="btn btn-success" style="text-decoration: none;" href="./?page={{ page + 1 }}">Next</a>
             {% endif %}
+         {% endif %}
         </div>
     </main>
 {% endblock %}

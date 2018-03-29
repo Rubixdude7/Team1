@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% import 'psikolog/calendar.html' as calendar %}
+
+{% block title %}{{ psyc_info.full_name }}{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    {{ calendar.script_tag() }}
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+        var cal = new calendarModule.Calendar("#calendar");
+        cal.setup();
+        $.getJSON("/api/calendar/psyc/{{ psyc_info.psyc_id }}", function(data){
+            cal.setAvailabilities(data);
+            cal.refresh();
+        });
+    });
+    </script>
+{% endblock %}
+
+{% block content %}
+<main id="psyc-page">
+    <div class="box">
+        <div class="psyc-info">
+            <h2>
+                {{ psyc_info.full_name }}
+            </h2>
+
+            <p class="psyc-bio">
+                {{ psyc_info.qualifications }}
+            </p>
+        </div>
+
+        <div class="pull-right" aria-hidden="true">
+            <img class="avatar" src="{{ avatar_url }}" alt="[photograph of {{ psyc_info.full_name }}]" />
+        </div>
+    </div>
+
+    <div class="box">
+        {{ calendar.calendar('calendar', 'calendar-planning') }}
+    </div>
+</main>
+{% endblock %}

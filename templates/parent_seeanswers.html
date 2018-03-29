@@ -8,16 +8,12 @@
             <hr>
          {% for i in questions %}
 
-          <p><b>Question:  {{ i.question}}</b></p>
+             <p><b>Question:  {{ i.question}}</b></p>
              <br>
-             {% for j in answers %}
-
-
-                 {% if j.q_id == i.q_id %}
-                   <p>Your Answer: {{ j.answer }} </p>
-                    <br>
-                 {% endif %}
-             {% endfor %}
+             {% if answers[loop.index0] != None %}
+                 <p>Your Answer: {{ answers[loop.index0] }} </p>
+                 <br>
+             {% endif %}
 
         {% endfor %}
 

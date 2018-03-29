@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<main id="mainHome">
+    <div class="box">
+        <h1 class="title">Admin Portal</h1>
+    </div>
+
+    <div class="box">
+        <h1 class="title">Tools</h1>
+
+        <hr><br>
+        <center>
+            <form action="/admin" style="display: inline-block">
+                    <button type="submit">User Management</button>
+            </form>&nbsp;&nbsp;&nbsp;
+            <form action="/questions" style="display: inline-block">
+                    <button type="submit" >Question Management</button>
+            </form>
+        </center>
+    </div>
+
+</main>
+{% endblock %}

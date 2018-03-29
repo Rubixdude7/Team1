@@ -161,3 +161,6 @@ venv.bak/
 
 # git mergetool
 *.orig
+
+# SQLite
+local.db

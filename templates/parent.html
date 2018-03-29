@@ -5,61 +5,115 @@
     <div class="box">
         <h1 class="title">{{ user }}</h1>
         <hr>
-
-        <!--this part is fucked rn -->
         <p>
-            Phone Number: {{ contact_info.phone_no }}<br>
+            {% if(contact_info.phone_no) %}
+                Phone Number: {{ contact_info.phone_no }}<br>
+            {% endif %}
 
-            Address 1: {{ contact_info.address_1 }}<br>
+            {% if(contact_info.address_1) %}
+                Address 1: {{ contact_info.address_1 }}<br>
+            {% endif %}
 
             {% if(contact_info.address_2) %}
                 Address 2: {{ contact_info.address_2 }}<br>
             {% endif %}
 
-            City: {{ contact_info.city }}<br>
+            {% if(contact_info.city) %}
+                City: {{ contact_info.city }}<br>
+            {% endif %}
 
             {% if(contact_info.providence) %}
-                Providence: {{ contact_info.providence }}<br>
+                Province: {{ contact_info.providence }}<br>
             {% endif %}
 
             {% if(contact_info.zip) %}
                 Zip: {{ contact_info.zip }}<br>
+
+            {% elif(contact_info == None) %}
+                Please Click Below To Fill Out Your Contact Information
             {% endif %}
 
 
 
-        <form action="/parent/contact">
-            <button type="submit">
-                Update Contact Information
-            </button>
-        </form>
+            <form action="/parent/contact">
+                <button type="submit" class="btn btn-info">
+                    {% if(contact_info) %}
+                        Update Contact Information
+
+                    {% elif(contact_info == None) %}
+                        Add Contact Information
+
+                    {% endif %}
+
+                </button>
+            </form>
+            <br>
+             <form action="/childform">
+                <button type="submit" class="btn btn-secondary">
+                    Add Child
+                </button>
+             </form>
         </p>
 
     </div>
 
-    <div class="box">
-        <p>
-        <form action="/childform">
-            <button type="submit">
-                Add Child
-            </button>
-        </form>
-        </p>
-
-
-        </p>
-
-
-        <ul class="list-group">
             {% for child in children %}
-                <li class="list-group-item"><a href="{{ url_for('child', child_id=child.child_id) }}">{{ child.child_nm_fst }}</a></li>
-                <br>
-          <a href="{{ url_for('parent_seeanswers', child_id=child.child_id) }}">View Question Answers</a>
-                <br>
-                <br>
+                <li class="list-group-item" style="list-style: none">
+                    <div class="box">
+                        <p>
+
+
+                            First name: {{ child.child_nm_fst }}<br>
+                            Last name: {{ child.child_nm_lst }}<br>
+                            Age: {{ querydb.getAge(child) }}<br>
+                            {% if not child.child_id in updatedQuestions and child.q_comp_dtm != None %}
+                                    Questions completed on: {{ child.q_comp_dtm }}<br>
+                            {% endif %}
+
+
+                            {% if current_user.is_authenticated and current_user.is_in_role("user") %}
+                                {% if child.q_comp_dtm != None and not child.child_id in updatedQuestions %}
+                                    <form>
+                                        <button onclick="location.href='{{ url_for('parent_seeanswers', child_id=child.child_id) }}'" type="button" class="btn btn-info">
+                                            View Question Answers
+                                        </button>
+                                    </form>
+                                    <form>
+                                        <br>
+                                        <button class="btn-warning btn" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-warning">
+                                            Edit Answers!
+                                        </button>
+                                    </form>
+                                {% elif child.q_comp_dtm == None %}
+                                    <form>
+                                        <button class="btn-danger btn" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-danger">
+                                            Questionnaire Needs Completed!
+                                        </button>
+                                    </form>
+                                {% endif %}
+
+                                {% if child.child_id in updatedQuestions %}
+                                    <br>
+                                    <button class="btn-danger btn" onclick="location.href='{{ url_for('questionsUserView', child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-danger">
+                                        Answer New Questions!
+                                    </button>
+                                {% endif %}
+
+                                {% if not child.child_id in updatedQuestions and child.q_comp_dtm != None and querydb.postConsult(child.child_id) %}
+                                    <br>
+                                    <button onclick="location.href='{{ url_for('schedule', child_id=child.child_id) }}'" type="button" class="btn btn-success">Schedule Consultation</button>
+                                {% elif not querydb.postConsult(child.child_id) %}
+                                    <br>
+                                    Next Appointment: {{ querydb.haveTime(child.child_id) }}
+                                {% endif %}
+                            {% endif %}
+
+                        </p>
+                    </div>
+                </li>
+
+
             {% endfor %}
-        </ul>
-    </div>
 </main>
 
 

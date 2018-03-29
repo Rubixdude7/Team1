@@ -44,9 +44,9 @@
                     {{ form.city(size=25) }}
                 </div>
                 <div class="form-control-2">
-                    {{ form.providence.label }}
+                    {{ form.province.label }}
                     <br>
-                    {{ form.providence(size=25) }}
+                    {{ form.province(size=25) }}
                 </div>
                 <div class="form-control-2">
                     {{ form.zip.label }}
@@ -57,10 +57,12 @@
             <div class="form-control-2">
                 {{ form.role.label }}
                 <br>
-                {{ form.role(size=1) }}
+                <div class="select">
+                    {{ form.role(size=1) }}
+                </div>
             </div>
             <div class="form-control-2">
-                {{ form.submit() }}
+                {{ form.submit(class="btn btn-success") }}
             </div>
         </form>
     </div>
