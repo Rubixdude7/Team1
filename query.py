@@ -499,7 +499,7 @@ class query(object):
                                .join(db.consultation, JOIN_INNER, db.consultation.cnslt_id == db.consult_time.cnslt)\
                                .join(db.child, JOIN_INNER, db.consultation.child == db.child.child_id)\
                                .where(db.psychologist.psyc_id == psyc_id)\
-                               .order_by(db.consult_time.time_st.desc())\
+                               .order_by(db.consult_time.time_st.asc())\
                                .naive()
         
         wib = pytz.timezone('Asia/Jakarta')
