@@ -1,0 +1,1177 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>app &#8212; Passion Konsultan Web App 1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for app</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">sqlalchemy.exc</span>
+<span class="kn">import</span> <span class="nn">babel</span>
+<span class="kn">import</span> <span class="nn">pytz</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">url_for</span><span class="p">,</span> <span class="n">Markup</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">json</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">flask_sqlalchemy</span> <span class="k">import</span> <span class="n">SQLAlchemy</span>
+<span class="kn">from</span> <span class="nn">playhouse.flask_utils</span> <span class="k">import</span> <span class="n">object_list</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">request</span>
+<span class="kn">from</span> <span class="nn">flask_user</span> <span class="k">import</span> <span class="n">login_required</span><span class="p">,</span> <span class="n">roles_required</span><span class="p">,</span> <span class="n">UserManager</span><span class="p">,</span> <span class="n">UserMixin</span><span class="p">,</span> <span class="n">SQLAlchemyAdapter</span><span class="p">,</span> <span class="n">current_user</span>
+<span class="kn">from</span> <span class="nn">flask_user</span> <span class="k">import</span> <span class="n">login_required</span><span class="p">,</span> <span class="n">roles_required</span><span class="p">,</span> <span class="n">UserManager</span><span class="p">,</span> <span class="n">UserMixin</span><span class="p">,</span> <span class="n">SQLAlchemyAdapter</span><span class="p">,</span> <span class="n">current_user</span><span class="p">,</span> \
+    <span class="n">user_registered</span>
+<span class="kn">from</span> <span class="nn">flask_user.forms</span> <span class="k">import</span> <span class="n">RegisterForm</span>
+<span class="kn">from</span> <span class="nn">flask_mail</span> <span class="k">import</span> <span class="n">Mail</span>
+<span class="kn">from</span> <span class="nn">flask_wtf</span> <span class="k">import</span> <span class="n">FlaskForm</span>
+<span class="kn">from</span> <span class="nn">wtforms</span> <span class="k">import</span> <span class="n">StringField</span><span class="p">,</span> <span class="n">DateTimeField</span><span class="p">,</span> <span class="n">Form</span><span class="p">,</span> <span class="n">SelectField</span><span class="p">,</span> <span class="n">SubmitField</span><span class="p">,</span> <span class="n">RadioField</span>
+<span class="kn">from</span> <span class="nn">wtforms.validators</span> <span class="k">import</span> <span class="n">DataRequired</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">url_for</span>
+<span class="kn">from</span> <span class="nn">werkzeug.utils</span> <span class="k">import</span> <span class="n">secure_filename</span>
+<span class="kn">from</span> <span class="nn">wtforms</span> <span class="k">import</span> <span class="n">StringField</span><span class="p">,</span> <span class="n">DateField</span>
+<span class="kn">from</span> <span class="nn">wtforms.validators</span> <span class="k">import</span> <span class="n">DataRequired</span><span class="p">,</span> <span class="n">ValidationError</span>
+<span class="kn">import</span> <span class="nn">query</span>
+<span class="kn">import</span> <span class="nn">models</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">flash</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">redirect</span>
+<span class="kn">from</span> <span class="nn">jose</span> <span class="k">import</span> <span class="n">jwt</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span>
+<span class="kn">from</span> <span class="nn">_sha256</span> <span class="k">import</span> <span class="n">sha256</span>
+<span class="kn">from</span> <span class="nn">uuid</span> <span class="k">import</span> <span class="n">uuid4</span> <span class="c1">#this is in place of js&#39;s guid</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SECRET_KEY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;thisisasecret&#39;</span>
+<span class="c1"># DEV Jason&#39;s database</span>
+<span class="c1"># app.config[&#39;SQLALCHEMY_DATABASE_URI&#39;] = &#39;mysql+pymysql://mgqmsvhuvgtovyte:Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU@42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com/db42576e98688b4ab28226a87601334c89&#39;</span>
+<span class="c1"># DEV sqlite (local)</span>
+<span class="c1">#app.config[&#39;SQLALCHEMY_DATABASE_URI&#39;] = &#39;sqlite:///local.db&#39;</span>
+<span class="c1"># Production Brandon&#39;s databasee</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span>
+    <span class="s1">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d&#39;</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span>
+    <span class="s1">&#39;SQLALCHEMY_TRACK_MODIFICATIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># TODO make sure this is ok, this gets rid of the warning in the terminal</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;CSRF_ENABLED&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;USER_APP_NAME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Passion&#39;</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;USER_AFTER_REGISTER_ENDPOINT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;user.login&#39;</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">from_pyfile</span><span class="p">(</span><span class="s1">&#39;config.cfg&#39;</span><span class="p">)</span>
+
+<span class="c1"># Setup Flask-User</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">SQLAlchemy</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<span class="n">mail</span> <span class="o">=</span> <span class="n">Mail</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="User"><a class="viewcode-back" href="../modules/app.html#app.User">[docs]</a><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Model</span><span class="p">,</span> <span class="n">UserMixin</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">BigInteger</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># User authentication information</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="c1"># User email information</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">confirmed_at</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">DateTime</span><span class="p">())</span>
+
+    <span class="c1"># User information</span>
+    <span class="n">active</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Boolean</span><span class="p">(),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="s1">&#39;0&#39;</span><span class="p">)</span>
+    <span class="n">first_name</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">last_name</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Relationships</span>
+    <span class="n">roles</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">relationship</span><span class="p">(</span><span class="s1">&#39;Role&#39;</span><span class="p">,</span> <span class="n">secondary</span><span class="o">=</span><span class="s1">&#39;user_roles&#39;</span><span class="p">,</span>
+                            <span class="n">backref</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">backref</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">,</span> <span class="n">lazy</span><span class="o">=</span><span class="s1">&#39;dynamic&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">active</span>
+
+    <span class="k">def</span> <span class="nf">is_in_role</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+        <span class="n">role_nm</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Role</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">UserRoles</span><span class="p">,</span> <span class="p">(</span><span class="n">Role</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">UserRoles</span><span class="o">.</span><span class="n">role_id</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span>
+                    <span class="n">UserRoles</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">rs</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">rn</span> <span class="ow">in</span> <span class="n">role_nm</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="n">rn</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">rs</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">rs</span></div>
+
+
+<span class="c1"># Define the Role data model</span>
+<div class="viewcode-block" id="Role"><a class="viewcode-back" href="../modules/app.html#app.Role">[docs]</a><span class="k">class</span> <span class="nc">Role</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;role_id&#39;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">BigInteger</span><span class="p">(),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;role_nm&#39;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<span class="c1"># Define the UserRoles data model</span>
+<div class="viewcode-block" id="UserRoles"><a class="viewcode-back" href="../modules/app.html#app.UserRoles">[docs]</a><span class="k">class</span> <span class="nc">UserRoles</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;user_role_id&#39;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">BigInteger</span><span class="p">(),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">user_id</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Integer</span><span class="p">(),</span> <span class="n">db</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;user.user_id&#39;</span><span class="p">,</span> <span class="n">ondelete</span><span class="o">=</span><span class="s1">&#39;CASCADE&#39;</span><span class="p">))</span>
+    <span class="n">role_id</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Integer</span><span class="p">(),</span> <span class="n">db</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;role.role_id&#39;</span><span class="p">,</span> <span class="n">ondelete</span><span class="o">=</span><span class="s1">&#39;CASCADE&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="MyRegisterForm"><a class="viewcode-back" href="../modules/app.html#app.MyRegisterForm">[docs]</a><span class="k">class</span> <span class="nc">MyRegisterForm</span><span class="p">(</span><span class="n">RegisterForm</span><span class="p">):</span>
+    <span class="n">first_name</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;First Name&#39;</span><span class="p">,</span> <span class="n">validators</span><span class="o">=</span><span class="p">[</span><span class="n">DataRequired</span><span class="p">(</span><span class="s1">&#39;First name is required&#39;</span><span class="p">)])</span>
+    <span class="n">last_name</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;Last Name&#39;</span><span class="p">)</span></div>
+
+
+<span class="c1"># Setup Flask-User</span>
+<span class="n">db_adapter</span> <span class="o">=</span> <span class="n">SQLAlchemyAdapter</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">UserClass</span><span class="o">=</span><span class="n">User</span><span class="p">)</span>  <span class="c1"># Register the User model</span>
+<span class="n">user_manager</span> <span class="o">=</span> <span class="n">UserManager</span><span class="p">(</span><span class="n">db_adapter</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">register_form</span><span class="o">=</span><span class="n">MyRegisterForm</span><span class="p">)</span>  <span class="c1"># Initialize Flask-User</span>
+
+<span class="c1"># set up query class as db</span>
+<span class="n">querydb</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">query</span><span class="p">()</span>
+
+
+<span class="c1"># This hook ensures that a connection is opened to handle any queries</span>
+<span class="c1"># generated by the request.</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">before_request</span>
+<span class="k">def</span> <span class="nf">_db_connect</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">models</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">is_closed</span><span class="p">():</span>
+        <span class="n">models</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        <span class="n">models</span><span class="o">.</span><span class="n">create_tables_and_seed_if_necessary</span><span class="p">()</span>
+
+<span class="c1"># This hook ensures that the connection is closed when we&#39;ve finished</span>
+<span class="c1"># processing the request.</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">teardown_request</span>
+<span class="k">def</span> <span class="nf">_db_close</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">models</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">is_closed</span><span class="p">():</span>
+        <span class="n">models</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="c1"># This hook ensures that a user is given a role when they sign up</span>
+<span class="c1"># new user registered</span>
+<span class="nd">@user_registered</span><span class="o">.</span><span class="n">connect_via</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_after_register_hook</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="o">**</span><span class="n">extra</span><span class="p">):</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="n">Role</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="n">user_role</span> <span class="o">=</span> <span class="n">UserRoles</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">role_id</span><span class="o">=</span><span class="n">role</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user_role</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+
+<span class="c1">#           BRANDON         #</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">errorhandler</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">page_not_found</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;404.html&#39;</span><span class="p">),</span> <span class="mi">404</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">errorhandler</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">page_not_found</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;403.html&#39;</span><span class="p">),</span> <span class="mi">403</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">errorhandler</span><span class="p">(</span><span class="mi">410</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">page_not_found</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;410.html&#39;</span><span class="p">),</span> <span class="mi">410</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">errorhandler</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">page_not_found</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;500.html&#39;</span><span class="p">),</span> <span class="mi">500</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">errorhandler</span><span class="p">(</span><span class="n">sqlalchemy</span><span class="o">.</span><span class="n">exc</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">handle_bad_request</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+    <span class="n">flash</span><span class="p">(</span><span class="s2">&quot;TELL BRANDON!!! HE IS TRYING TO SEE IF THIS FIXES THE ERROR THAT HE CAUGHT!!! &quot;</span>
+          <span class="s2">&quot;SOME BACKGROUND, THIS HAPPENS BECAUSE OF AN ERROR WITH OUT DB TIMING OUT&quot;</span>
+          <span class="s2">&quot;THE FIX IS TO REFRESH THE PAGE AND IN THE FUTURE THAT IS WHAT WILL HAPPEND&quot;</span>
+          <span class="s2">&quot;BUT FOR NOW WE NEED TO SEND YOU HOME TO SEE IF THE ERROR IS EVEN BEING CAUGHT&quot;</span>
+          <span class="s2">&quot;SO TELL BRANDON!!!!!&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">))</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="n">page_num</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="s1">&#39;page_num&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+        <span class="n">page_num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;page_num&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;index.html&quot;</span><span class="p">,</span> <span class="n">blog_posts</span><span class="o">=</span><span class="n">querydb</span><span class="o">.</span><span class="n">getAllBlogPosts</span><span class="p">(</span><span class="n">page_num</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">page_num</span><span class="o">=</span><span class="n">page_num</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/consultation&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">consultation</span><span class="p">():</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;child_id&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;child_id&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;psyc_id&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;psyc_id&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;len&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;st_dt&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;st_dt&#39;</span><span class="p">]</span>
+    <span class="p">}</span>
+
+    <span class="n">status</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">schecule_cnslt</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="n">status</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="n">status</span><span class="p">[</span><span class="mi">1</span><span class="p">]})</span>
+
+
+<span class="c1">#           END BRANDON         #</span>
+
+<span class="c1">#    Begin Jared</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/editQuestion&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">editQuestion</span><span class="p">():</span>
+    <span class="n">q_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;q_id&#39;</span><span class="p">)</span>
+    <span class="n">getQuestion</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getQuestion</span><span class="p">(</span><span class="n">q_id</span><span class="p">)</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="n">QuestionEdit</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">validate_on_submit</span><span class="p">():</span>
+        <span class="n">newQuestion</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">question</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">querydb</span><span class="o">.</span><span class="n">editQuestion</span><span class="p">(</span><span class="n">q_id</span><span class="p">,</span> <span class="n">newQuestion</span><span class="p">)</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Your changes have been saved.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;questions&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;editQuestion.html&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Edit Question&#39;</span><span class="p">,</span>
+                           <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span> <span class="n">question</span><span class="o">=</span><span class="n">getQuestion</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/questiondeactivate&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">questiondeactivate</span><span class="p">():</span>
+    <span class="n">q_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;q_id&#39;</span><span class="p">)</span>
+    <span class="n">querydb</span><span class="o">.</span><span class="n">deactivateQuestion</span><span class="p">(</span><span class="n">q_id</span><span class="p">)</span>
+    <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Your blog post has been deactivated!&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;questions&#39;</span><span class="p">))</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/questionreactivate&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">questionreactivate</span><span class="p">():</span>
+    <span class="n">q_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;q_id&#39;</span><span class="p">)</span>
+    <span class="n">querydb</span><span class="o">.</span><span class="n">reactivateQuestion</span><span class="p">(</span><span class="n">q_id</span><span class="p">)</span>
+    <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Your blog post has been reactivated!&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;questions&#39;</span><span class="p">))</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/questionDelete&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">questionDelete</span><span class="p">():</span>
+    <span class="n">q_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;q_id&#39;</span><span class="p">)</span>
+    <span class="n">querydb</span><span class="o">.</span><span class="n">questionDelete</span><span class="p">(</span><span class="n">q_id</span><span class="p">)</span>
+    <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Question has been deleted!&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;questions&#39;</span><span class="p">))</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/questions/&#39;</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">questions</span><span class="p">():</span>  <span class="c1"># TODO Breaks if there are no quesions in db</span>
+    <span class="n">questions</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAllQuestions</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">questions</span><span class="p">:</span>
+
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;questions.html&quot;</span><span class="p">,</span> <span class="n">questions</span><span class="o">=</span><span class="n">questions</span><span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="n">object_list</span><span class="p">(</span><span class="s2">&quot;questions.html&quot;</span><span class="p">,</span> <span class="n">paginate_by</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="n">questions</span><span class="p">,</span> <span class="n">context_variable</span><span class="o">=</span><span class="s1">&#39;questions&#39;</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/reviews&#39;</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">reviews</span><span class="p">():</span>  <span class="c1"># TODO Breaks if there are no quesions in db</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;reviews.html&quot;</span><span class="p">)</span>
+
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/questionsUserView/&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">questionsUserView</span><span class="p">():</span>
+    <span class="n">totalQuestions</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;totalQuestions&#39;</span><span class="p">)</span>
+    <span class="n">child_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;child_id&#39;</span><span class="p">)</span>
+    <span class="n">child_name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;child_name&#39;</span><span class="p">)</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">child_id</span><span class="p">)</span>
+    <span class="n">checkComplete</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">q_comp_dtm</span>
+    <span class="c1"># brody</span>
+    <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;parent&#39;</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">c</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span> <span class="o">!=</span> <span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;parent&#39;</span><span class="p">))</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;page&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">page</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">page</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">savePaginateAnswers</span><span class="p">()</span>
+    <span class="c1"># end brody</span>
+
+    <span class="n">questions</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAllQuestionsForUsers</span><span class="p">()</span>
+    <span class="c1"># Brody code</span>
+    <span class="n">answers</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">questions</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">querydb</span><span class="o">.</span><span class="n">getAnswer</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">q_id</span><span class="p">,</span> <span class="n">child_id</span><span class="p">))</span>
+    <span class="c1"># end Brody code</span>
+    <span class="k">if</span> <span class="n">totalQuestions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">totalQuestions</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">questions</span><span class="p">)</span>  <span class="c1"># for progress bar</span>
+        <span class="n">totalQuestions</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">totalQuestions</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">questions</span><span class="p">:</span>
+
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;questionsUserView.html&quot;</span><span class="p">,</span> <span class="n">questions</span><span class="o">=</span><span class="n">questions</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">object_list</span><span class="p">(</span><span class="s2">&quot;questionsUserView.html&quot;</span><span class="p">,</span> <span class="n">paginate_by</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="n">questions</span><span class="p">,</span> <span class="n">context_variable</span><span class="o">=</span><span class="s1">&#39;questions&#39;</span><span class="p">,</span>
+                       <span class="n">child_id</span><span class="o">=</span><span class="n">child_id</span><span class="p">,</span> <span class="n">child_name</span><span class="o">=</span><span class="n">child_name</span><span class="p">,</span> <span class="n">answers</span><span class="o">=</span><span class="n">answers</span><span class="p">,</span> <span class="n">totalQuestions</span><span class="o">=</span><span class="n">totalQuestions</span><span class="p">,</span>
+                       <span class="n">checkComplete</span><span class="o">=</span><span class="n">checkComplete</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/questionsUserView2/&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">questionsUserView2</span><span class="p">():</span>  <span class="c1"># post QuestionUserView</span>
+    <span class="c1"># getargs</span>
+    <span class="n">totalQuestions</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;totalQuestions&#39;</span><span class="p">)</span>
+    <span class="n">totalQuestions</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">totalQuestions</span><span class="p">)</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">)</span>
+    <span class="n">totalPage</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;totalPage&#39;</span><span class="p">)</span>
+    <span class="n">child_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;child_id&#39;</span><span class="p">)</span>
+    <span class="n">child_name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;child_name&#39;</span><span class="p">)</span>
+
+    <span class="c1"># validation</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">child_id</span><span class="p">)</span>
+    <span class="n">checkComplete</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">q_comp_dtm</span>
+    <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;parent&#39;</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">c</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span> <span class="o">!=</span> <span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;parent&#39;</span><span class="p">))</span>
+
+    <span class="c1"># how much each page should paginate by, change for differet number of questions per page(please change this value for other question views if you change)</span>
+    <span class="n">paginate</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">questions</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAllQuestionsForUsers</span><span class="p">()</span>
+    <span class="c1"># Brody code</span>
+    <span class="n">answers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">questions</span><span class="p">:</span>
+        <span class="n">answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">querydb</span><span class="o">.</span><span class="n">getAnswer</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">q_id</span><span class="p">,</span> <span class="n">child_id</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">page</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">answers</span> <span class="o">=</span> <span class="n">answers</span><span class="p">[(</span><span class="n">paginate</span> <span class="o">*</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">page</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)):</span> <span class="nb">len</span><span class="p">(</span><span class="n">answers</span><span class="p">)]</span>
+    <span class="c1"># End Brody code</span>
+
+    <span class="n">questionAnswerList</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;fname&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">questionAnswerList</span><span class="p">)</span>
+    <span class="n">questionIdList</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;qField&#39;</span><span class="p">)</span>
+    <span class="n">childId</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cField&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">questionIdList</span><span class="p">)</span>
+    <span class="c1"># Brody says: q = answer, q2 = questionId</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">q2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">questionAnswerList</span><span class="p">,</span> <span class="n">questionIdList</span><span class="p">):</span>
+        <span class="c1"># lack of this if was causing false &quot;completed&quot; question forms</span>
+        <span class="k">if</span> <span class="n">q</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">querydb</span><span class="o">.</span><span class="n">addQuestionAnswers</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">q2</span><span class="p">,</span> <span class="n">childId</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">page</span> <span class="o">==</span> <span class="n">totalPage</span><span class="p">:</span>
+        <span class="n">querydb</span><span class="o">.</span><span class="n">checkComp</span><span class="p">(</span><span class="n">child_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;parent&#39;</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">object_list</span><span class="p">(</span><span class="s2">&quot;questionsUserView.html&quot;</span><span class="p">,</span> <span class="n">paginate_by</span><span class="o">=</span><span class="n">paginate</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="n">questions</span><span class="p">,</span> <span class="n">context_variable</span><span class="o">=</span><span class="s1">&#39;questions&#39;</span><span class="p">,</span>
+                       <span class="n">child_id</span><span class="o">=</span><span class="n">child_id</span><span class="p">,</span> <span class="n">child_name</span><span class="o">=</span><span class="n">child_name</span><span class="p">,</span> <span class="n">answers</span><span class="o">=</span><span class="n">answers</span><span class="p">,</span> <span class="n">totalQuestions</span><span class="o">=</span><span class="n">totalQuestions</span><span class="p">,</span>
+                       <span class="n">checkComplete</span><span class="o">=</span><span class="n">checkComplete</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/viewAnswers/&#39;</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">viewAnswers</span><span class="p">():</span>
+    <span class="n">child_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;child_id&#39;</span><span class="p">)</span>
+    <span class="n">child_name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;child_name&#39;</span><span class="p">)</span>
+    <span class="n">questions</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAllQuestionAnswers</span><span class="p">()</span>
+    <span class="c1">#  count = querydb.paginate(page_num) --still working on pagination</span>
+    <span class="k">return</span> <span class="n">object_list</span><span class="p">(</span><span class="s2">&quot;questionsUserView.html&quot;</span><span class="p">,</span> <span class="n">paginate_by</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="n">questions</span><span class="p">,</span> <span class="n">context_variable</span><span class="o">=</span><span class="s1">&#39;questions&#39;</span><span class="p">,</span>
+                       <span class="n">child_id</span><span class="o">=</span><span class="n">child_id</span><span class="p">,</span> <span class="n">child_name</span><span class="o">=</span><span class="n">child_name</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/parent_seeanswers&#39;</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">parent_seeanswers</span><span class="p">():</span>
+    <span class="n">child_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;child_id&#39;</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">child_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;parent&#39;</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">current_user</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;parent&#39;</span><span class="p">))</span>
+    <span class="n">questions</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAllQuestionsForUsers</span><span class="p">()</span>
+    <span class="c1"># Brody code</span>
+    <span class="n">answers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">questions</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Q_ID: &quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">q_id</span><span class="p">)</span>
+        <span class="n">answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">querydb</span><span class="o">.</span><span class="n">getAnswer</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">q_id</span><span class="p">,</span> <span class="n">child_id</span><span class="p">))</span>
+    <span class="c1"># end Brody code</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;parent_seeanswers.html&quot;</span><span class="p">,</span> <span class="n">child_id</span><span class="o">=</span><span class="n">child_id</span><span class="p">,</span> <span class="n">answers</span><span class="o">=</span><span class="n">answers</span><span class="p">,</span> <span class="n">questions</span><span class="o">=</span><span class="n">questions</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/add_questions&#39;</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">add_questions</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;add_question.html&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/post_add_questions&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">post_questions</span><span class="p">():</span>
+    <span class="n">question</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;question&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">querydb</span><span class="o">.</span><span class="n">addQuestion</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;questions&#39;</span><span class="p">))</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/post_edit_questionAnswers&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">post_editQuestions</span><span class="p">():</span>
+    <span class="n">questionAnswerList</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;fname&#39;</span><span class="p">)</span>
+    <span class="n">questionIdList</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;qField&#39;</span><span class="p">)</span>
+    <span class="n">childId</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cField&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">q2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">questionAnswerList</span><span class="p">,</span> <span class="n">questionIdList</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">questionAnswerList</span><span class="p">)</span>
+        <span class="n">querydb</span><span class="o">.</span><span class="n">addQuestionAnswers</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">q2</span><span class="p">,</span> <span class="n">childId</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;parent&#39;</span><span class="p">))</span>
+
+
+
+<span class="c1">#   End Jared</span>
+
+<span class="c1"># Start Gabe</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/parent&#39;</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">parent</span><span class="p">():</span>
+    <span class="n">updatedQuestions</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">checkNewQuestions</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;parent.html&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">current_user</span><span class="o">.</span><span class="n">first_name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">current_user</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span>
+                           <span class="n">children</span><span class="o">=</span><span class="n">querydb</span><span class="o">.</span><span class="n">getChildren</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+                           <span class="n">contact_info</span><span class="o">=</span><span class="n">querydb</span><span class="o">.</span><span class="n">contactID</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="n">querydb</span><span class="o">=</span><span class="n">querydb</span><span class="p">,</span>
+                           <span class="n">updatedQuestions</span><span class="o">=</span><span class="n">updatedQuestions</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/parent/contact&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">contact</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;contact.html&#39;</span><span class="p">,</span> <span class="n">contact_info</span><span class="o">=</span><span class="n">querydb</span><span class="o">.</span><span class="n">contactID</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/parent/contact&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">editContact</span><span class="p">():</span>
+    <span class="n">contact_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">contactID</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">querydb</span><span class="o">.</span><span class="n">updateContact</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">contact_id</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;phone_no&#39;</span><span class="p">),</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;address_1&#39;</span><span class="p">),</span>
+                          <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;address_2&#39;</span><span class="p">),</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;city&#39;</span><span class="p">),</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;providence&#39;</span><span class="p">),</span>
+                          <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zip&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">parent</span><span class="p">()</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/videoConf&#39;</span><span class="p">)</span>
+<span class="c1">#@login_required</span>
+<span class="c1">#@roles_required(&#39;user&#39;, &#39;psyc&#39;)</span>
+<span class="k">def</span> <span class="nf">videoConf</span><span class="p">():</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://interviews.skype.com/api/interviews&#39;</span>
+
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">generateToken</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># stores the token</span>
+
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;User-Agent&#39;</span><span class="p">:</span> <span class="s1">&#39;Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="s1">&#39;Bearer &#39;</span> <span class="o">+</span> <span class="n">token</span><span class="p">}</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="vm">__dict__</span>
+    <span class="n">requrl</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_content&#39;</span><span class="p">,</span> <span class="p">{}))</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;urls&#39;</span><span class="p">,</span> <span class="p">{})[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">requrl</span><span class="p">)</span>
+    <span class="c1">#print(querydb.generateUrl())</span>
+
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">requrl</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="mi">302</span><span class="p">)</span>
+
+<span class="c1"># End Gabe</span>
+
+
+<span class="c1"># Start Brody&#39;s code</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/childform&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">childform</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;childform.html&#39;</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/childform&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">addChild</span><span class="p">():</span>
+    <span class="n">born</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dateofbirth&#39;</span><span class="p">),</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+    <span class="n">age</span> <span class="o">=</span> <span class="n">today</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="n">born</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="p">((</span><span class="n">today</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">today</span><span class="o">.</span><span class="n">day</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">born</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">born</span><span class="o">.</span><span class="n">day</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">age</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Error with childs age&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parent</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">age</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Error with childs age&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parent</span><span class="p">()</span>
+
+    <span class="n">querydb</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;firstname&#39;</span><span class="p">),</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lastname&#39;</span><span class="p">),</span>
+                     <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dateofbirth&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">parent</span><span class="p">()</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/post_add_questionAnswers&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">savePaginateAnswers</span><span class="p">():</span>
+    <span class="n">questionAnswerList</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;fname&#39;</span><span class="p">)</span>
+    <span class="n">questionIdList</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;qField&#39;</span><span class="p">)</span>
+    <span class="n">childId</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cField&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Brody says: q = answer, q2 = questionId</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">q2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">questionAnswerList</span><span class="p">,</span> <span class="n">questionIdList</span><span class="p">):</span>
+        <span class="c1"># lack of this if was causing false &quot;completed&quot; question forms</span>
+        <span class="k">if</span> <span class="n">q</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">querydb</span><span class="o">.</span><span class="n">addQuestionAnswers</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">q2</span><span class="p">,</span> <span class="n">childId</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/staffconsultations&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;staff&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">approvePayments</span><span class="p">():</span>
+    <span class="n">consultations</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getUnpaidConsultations</span><span class="p">()</span>
+    <span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">consultations</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Consultation ID: &quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">cnslt_id</span><span class="p">)</span>
+        <span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">querydb</span><span class="o">.</span><span class="n">getChildNameFromID</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">child</span><span class="p">))</span>
+        <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">querydb</span><span class="o">.</span><span class="n">getConsultationTime</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">cnslt_id</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;staffconsultations.html&#39;</span><span class="p">,</span> <span class="n">children</span><span class="o">=</span><span class="n">children</span><span class="p">,</span> <span class="n">consultations</span><span class="o">=</span><span class="n">consultations</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="n">times</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/staff_ApprovedConsultations&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;staff&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">viewApprovedConsultations</span><span class="p">():</span>
+    <span class="n">consultations</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPaidConsultations</span><span class="p">()</span>
+    <span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">consultations</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Consultation ID: &quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">cnslt_id</span><span class="p">)</span>
+        <span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">querydb</span><span class="o">.</span><span class="n">getChildNameFromID</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">child</span><span class="p">))</span>
+        <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">querydb</span><span class="o">.</span><span class="n">getConsultationTime</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">cnslt_id</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;staff_ApprovedConsultations.html&#39;</span><span class="p">,</span> <span class="n">children</span><span class="o">=</span><span class="n">children</span><span class="p">,</span> <span class="n">consultations</span><span class="o">=</span><span class="n">consultations</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="n">times</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/staffconsultations/approvals&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">getPaymentChanges</span><span class="p">():</span>
+    <span class="n">consultations</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;consult_id&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">consultations</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="s1">&#39;on&#39;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Marking paid: &quot;</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+                <span class="n">querydb</span><span class="o">.</span><span class="n">markConsultApproved</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Check box was off&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;approvePayments&#39;</span><span class="p">))</span>
+
+
+<span class="c1"># End Brody</span>
+
+
+<span class="c1"># Start Jason&#39;s code</span>
+
+<span class="c1"># Forms</span>
+<div class="viewcode-block" id="RoleChangeForm"><a class="viewcode-back" href="../modules/app.html#app.RoleChangeForm">[docs]</a><span class="k">class</span> <span class="nc">RoleChangeForm</span><span class="p">(</span><span class="n">FlaskForm</span><span class="p">):</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="n">SelectField</span><span class="p">(</span><span class="s1">&#39;Role&#39;</span><span class="p">,</span> <span class="n">coerce</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">validators</span><span class="o">=</span><span class="p">[</span><span class="n">DataRequired</span><span class="p">()],</span> <span class="n">option_widget</span><span class="o">=</span><span class="s1">&#39;Select&#39;</span><span class="p">)</span>
+    <span class="n">submit</span> <span class="o">=</span> <span class="n">SubmitField</span><span class="p">(</span><span class="s1">&#39;Submit&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EditClientForm"><a class="viewcode-back" href="../modules/app.html#app.EditClientForm">[docs]</a><span class="k">class</span> <span class="nc">EditClientForm</span><span class="p">(</span><span class="n">FlaskForm</span><span class="p">):</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="n">SelectField</span><span class="p">(</span><span class="s1">&#39;Role&#39;</span><span class="p">,</span> <span class="n">coerce</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">validators</span><span class="o">=</span><span class="p">[</span><span class="n">DataRequired</span><span class="p">()],</span> <span class="n">option_widget</span><span class="o">=</span><span class="s1">&#39;Select&#39;</span><span class="p">)</span>
+    <span class="n">firstName</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;firstName&#39;</span><span class="p">)</span>
+    <span class="n">lastName</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;lastName&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QuestionEdit"><a class="viewcode-back" href="../modules/app.html#app.QuestionEdit">[docs]</a><span class="k">class</span> <span class="nc">QuestionEdit</span><span class="p">(</span><span class="n">FlaskForm</span><span class="p">):</span>
+    <span class="n">question</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;question&#39;</span><span class="p">)</span>
+    <span class="n">submit</span> <span class="o">=</span> <span class="n">SubmitField</span><span class="p">(</span><span class="s1">&#39;Submit&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ClientEditForm"><a class="viewcode-back" href="../modules/app.html#app.ClientEditForm">[docs]</a><span class="k">class</span> <span class="nc">ClientEditForm</span><span class="p">(</span><span class="n">FlaskForm</span><span class="p">):</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;Email&#39;</span><span class="p">)</span>
+    <span class="n">fName</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;First Name&#39;</span><span class="p">)</span>
+    <span class="n">lName</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;Last Name&#39;</span><span class="p">)</span>
+    <span class="n">phone</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;Phone Number&#39;</span><span class="p">)</span>
+    <span class="n">address_1</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;Address 1&#39;</span><span class="p">)</span>
+    <span class="n">address_2</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;Address 2&#39;</span><span class="p">)</span>
+    <span class="n">city</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;City&#39;</span><span class="p">)</span>
+    <span class="n">province</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;Province&#39;</span><span class="p">)</span>
+    <span class="nb">zip</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;Zip Code&#39;</span><span class="p">)</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="n">SelectField</span><span class="p">(</span><span class="s1">&#39;Role&#39;</span><span class="p">,</span> <span class="n">coerce</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">validators</span><span class="o">=</span><span class="p">[</span><span class="n">DataRequired</span><span class="p">()],</span> <span class="n">option_widget</span><span class="o">=</span><span class="s1">&#39;Select&#39;</span><span class="p">)</span>
+    <span class="n">submit</span> <span class="o">=</span> <span class="n">SubmitField</span><span class="p">(</span><span class="s1">&#39;Submit&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SearchBar"><a class="viewcode-back" href="../modules/app.html#app.SearchBar">[docs]</a><span class="k">class</span> <span class="nc">SearchBar</span><span class="p">(</span><span class="n">FlaskForm</span><span class="p">):</span>
+    <span class="n">radio</span> <span class="o">=</span> <span class="n">RadioField</span><span class="p">(</span><span class="s1">&#39;Items Per Page&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;5&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;10&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;15&#39;</span><span class="p">,</span> <span class="mi">15</span><span class="p">)],</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;5&#39;</span><span class="p">)</span>
+    <span class="n">search</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;Search&#39;</span><span class="p">,</span> <span class="n">render_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;placeholder&quot;</span><span class="p">:</span> <span class="s2">&quot;Search&quot;</span><span class="p">})</span>
+    <span class="n">submit</span> <span class="o">=</span> <span class="n">SubmitField</span><span class="p">(</span><span class="s1">&#39;Submit&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FeeAssign"><a class="viewcode-back" href="../modules/app.html#app.FeeAssign">[docs]</a><span class="k">class</span> <span class="nc">FeeAssign</span><span class="p">(</span><span class="n">FlaskForm</span><span class="p">):</span>
+    <span class="n">oneHourFee</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;1 Hour&#39;</span><span class="p">)</span>
+    <span class="n">onePointFiveFee</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;1.5 Hour&#39;</span><span class="p">)</span>
+    <span class="n">twoHourFee</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="s1">&#39;2 Hour&#39;</span><span class="p">)</span>
+    <span class="n">submit</span> <span class="o">=</span> <span class="n">SubmitField</span><span class="p">(</span><span class="s1">&#39;Submit&#39;</span><span class="p">)</span></div>
+
+
+<span class="c1"># Routes</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/adminPortal&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">adminPortal</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;admin/adminPortal.html&#39;</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/feeAdjust&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">feeAdjust</span><span class="p">():</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="n">FeeAssign</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">validate_on_submit</span><span class="p">():</span>
+        <span class="n">feeOne</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">oneHourFee</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">feeOneFive</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">onePointFiveFee</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">feeTwo</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">twoHourFee</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">querydb</span><span class="o">.</span><span class="n">updateLengthFee</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">feeOne</span><span class="p">)</span>
+        <span class="n">querydb</span><span class="o">.</span><span class="n">updateLengthFee</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">feeOneFive</span><span class="p">)</span>
+        <span class="n">querydb</span><span class="o">.</span><span class="n">updateLengthFee</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">feeTwo</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;adminPortal&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;admin/feeAdjust.html&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/admin&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">admin</span><span class="p">():</span>
+    <span class="n">page_num</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">items_per_page</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="k">if</span> <span class="s1">&#39;page_num&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+        <span class="n">page_num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;page_num&#39;</span><span class="p">])</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="n">SearchBar</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">validate_on_submit</span><span class="p">():</span>
+        <span class="n">items_per_page</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">radio</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">radio</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">items_per_page</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getSearchedUsers</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">search</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">page_num</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">items_per_page</span><span class="p">))</span>
+        <span class="n">num_of_pages</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">querydb</span><span class="o">.</span><span class="n">getSearchedUserCount</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">search</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="nb">int</span><span class="p">(</span><span class="n">items_per_page</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;items_per_page&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="n">items_per_page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;items_per_page&#39;</span><span class="p">]</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">radio</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">items_per_page</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAllUsers</span><span class="p">(</span><span class="n">page_num</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">items_per_page</span><span class="p">))</span>
+        <span class="n">num_of_pages</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">querydb</span><span class="o">.</span><span class="n">getUserCount</span><span class="p">()</span> <span class="o">/</span> <span class="nb">int</span><span class="p">(</span><span class="n">items_per_page</span><span class="p">))</span>
+    <span class="n">roles</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">usersandroles</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">role</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+        <span class="n">roles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="s1">&#39;admin&#39;</span><span class="p">:</span>
+            <span class="n">usersandroles</span><span class="p">[</span><span class="n">u</span><span class="o">.</span><span class="n">email</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Admin&#39;</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="s1">&#39;user&#39;</span><span class="p">:</span>
+            <span class="n">usersandroles</span><span class="p">[</span><span class="n">u</span><span class="o">.</span><span class="n">email</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;User&#39;</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="s1">&#39;psyc&#39;</span><span class="p">:</span>
+            <span class="n">usersandroles</span><span class="p">[</span><span class="n">u</span><span class="o">.</span><span class="n">email</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Psychologist&#39;</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="s1">&#39;staff&#39;</span><span class="p">:</span>
+            <span class="n">usersandroles</span><span class="p">[</span><span class="n">u</span><span class="o">.</span><span class="n">email</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Office Staff&#39;</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;admin/admin.html&#39;</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">users</span><span class="p">,</span> <span class="n">roles</span><span class="o">=</span><span class="n">roles</span><span class="p">,</span> <span class="n">usersandroles</span><span class="o">=</span><span class="n">usersandroles</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">form</span>
+                           <span class="p">,</span> <span class="n">page_num</span><span class="o">=</span><span class="n">page_num</span><span class="p">,</span> <span class="n">num_of_pages</span><span class="o">=</span><span class="n">num_of_pages</span><span class="p">,</span> <span class="n">items_per_page</span><span class="o">=</span><span class="n">items_per_page</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/edit&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">edit</span><span class="p">():</span>
+    <span class="n">isUserOrPsyc</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">u_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;u_id&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">u_id</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">))</span>
+    <span class="n">current_role</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">role</span><span class="p">(</span><span class="n">u_id</span><span class="p">)</span>
+    <span class="n">c_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">contactID</span><span class="p">(</span><span class="n">u_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">current_role</span> <span class="o">==</span> <span class="s1">&#39;user&#39;</span> <span class="ow">or</span> <span class="n">current_role</span> <span class="o">==</span> <span class="s1">&#39;psyc&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ClientEditForm</span><span class="p">()</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">email</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getEmail</span><span class="p">(</span><span class="n">u_id</span><span class="p">)</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">fName</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getfName</span><span class="p">(</span><span class="n">u_id</span><span class="p">)</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">lName</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getlName</span><span class="p">(</span><span class="n">u_id</span><span class="p">)</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">phone</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPhone</span><span class="p">(</span><span class="n">c_id</span><span class="p">)</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">address_1</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAdd1</span><span class="p">(</span><span class="n">c_id</span><span class="p">)</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">address_2</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAdd2</span><span class="p">(</span><span class="n">c_id</span><span class="p">)</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">city</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getCity</span><span class="p">(</span><span class="n">c_id</span><span class="p">)</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">province</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getProvince</span><span class="p">(</span><span class="n">c_id</span><span class="p">)</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">zip</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getZip</span><span class="p">(</span><span class="n">c_id</span><span class="p">)</span>
+        <span class="n">isUserOrPsyc</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">RoleChangeForm</span><span class="p">()</span>
+    <span class="n">roles</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAllRoles</span><span class="p">()</span>
+    <span class="n">current_role</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">role</span><span class="p">(</span><span class="n">u_id</span><span class="p">)</span>
+    <span class="n">rolenames</span> <span class="o">=</span> <span class="p">[</span><span class="n">current_role</span><span class="p">]</span>
+    <span class="n">roleplusbigbois</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">role_nm</span> <span class="o">!=</span> <span class="n">current_role</span><span class="p">:</span>
+            <span class="n">rolenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">role_nm</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">rolenames</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;user&#39;</span><span class="p">:</span>
+            <span class="n">roleplusbigbois</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;User&#39;</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;psyc&#39;</span><span class="p">:</span>
+            <span class="n">roleplusbigbois</span><span class="p">[</span><span class="s1">&#39;psyc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Psychologist&#39;</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;admin&#39;</span><span class="p">:</span>
+            <span class="n">roleplusbigbois</span><span class="p">[</span><span class="s1">&#39;Admin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Admin&#39;</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;staff&#39;</span><span class="p">:</span>
+            <span class="n">roleplusbigbois</span><span class="p">[</span><span class="s1">&#39;staff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Office Staff&#39;</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="p">[(</span><span class="n">r</span><span class="p">,</span> <span class="n">roleplusbigbois</span><span class="p">[</span><span class="n">r</span><span class="p">])</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roleplusbigbois</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">validate_on_submit</span><span class="p">():</span>
+        <span class="n">newRole</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">if</span> <span class="n">newRole</span> <span class="o">==</span> <span class="s1">&#39;psyc&#39;</span><span class="p">:</span>
+            <span class="n">querydb</span><span class="o">.</span><span class="n">addPsychologistIfNotExist</span><span class="p">(</span><span class="n">u_id</span><span class="p">)</span>
+        <span class="n">querydb</span><span class="o">.</span><span class="n">updateUserRole</span><span class="p">(</span><span class="n">u_id</span><span class="p">,</span> <span class="n">newRole</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">isUserOrPsyc</span><span class="p">:</span>
+            <span class="n">querydb</span><span class="o">.</span><span class="n">updateEmail</span><span class="p">(</span><span class="n">u_id</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">email</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">querydb</span><span class="o">.</span><span class="n">updateName</span><span class="p">(</span><span class="n">u_id</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">fName</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">lName</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">querydb</span><span class="o">.</span><span class="n">updateContact</span><span class="p">(</span><span class="n">u_id</span><span class="p">,</span> <span class="n">c_id</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">phone</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">address_1</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">address_2</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                                  <span class="n">form</span><span class="o">.</span><span class="n">city</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">province</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">zip</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Your changes have been saved.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;admin/edit.html&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Edit Profile&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span> <span class="n">isUserOrPsyc</span><span class="o">=</span><span class="n">isUserOrPsyc</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/delete&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">delete</span><span class="p">():</span>
+    <span class="n">user_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;u_id&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">))</span>
+    <span class="n">querydb</span><span class="o">.</span><span class="n">softDeleteUser</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">))</span>
+
+
+<span class="c1"># End Jason&#39;s code</span>
+
+<span class="c1"># Begin Charlie&#39;s code</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">template_global</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">display_datetime</span><span class="p">(</span><span class="n">dt</span><span class="p">):</span>
+    <span class="n">wib</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="s1">&#39;Asia/Jakarta&#39;</span><span class="p">)</span>
+    <span class="n">pytz</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">wib</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">babel</span><span class="o">.</span><span class="n">dates</span><span class="o">.</span><span class="n">format_datetime</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;EEEE, d MMMM yyyy hh:mm a (z)&#39;</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">wib</span><span class="p">,</span> <span class="n">locale</span><span class="o">=</span><span class="s1">&#39;id_ID&#39;</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">template_global</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">indonesian_locale</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">babel</span><span class="o">.</span><span class="n">Locale</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;ID&#39;</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/api/calendar&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/api/calendar/psyc/&lt;int:psyc_id&gt;&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">api_calendar</span><span class="p">(</span><span class="n">psyc_id</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">):</span>
+    <span class="n">slots</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAllSlotsThatCanBeBooked</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">:</span>
+        <span class="c1"># Adjust month number for javascript</span>
+        <span class="n">s</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">][</span><span class="s1">&#39;month&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">s</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">][</span><span class="s1">&#39;month&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">slots</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/api/availabilities&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">api_availabilities</span><span class="p">():</span>
+    <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">avails</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAvailabilities</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">avails</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/api/blog/&lt;psyc_id&gt;&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">api_blog</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">):</span>
+    <span class="n">page_num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;page_num&#39;</span><span class="p">])</span>
+    <span class="n">page_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;page_size&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">querydb</span><span class="o">.</span><span class="n">apiBlog</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">,</span> <span class="n">page_num</span><span class="p">,</span> <span class="n">page_size</span><span class="p">))</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/my_psikolog_page&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">my_psikolog_page</span><span class="p">():</span>
+    <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;psikolog&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">psyc_id</span><span class="p">))</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/schedule&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">schedule</span><span class="p">():</span>  <span class="c1"># TODO make sure only child of that parent can get here</span>
+    <span class="n">child_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;child_id&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;schedule.html&#39;</span><span class="p">,</span>
+                           <span class="n">psyc_names</span><span class="o">=</span><span class="n">querydb</span><span class="o">.</span><span class="n">getPsychologistNames</span><span class="p">(),</span>
+                           <span class="n">len_fee</span><span class="o">=</span><span class="n">querydb</span><span class="o">.</span><span class="n">get_len_fee</span><span class="p">(),</span> <span class="n">child_id</span><span class="o">=</span><span class="n">child_id</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/api/appointments&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">api_appointments</span><span class="p">():</span>
+    <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    
+    <span class="n">page_num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;page_num&#39;</span><span class="p">])</span>
+    <span class="n">page_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;page_size&#39;</span><span class="p">])</span>
+    
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">querydb</span><span class="o">.</span><span class="n">apiAppointments</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">,</span> <span class="n">page_num</span><span class="p">,</span> <span class="n">page_size</span><span class="p">))</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/appointments&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">psikolog_appointments</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;psikolog/appointments.html&#39;</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/&lt;int:id&gt;&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">psikolog</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">psyc_info</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">lookupPsychologist</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">psyc_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Got their info.</span>
+            <span class="c1"># Now fetch their blog posts.</span>
+            <span class="n">blg</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getBlogPostsBy</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+            <span class="n">blog_posts</span> <span class="o">=</span> <span class="p">[{</span>
+                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">post</span><span class="o">.</span><span class="n">subject</span><span class="p">,</span>
+                <span class="s1">&#39;date_posted&#39;</span><span class="p">:</span> <span class="n">post</span><span class="o">.</span><span class="n">updt_dtm</span><span class="p">,</span>
+                <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="n">Markup</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+            <span class="p">}</span> <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">blg</span><span class="p">]</span>
+
+            <span class="n">can_edit</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">current_user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+                <span class="n">logged_in_psyc</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getUserPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">logged_in_psyc</span> <span class="o">==</span> <span class="nb">id</span><span class="p">:</span>
+                    <span class="n">can_edit</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="c1"># Fetch the psychologist&#39;s avatar</span>
+            <span class="n">avatar_url</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAvatar</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;psikolog/psikolog_page.html&#39;</span><span class="p">,</span> <span class="n">psyc_info</span><span class="o">=</span><span class="n">psyc_info</span><span class="p">,</span> <span class="n">blog_posts</span><span class="o">=</span><span class="n">blog_posts</span><span class="p">,</span>
+                                   <span class="n">can_edit</span><span class="o">=</span><span class="n">can_edit</span><span class="p">,</span> <span class="n">avatar_url</span><span class="o">=</span><span class="n">avatar_url</span><span class="p">)</span>
+
+    <span class="c1"># Either no id was given or no psychologist was found.</span>
+    <span class="c1"># In both cases, show a list of psychologists.</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;list_psikolog.html&#39;</span><span class="p">,</span> <span class="n">psychologist_links</span><span class="o">=</span><span class="n">querydb</span><span class="o">.</span><span class="n">psychologistLinks</span><span class="p">())</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/dashboard&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">psikolog_dashboard</span><span class="p">():</span>
+    <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">psyc_info</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">lookupPsychologist</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">)</span>
+    <span class="n">avatar_url</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAvatar</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;psikolog/dashboard.html&#39;</span><span class="p">,</span> <span class="n">psyc_info</span><span class="o">=</span><span class="n">psyc_info</span><span class="p">,</span> <span class="n">avatar_url</span><span class="o">=</span><span class="n">avatar_url</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/&lt;int:psyc_id&gt;/&lt;int:year&gt;/&lt;int:month&gt;/&lt;int:day&gt;&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">view_day</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">):</span>
+    <span class="n">psyc</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">lookupPsychologist</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">)</span>
+    <span class="n">avails</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAvailabilitiesForDay</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;view_day.html&#39;</span><span class="p">,</span> <span class="n">psyc</span><span class="o">=</span><span class="n">psyc</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="n">day</span><span class="p">,</span> <span class="n">avails</span><span class="o">=</span><span class="n">avails</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/write_blog_post&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">write_blog_post</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;write_blog_post.html&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">subject</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span>
+        <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">querydb</span><span class="o">.</span><span class="n">createBlogPost</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">psyc_id</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Your blog post has been published.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;psikolog_dashboard&#39;</span><span class="p">))</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/delete_blog_post/&lt;int:blog_id&gt;&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">delete_blog_post</span><span class="p">(</span><span class="n">blog_id</span><span class="p">):</span>
+    <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">querydb</span><span class="o">.</span><span class="n">deleteBlogPost</span><span class="p">(</span><span class="n">blog_id</span><span class="p">,</span> <span class="n">psyc_id</span><span class="p">)</span>
+    <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Blog post successfully deleted.&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;psikolog_dashboard&#39;</span><span class="p">))</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/change_avatar&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">change_avatar</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;change_avatar.html&#39;</span><span class="p">,</span> <span class="n">psyc_id</span><span class="o">=</span><span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">querydb</span><span class="o">.</span><span class="n">updateAvatar</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s1">&#39;avatar&#39;</span><span class="p">])</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Avatar updated.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;psikolog_dashboard&#39;</span><span class="p">))</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/edit_qualifications&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">edit_qualifications</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;edit_qualifications.html&#39;</span><span class="p">,</span> <span class="n">psyc_id</span><span class="o">=</span><span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">querydb</span><span class="o">.</span><span class="n">updateQualifications</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;qualifications&#39;</span><span class="p">])</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Qualifications updated.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;psikolog_dashboard&#39;</span><span class="p">))</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/edit_availability_list&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/edit_availability_list/&lt;int:page&gt;&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">edit_availability_list</span><span class="p">(</span><span class="n">page</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">page</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">avail_list</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAvailabilities</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">,</span> <span class="n">page</span><span class="o">=</span><span class="n">page</span><span class="p">)</span>
+    <span class="n">weekdays</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getWeekDayList</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;edit_availability_list.html&#39;</span><span class="p">,</span> <span class="n">psyc_id</span><span class="o">=</span><span class="n">psyc_id</span><span class="p">,</span> <span class="n">avails</span><span class="o">=</span><span class="n">avail_list</span><span class="p">,</span> <span class="n">weekdays</span><span class="o">=</span><span class="n">weekdays</span><span class="p">,</span>
+                           <span class="n">page</span><span class="o">=</span><span class="n">page</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/add_vacation&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">add_vacation</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;add_vacation.html&#39;</span><span class="p">,</span> <span class="n">current_year</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        
+        <span class="n">vac_st_day</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_st_day&#39;</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_st_month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_st_month&#39;</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_st_year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_st_year&#39;</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_st_hour</span><span class="p">,</span> <span class="n">vac_st_minute</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_st_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="n">vac_st_hour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vac_st_hour</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_st_minute</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vac_st_minute</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_st</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="s1">&#39;Asia/Jakarta&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">vac_st_year</span><span class="p">,</span>
+                                                                          <span class="n">vac_st_month</span><span class="p">,</span>
+                                                                          <span class="n">vac_st_day</span><span class="p">,</span>
+                                                                          <span class="n">vac_st_hour</span><span class="p">,</span>
+                                                                          <span class="n">vac_st_minute</span><span class="p">))</span>
+        <span class="n">vac_st</span> <span class="o">=</span> <span class="n">vac_st</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">pytz</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+        
+        <span class="n">vac_end_day</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_end_day&#39;</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_end_month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_end_month&#39;</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_end_year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_end_year&#39;</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_end_hour</span><span class="p">,</span> <span class="n">vac_end_minute</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="n">vac_end_hour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vac_end_hour</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_end_minute</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vac_end_minute</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_end</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="s1">&#39;Asia/Jakarta&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">vac_end_year</span><span class="p">,</span>
+                                                                           <span class="n">vac_end_month</span><span class="p">,</span>
+                                                                           <span class="n">vac_end_day</span><span class="p">,</span>
+                                                                           <span class="n">vac_end_hour</span><span class="p">,</span>
+                                                                           <span class="n">vac_end_minute</span><span class="p">))</span>
+        <span class="n">vac_end</span> <span class="o">=</span> <span class="n">vac_end</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">pytz</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">vac_st</span> <span class="o">&gt;</span> <span class="n">vac_end</span><span class="p">:</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">vac_end</span>
+            <span class="n">vac_end</span> <span class="o">=</span> <span class="n">vac_st</span>
+            <span class="n">vac_st</span> <span class="o">=</span> <span class="n">temp</span>
+            
+        <span class="n">querydb</span><span class="o">.</span><span class="n">addVacation</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">,</span> <span class="n">vac_st</span><span class="p">,</span> <span class="n">vac_end</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Your vacation has been added to the system.&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;edit_vacation_list&#39;</span><span class="p">))</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/edit_vacation/&lt;int:vac_id&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">edit_vacation</span><span class="p">(</span><span class="n">vac_id</span><span class="p">):</span>
+    <span class="n">wib</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="s1">&#39;Asia/Jakarta&#39;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
+        <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        
+        <span class="n">vac</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getVacation</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">,</span> <span class="n">vac_id</span><span class="p">)</span>
+        
+        <span class="c1"># Convert times to WIB timezone</span>
+        <span class="n">vac</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;vac_id&#39;</span><span class="p">:</span> <span class="n">vac</span><span class="o">.</span><span class="n">vac_id</span><span class="p">,</span>
+            <span class="s1">&#39;vac_st&#39;</span><span class="p">:</span> <span class="n">pytz</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">vac</span><span class="o">.</span><span class="n">vac_st</span><span class="p">)</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">wib</span><span class="p">),</span>
+            <span class="s1">&#39;vac_end&#39;</span><span class="p">:</span> <span class="n">pytz</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">vac</span><span class="o">.</span><span class="n">vac_end</span><span class="p">)</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">wib</span><span class="p">)</span>
+        <span class="p">}</span>
+        
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;edit_vacation.html&#39;</span><span class="p">,</span>
+                               <span class="n">vac</span><span class="o">=</span><span class="n">vac</span><span class="p">,</span>
+                               <span class="n">current_year</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        
+        <span class="n">vac_st_day</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_st_day&#39;</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_st_month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_st_month&#39;</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_st_year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_st_year&#39;</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_st_hour</span><span class="p">,</span> <span class="n">vac_st_minute</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_st_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="n">vac_st_hour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vac_st_hour</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_st_minute</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vac_st_minute</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_st</span> <span class="o">=</span> <span class="n">wib</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">vac_st_year</span><span class="p">,</span>
+                                                <span class="n">vac_st_month</span><span class="p">,</span>
+                                                <span class="n">vac_st_day</span><span class="p">,</span>
+                                                <span class="n">vac_st_hour</span><span class="p">,</span>
+                                                <span class="n">vac_st_minute</span><span class="p">))</span>
+        <span class="n">vac_st</span> <span class="o">=</span> <span class="n">vac_st</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">pytz</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+        
+        <span class="n">vac_end_day</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_end_day&#39;</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_end_month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_end_month&#39;</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_end_year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_end_year&#39;</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_end_hour</span><span class="p">,</span> <span class="n">vac_end_minute</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;vac_end_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="n">vac_end_hour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vac_end_hour</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_end_minute</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vac_end_minute</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">vac_end</span> <span class="o">=</span> <span class="n">wib</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">vac_end_year</span><span class="p">,</span>
+                                                 <span class="n">vac_end_month</span><span class="p">,</span>
+                                                 <span class="n">vac_end_day</span><span class="p">,</span>
+                                                 <span class="n">vac_end_hour</span><span class="p">,</span>
+                                                 <span class="n">vac_end_minute</span><span class="p">))</span>
+        <span class="n">vac_end</span> <span class="o">=</span> <span class="n">vac_end</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">pytz</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">vac_st</span> <span class="o">&gt;</span> <span class="n">vac_end</span><span class="p">:</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">vac_end</span>
+            <span class="n">vac_end</span> <span class="o">=</span> <span class="n">vac_st</span>
+            <span class="n">vac_st</span> <span class="o">=</span> <span class="n">temp</span>
+
+        <span class="n">querydb</span><span class="o">.</span><span class="n">updateVacation</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">,</span> <span class="n">vac_id</span><span class="p">,</span> <span class="n">vac_st</span><span class="p">,</span> <span class="n">vac_end</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Your vacation has been updated.&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;edit_vacation_list&#39;</span><span class="p">))</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/delete_vacation/&lt;int:vac_id&gt;&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">delete_vacation</span><span class="p">(</span><span class="n">vac_id</span><span class="p">):</span>
+    <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">querydb</span><span class="o">.</span><span class="n">deleteVacation</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">,</span> <span class="n">vac_id</span><span class="p">)</span>
+    <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Vacation deleted.&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;edit_vacation_list&#39;</span><span class="p">))</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/edit_vacation_list&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/edit_vacation_list/&lt;int:page&gt;&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">edit_vacation_list</span><span class="p">(</span><span class="n">page</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">page</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="mi">1</span>
+    
+    <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">vac_list</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getVacations</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">,</span> <span class="n">page</span><span class="o">=</span><span class="n">page</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;edit_vacation_list.html&#39;</span><span class="p">,</span> <span class="n">page</span><span class="o">=</span><span class="n">page</span><span class="p">,</span> <span class="n">vac_list</span><span class="o">=</span><span class="n">vac_list</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/delete_availability/&lt;int:avail_id&gt;&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">delete_availability</span><span class="p">(</span><span class="n">avail_id</span><span class="p">):</span>
+    <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">querydb</span><span class="o">.</span><span class="n">deleteAvailability</span><span class="p">(</span><span class="n">avail_id</span><span class="p">,</span> <span class="n">psyc_id</span><span class="p">)</span>
+    <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Availability time has been deleted.&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;edit_availability_list&#39;</span><span class="p">))</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/add_availability&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">add_availability</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
+        <span class="n">weekdays</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getWeekDays</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;add_availability.html&#39;</span><span class="p">,</span> <span class="n">weekdays</span><span class="o">=</span><span class="n">weekdays</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">time_st</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;time_st&#39;</span><span class="p">]</span>
+        <span class="n">time_end</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;time_end&#39;</span><span class="p">]</span>
+        <span class="n">weekday</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;weekday&#39;</span><span class="p">]</span>
+
+        <span class="n">querydb</span><span class="o">.</span><span class="n">addAvailability</span><span class="p">(</span><span class="n">psyc_id</span><span class="p">,</span> <span class="n">time_st</span><span class="p">,</span> <span class="n">time_end</span><span class="p">,</span> <span class="n">weekday</span><span class="p">)</span>
+
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Your new availability time has been created.&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;edit_availability_list&#39;</span><span class="p">))</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/edit_blog_post/&lt;int:blog_id&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">edit_blog_post</span><span class="p">(</span><span class="n">blog_id</span><span class="p">):</span>
+    <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
+        <span class="n">post</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getBlogPost</span><span class="p">(</span><span class="n">blog_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">post</span><span class="o">.</span><span class="n">psyc</span><span class="o">.</span><span class="n">psyc_id</span> <span class="o">!=</span> <span class="n">psyc_id</span><span class="p">:</span>
+            <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;You do not own that blog post.&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;psikolog_dashboard&#39;</span><span class="p">))</span>
+        
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;psikolog/edit_blog_post.html&#39;</span><span class="p">,</span> <span class="n">post</span><span class="o">=</span><span class="n">post</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">subject</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span>
+        
+        <span class="n">querydb</span><span class="o">.</span><span class="n">updateBlogPost</span><span class="p">(</span><span class="n">blog_id</span><span class="p">,</span> <span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">psyc_id</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Successfully updated blog post.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;psikolog_dashboard&#39;</span><span class="p">))</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/psikolog/edit_availability/&lt;int:avail_id&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;psyc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">edit_availability</span><span class="p">(</span><span class="n">avail_id</span><span class="p">):</span>
+    <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getPsycId</span><span class="p">(</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
+        <span class="n">avail</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getAvailability</span><span class="p">(</span><span class="n">avail_id</span><span class="p">,</span> <span class="n">psyc_id</span><span class="p">)</span>
+        <span class="n">weekdays</span> <span class="o">=</span> <span class="n">querydb</span><span class="o">.</span><span class="n">getWeekDays</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;edit_availability.html&#39;</span><span class="p">,</span> <span class="n">avail</span><span class="o">=</span><span class="n">avail</span><span class="p">,</span> <span class="n">avail_id</span><span class="o">=</span><span class="n">avail_id</span><span class="p">,</span> <span class="n">weekdays</span><span class="o">=</span><span class="n">weekdays</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">time_st</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;time_st&#39;</span><span class="p">]</span>
+        <span class="n">time_end</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;time_end&#39;</span><span class="p">]</span>
+        <span class="n">weekday</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;weekday&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">time_st</span> <span class="o">&lt;</span> <span class="n">time_end</span><span class="p">:</span>
+            <span class="n">querydb</span><span class="o">.</span><span class="n">updateAvailability</span><span class="p">(</span><span class="n">avail_id</span><span class="p">,</span> <span class="n">psyc_id</span><span class="p">,</span> <span class="n">time_st</span><span class="p">,</span> <span class="n">time_end</span><span class="p">,</span> <span class="n">weekday</span><span class="p">)</span>
+            <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Availability time has been updated.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Failed to add availability time.  &quot;Time Start&quot; must be earlier than &quot;Time End&quot;.&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;edit_availability_list&#39;</span><span class="p">))</span>
+
+
+<span class="c1"># End Charlie&#39;s code</span>
+
+<span class="c1"># Nolan&#39;s Code</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/staff&#39;</span><span class="p">)</span>
+<span class="nd">@roles_required</span><span class="p">(</span><span class="s1">&#39;staff&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">staff</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;staff.html&#39;</span><span class="p">,</span> <span class="n">children</span><span class="o">=</span><span class="n">querydb</span><span class="o">.</span><span class="n">getVerifiedChildren</span><span class="p">())</span>
+
+
+<span class="c1"># End Nolan&#39;s Code</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Seven Kapybaras and an Aquarium.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
