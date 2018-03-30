@@ -448,10 +448,10 @@ def videoConf():
                'Content-Type': 'application/json',
                'Authorization': 'Bearer ' + token}
     req = requests.post(url=url, data=data, headers=headers)
-    print(req.text)
+    #print(req.text)
     body = req.__dict__
     requrl = json.loads(body.get('_content', {})).get('urls', {})[0].get('url')
-    print(requrl)
+    #print(requrl)
 
     return redirect(requrl, code=302)
 
