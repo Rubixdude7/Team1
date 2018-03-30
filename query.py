@@ -924,25 +924,25 @@ class query(object):
         signed = jwt.encode(claims=payload, key=secret_key)
         return signed
 
-    def generateUrl(self):
-        url = 'https://interviews.skype.com/api/interviews'
-
-        payload = {"code": "passion", "title": "passion consultation"}
-
-        data = json.dumps(payload).encode('ascii')
-        token = query.generateToken(self, data)  # stores the token
-
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
-                   'Content-Type': 'application/json',
-                   'Authorization': 'Bearer ' + token}
-        req = requests.post(url=url, data=data, headers=headers)
-        # print(req.text)
-        body = req.__dict__
-        requrl = json.loads(body.get('_content', {})).get('urls', {})[0].get('url')
-        return requrl
+    # def generateUrl(self):
+    #     url = 'https://interviews.skype.com/api/interviews'
+    #
+    #     payload = {"code": "passion", "title": "passion consultation"}
+    #
+    #     data = json.dumps(payload).encode('ascii')
+    #     token = query.generateToken(self, data)  # stores the token
+    #
+    #     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+    #                'Content-Type': 'application/json',
+    #                'Authorization': 'Bearer ' + token}
+    #     req = requests.post(url=url, data=data, headers=headers)
+    #     # print(req.text)
+    #     body = req.__dict__
+    #     requrl = json.loads(body.get('_content', {})).get('urls', {})[0].get('url')
+    #     return requrl
 
     def updateConsult(self, consult_id, link):
-        c = db.consultation.select().where(db.consultation.cnsl_id == consult_id).get()
+        c = db.consultation.select(db.consultation.link).where(db.consultation.cnsl_id == consult_id).join(db.consultation, JOIN_INNER, db.consultation.child == db.child.child_id).tuples()
         c.link = db.consultation(link=link)
         c.save()
         return True
