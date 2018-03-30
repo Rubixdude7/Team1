@@ -97,6 +97,7 @@ class consultation(MySQLModel):
     fee = DoubleField()
     paid = CharField()
     length = DoubleField()
+    link = CharField()
     finished = CharField()
 
     class Meta:

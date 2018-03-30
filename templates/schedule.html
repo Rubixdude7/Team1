@@ -110,7 +110,31 @@
                         $('#schedule-appt').empty();
 
                         for(var i = 0; i < psycs_day.length; i++){
+
+                            //TODO 24 or 23 hour???
+                            if (psycs_day[i]['st']['hour'] < 12) {
+                                psycs_day[i]['st']['ind'] = 'am';
+                            }
+                            else{
+                                psycs_day[i]['st']['hour'] = psycs_day[i]['st']['hour'] - 12;
+                                psycs_day[i]['st']['ind'] = 'pm';
+                            }
+
+                            if (psycs_day[i]['end']['hour'] < 12) {
+                                psycs_day[i]['end']['ind'] = 'am';
+                            }
+                            else{
+                                psycs_day[i]['end']['hour'] = psycs_day[i]['end']['hour'] - 12;
+                                psycs_day[i]['end']['ind'] = 'pm';
+                            }
+
+                            if (psycs_day[i]['st']['minute'] < 10) psycs_day[i]['st']['minute'] = "0" + psycs_day[i]['st']['minute'];
+                            if (psycs_day[i]['end']['minute'] < 10) psycs_day[i]['end']['minute'] = "0" + psycs_day[i]['end']['minute'];
+
+                            
                             for(var j = 0; j < psycs.length; j++) {
+                                
+
                                 var k = i.toString() + j.toString();
 
 
@@ -124,11 +148,6 @@
 
                                 len_fee_str +=          "</select>" +
                                                     "</div>";
-
-                                var end_min = psycs_day[i]["end"]["minute"], st_min = psycs_day[i]["st"]["minute"];
-                                if (end_min == 0) end_min = "00";
-                                if (st_min == 0) st_min = "00";
-
 
                                 var time_select = "<div class=\"select\">" +
                                                         "<select id=\"time-st\">";
@@ -149,11 +168,14 @@
                                                     "<input type=\"hidden\" id=\"day\" value=\"" + day + "\">" +
                                                     "<input type=\"hidden\" id=\"month\" value=\"" + month + "\">" +
                                                     "<input type=\"hidden\" id=\"year\" value=\"" + year + "\">" +
+                                                    "<input type=\"hidden\" id=\"psyc-st-hr\" value=\"" + psycs_day[i]["st"]["hour"] + "\">" +
+                                                    "<input type=\"hidden\" id=\"psyc-st-min\" value=\"" + psycs_day[i]['st']['minute'] + "\">" +
+                                                    "<input type=\"hidden\" id=\"psyc-st-ind\" value=\"" + psycs_day[i]['st']['ind'] + "\">" +
                                                     "<h4>" + psycs[j]["first_name"] + " " + psycs[j]["last_name"] + "</h4>" +
                                                     "<div>" +
                                                         "<div>" +
-                                                            "<h5>Start: " + psycs_day[i]["st"]["hour"] + ":" + st_min + "</h5>" +
-                                                            "<h5> End: " + psycs_day[i]["end"]["hour"] + ":" + end_min + "</h5>" +
+                                                            "<h5>Start: " + psycs_day[i]["st"]["hour"] + ":" + psycs_day[i]['st']['minute'] + " " + psycs_day[i]['st']['ind'] + "</h5>" +
+                                                            "<h5> End: " + psycs_day[i]["end"]["hour"] + ":" + psycs_day[i]['end']['minute'] + " " + psycs_day[i]['end']['ind'] + "</h5>" +
                                                         "</div>" +
                                                         "<div>" +
                                                             "<label class=\"btn btn-success\" for=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] + "\"> Book </label>" +
