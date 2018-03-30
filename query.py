@@ -919,8 +919,7 @@ class query(object):
                    "iss": api_key,
                    "iat": int(time.time()),
                    "sub": hashlib.sha256(content).hexdigest(),
-                   "exp": int(time.time() + 10),
-                   'code': 'passion', 'title': 'passion conference'}
+                   "exp": int(time.time() + 10)}
         signed = jwt.encode(claims=payload, key=secret_key)
         return signed
 
