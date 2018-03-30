@@ -111,8 +111,8 @@
 
                         for(var i = 0; i < psycs_day.length; i++){
 
-                            //TODO 24 or 23 hour???
                             if (psycs_day[i]['st']['hour'] < 12) {
+                                if (psycs_day[i]['st']['hour'] == 0) psycs_day[i]['st']['hour'] = 12;
                                 psycs_day[i]['st']['ind'] = 'am';
                             }
                             else{
@@ -121,6 +121,7 @@
                             }
 
                             if (psycs_day[i]['end']['hour'] < 12) {
+                                if (psycs_day[i]['end']['hour'] == 0) psycs_day[i]['end']['hour'] = 12;
                                 psycs_day[i]['end']['ind'] = 'am';
                             }
                             else{
@@ -152,13 +153,25 @@
                                 var time_select = "<div class=\"select\">" +
                                                         "<select id=\"time-st\">";
 
-                                for (var l = psycs_day[i]["st"]["hour"]; l < psycs_day[i]["end"]["hour"]; l++){
-                                    time_select += "<option value=\"" + l + "\">" + l + "</option>";
+                                for (var l = 1; l < 13; l++){
+                                    time_select += "<option value=\"" + l + "\">" + l + "</option>"; //TODO this sucks, find a better way instead of all from 1 to 12. i only want the range
 
                                 }
 
                                 time_select +=          "</select>" +
                                                     "</div>";
+                                
+                                var time_ind_select ="<div class=\"select\">" +
+                                                        "<select id=\"time-ind\">"+
+                                                            "<option value=\"" + psycs_day[i]['st']['ind'] + "\">" + psycs_day[i]['st']['ind'] + "</option>";
+                                
+                                if (psycs_day[i]['st']['ind'] != psycs_day[i]['end']['ind']) {
+                                    time_ind_select +=          "<option value=\"" + psycs_day[i]['end']['ind'] + "\">" + psycs_day[i]['end']['ind'] + "</option>";
+                                }
+                                
+                                 time_ind_select +=      "</select>" +
+                                                    "</div>";
+            
 
                                 if(psycs_day[i]["psyc_id"] == psycs[j]["psyc_id"] && psyc == "all"){
                                     $('#schedule-appt').append(
@@ -168,9 +181,6 @@
                                                     "<input type=\"hidden\" id=\"day\" value=\"" + day + "\">" +
                                                     "<input type=\"hidden\" id=\"month\" value=\"" + month + "\">" +
                                                     "<input type=\"hidden\" id=\"year\" value=\"" + year + "\">" +
-                                                    "<input type=\"hidden\" id=\"psyc-st-hr\" value=\"" + psycs_day[i]["st"]["hour"] + "\">" +
-                                                    "<input type=\"hidden\" id=\"psyc-st-min\" value=\"" + psycs_day[i]['st']['minute'] + "\">" +
-                                                    "<input type=\"hidden\" id=\"psyc-st-ind\" value=\"" + psycs_day[i]['st']['ind'] + "\">" +
                                                     "<h4>" + psycs[j]["first_name"] + " " + psycs[j]["last_name"] + "</h4>" +
                                                     "<div>" +
                                                         "<div>" +
@@ -194,6 +204,7 @@
                                                                 "<option value=\"30\"> 30 </option>" +
                                                             "</select>" +
                                                         "</div>" +
+                                                        time_ind_select +
                                                     "</div>" +
                                                     "<input type=\"hidden\" id=\"time-end-hr\" value=\"" + psycs_day[i]["end"]["hour"] + "\">" +
                                                     "<input type=\"hidden\" id=\"time-end-mn\" value=\"" + psycs_day[i]["end"]["minute"] + "\">" +
@@ -250,6 +261,8 @@
                 var child_id= {{ child_id|tojson|safe }};
                 var psyc_id = parseInt($('#' + id).find('#psyc-id').val());
                 var st_tm_hr = parseInt($('#' + id).find('#time-st').val());
+                if ($('#' + id).find('#time-ind').val() == 'pm') st_tm_hr += 12;
+                if (st_tm_hr == 24) st_tm_hr = 0;
                 var st_tm_mn = parseInt($('#' + id).find('#time-st-mn').val());
                 var st_dt = $('#' + id).find('#year').val() + "-" + (parseInt($('#' + id).find('#month').val()) + 1) + "-" +$('#' + id).find('#day').val() + "-" + st_tm_hr + "-" + st_tm_mn;
                 st_tm_mn = st_tm_mn/60;
