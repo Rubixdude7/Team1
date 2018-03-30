@@ -9,16 +9,24 @@
     <div class="box">
         <h1 class="title">Tools</h1>
 
-        <hr><br>
-        <center>
-            <form action="/admin" style="display: inline-block">
-                    <button type="submit">User Management</button>
+        <hr>
+        <div id="admin-portal">
+            <form action="/admin"> <!--TODO Please use url_for() -->
+                    <button class="btn btn-primary" type="submit">User Management</button>
             </form>&nbsp;&nbsp;&nbsp;
-            <form action="/questions" style="display: inline-block">
-                    <button type="submit" >Question Management</button>
+            <form action="/questions">
+                    <button class="btn btn-primary" type="submit" >Question Management</button>
             </form>
+
+            <form action="/feeAdjust" style="display: inline-block">
+                <button class="btn btn-primary" type="submit">Fee Adjust</button>
+            </form>
+
         </center>
+
+        </div>
     </div>
+
 
 </main>
 {% endblock %}

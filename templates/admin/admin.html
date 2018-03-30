@@ -6,7 +6,10 @@
         <h1 class="title">User Management</h1>
     </div>
     <div class="box">
-        <form action="" method="post">
+        <h2 class="title">Users</h2>
+        <hr>
+
+        <form action="" method="post" id="admin-form">
             {{ form.hidden_tag() }}
             <!--TODO REMOVE AND PUT IN CSS-->
             <style>
@@ -14,17 +17,16 @@
                     display: none;
                 }
             </style>
-            <div class="form-control-1">
+            <div>
                 {% for choice in form.radio %}
                     {{ choice }}
                     {{ choice.label(class="btn btn-outline-info") }}
                 {% endfor %}
             </div>
-            <div class = form-control-2>{{ form.search(size=85) }} {{ form.submit(class="btn btn-success") }} </div>
+            <div>{{ form.search(size=85) }} {{ form.submit(class="btn btn-success") }} </div>
 
         </form>
-        <h2 class="title">Users</h2>
-        <hr>
+
         <div class="table-wrapper">
             <table class="table">
                 <thead>

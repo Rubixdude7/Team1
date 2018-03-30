@@ -10,8 +10,9 @@
 @import '_base/_reset';
 @import '_base/_typography';
 @import '_layout/_screenSize';
-@import '_layout/_box';
-@import '_layout/_table';
+@import '_components/_box';
+@import '_components/_button';
+@import '_components/_table';
 @import '_components/_navigation';
 @import '_components/_footer';
 @import '_components/_calendar';

@@ -1,0 +1,323 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>models.py - The models &#8212; Passion Konsultan Web App 1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="query.py - The query library" href="query.html" />
+    <link rel="prev" title="app.py - The application logic" href="app.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-models">
+<span id="models-py-the-models"></span><h1><code class="docutils literal notranslate"><span class="pre">models.py</span></code> - The models<a class="headerlink" href="#module-models" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="models.MySQLModel">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">MySQLModel</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#MySQLModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.MySQLModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>A base model that will use our MySQL database</p>
+<dl class="attribute">
+<dt id="models.MySQLModel.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.MySQLModel.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">MySQLModelDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.blog">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">blog</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#blog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.blog" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.blog.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.blog.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">blogDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.calendar">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">calendar</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#calendar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.calendar" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.calendar.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.calendar.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">calendarDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.child">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">child</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.child" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.child.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.child.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">childDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.consult_time">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">consult_time</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#consult_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.consult_time" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.consult_time.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.consult_time.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">consult_timeDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.consultation">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">consultation</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#consultation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.consultation" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.consultation.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.consultation.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">consultationDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.consultation_fee">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">consultation_fee</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#consultation_fee"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.consultation_fee" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.consultation_fee.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.consultation_fee.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">consultation_feeDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.consultation_length">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">consultation_length</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#consultation_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.consultation_length" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.consultation_length.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.consultation_length.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">consultation_lengthDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.contact">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">contact</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#contact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.contact" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.contact.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.contact.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">contactDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.day_typ_cd">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">day_typ_cd</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#day_typ_cd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.day_typ_cd" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.day_typ_cd.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.day_typ_cd.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">day_typ_cdDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.notes">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">notes</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#notes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.notes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.notes.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.notes.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">notesDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.psychologist">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">psychologist</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#psychologist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.psychologist" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.psychologist.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.psychologist.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">psychologistDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.psychologist_child_xref">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">psychologist_child_xref</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#psychologist_child_xref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.psychologist_child_xref" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.psychologist_child_xref.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.psychologist_child_xref.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">psychologist_child_xrefDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.question_answers">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">question_answers</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#question_answers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.question_answers" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.question_answers.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.question_answers.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">question_answersDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.questions">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">questions</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#questions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.questions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.questions.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.questions.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">questionsDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.review">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">review</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#review"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.review" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.review.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.review.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">reviewDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.role">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">role</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#role"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.role" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.role.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.role.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">roleDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.slider">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">slider</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#slider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.slider" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.slider.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.slider.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">sliderDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.user">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">user</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.user" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.user.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.user.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">userDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.user_roles">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">user_roles</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#user_roles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.user_roles" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.user_roles.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.user_roles.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">user_rolesDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.vacation">
+<em class="property">class </em><code class="descclassname">models.</code><code class="descname">vacation</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models.html#vacation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.vacation" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="models.vacation.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#models.vacation.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">vacationDoesNotExist</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="app.html" title="previous chapter"><code class="docutils literal notranslate"><span class="pre">app.py</span></code> - The application logic</a></li>
+      <li>Next: <a href="query.html" title="next chapter"><code class="docutils literal notranslate"><span class="pre">query.py</span></code> - The query library</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/modules/models.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Seven Kapybaras and an Aquarium.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../_sources/modules/models.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

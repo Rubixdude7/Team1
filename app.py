@@ -29,7 +29,7 @@ import urllib.request
 import urllib.parse
 from _sha256 import sha256
 from uuid import uuid4 #this is in place of js's guid
-import time
+import requests
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
@@ -247,6 +247,13 @@ def questions():  # TODO Breaks if there are no quesions in db
     return object_list("questions.html", paginate_by=3, query=questions, context_variable='questions')
 
 
+@app.route('/reviews')
+@login_required
+def reviews():  # TODO Breaks if there are no quesions in db
+    return render_template("reviews.html")
+
+
+
 @app.route('/questionsUserView/', methods=['GET', 'POST'])
 @login_required
 def questionsUserView():
@@ -429,32 +436,27 @@ def editContact():
 
 
 @app.route('/videoConf')
+#@login_required
+#@roles_required('user', 'psyc')
 def videoConf():
     url = 'https://interviews.skype.com/api/interviews'
-    content = {"jti": str(uuid4()),
-                        "iss": "7b36897b-f594-6f25-fb8d-440c854a2c24",
-                        "iat": str(int(time.time())),
-                        "sub": str(sha256()),
-                        "exp": str(int(time.time() + 10))}
 
-    print(querydb.generateToken(content)) #prints the token
+    payload = {}
 
-    data = urllib.parse.urlencode(content, encoding='utf-8')
-    print(data) #prints the encoded content
-    data = data.encode('ascii')
-    print(data) #prints the ascii encoded content
+    data = json.dumps(payload).encode('ascii')
+    token = querydb.generateToken(data)  # stores the token
 
-    headers = {'User-Agent': 'Mozilla/5.0', 'Content-Type': 'application/json',
-               'Authorization': 'Bearer' + querydb.generateToken(content)}
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+               'Content-Type': 'application/json',
+               'Authorization': 'Bearer ' + token}
+    req = requests.post(url=url, data=data, headers=headers)
+    print(req.text)
+    body = req.__dict__
+    requrl = json.loads(body.get('_content', {})).get('urls', {})[0].get('url')
+    print(requrl)
+    #print(querydb.generateUrl())
 
-    req = urllib.request.Request(url=url, data=data, headers=headers)
-    response = urllib.request.urlopen(req) #this is where it breaks, the request is sent but we never get the response
-    the_page = response.read().decode("utf-8")
-    print(the_page)
-    return render_template('videoConf.html')
-
-
-
+    return redirect(requrl, code=302)
 
 # End Gabe
 
@@ -501,7 +503,7 @@ def savePaginateAnswers():
 @app.route('/staffconsultations', methods=['GET', 'POST'])
 @roles_required('staff')
 def approvePayments():
-    consultations = querydb.getDescendingConsultations()
+    consultations = querydb.getUnpaidConsultations()
     children = []
     times = []
     for c in consultations:
@@ -509,6 +511,19 @@ def approvePayments():
         children.append(querydb.getChildNameFromID(c.child))
         times.append(querydb.getConsultationTime(c.cnslt_id))
     return render_template('staffconsultations.html', children=children, consultations=consultations, times=times)
+
+
+@app.route('/staff_ApprovedConsultations', methods=['GET', 'POST'])
+@roles_required('staff')
+def viewApprovedConsultations():
+    consultations = querydb.getPaidConsultations()
+    children = []
+    times = []
+    for c in consultations:
+        print("Consultation ID: ", c.cnslt_id)
+        children.append(querydb.getChildNameFromID(c.child))
+        times.append(querydb.getConsultationTime(c.cnslt_id))
+    return render_template('staff_ApprovedConsultations.html', children=children, consultations=consultations, times=times)
 
 
 @app.route('/staffconsultations/approvals', methods=['GET', 'POST'])
@@ -568,11 +583,34 @@ class SearchBar(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class FeeAssign(FlaskForm):
+    oneHourFee = StringField('1 Hour')
+    onePointFiveFee = StringField('1.5 Hour')
+    twoHourFee = StringField('2 Hour')
+    submit = SubmitField('Submit')
+
+
 # Routes
 @app.route('/adminPortal')
 @roles_required('admin')
 def adminPortal():
     return render_template('admin/adminPortal.html')
+
+
+@app.route('/feeAdjust', methods=['GET', 'POST'])
+@roles_required('admin')
+def feeAdjust():
+    form = FeeAssign()
+    if form.validate_on_submit():
+        feeOne = form.oneHourFee.data
+        feeOneFive = form.onePointFiveFee.data
+        feeTwo = form.twoHourFee.data
+        querydb.updateLengthFee(1,feeOne)
+        querydb.updateLengthFee(2,feeOneFive)
+        querydb.updateLengthFee(3,feeTwo)
+        flash("Your changes have been saved")
+        return redirect(url_for('adminPortal'))
+    return render_template('admin/feeAdjust.html', form=form)
 
 
 @app.route('/admin', methods=['GET', 'POST'])

@@ -1,0 +1,100 @@
+.box{
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: all 0.2s ease-in-out;
+  background-color: $cardBackground;
+  margin: 1em auto;
+  padding: 1em;
+  box-sizing: border-box;
+
+
+  &:hover{
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  }
+
+  .title{
+    text-align: center;
+  }
+}
+
+.box50{
+  width: calc(50% - 1em) !important;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+
+  &:nth-child(2n + 1){
+    margin: 1em 1em 1em 0;
+  }
+
+  &:nth-child(2n){
+    margin: 1em 0 1em 1em;
+  }
+}
+
+.flash{
+  @extend .box;
+  background-color: rgba(0, 179, 0, .5) !important;
+  p{
+    margin: 0;
+  }
+}
+
+.input-icon {
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 82%;
+}
+
+img.avatar {
+    display: block;
+    margin: 6px;
+    padding: 3px;
+    width: 128px;
+    height: 128px;
+    border: 1px solid #999;
+}
+
+.psyc-info{
+  width: calc(100% - 148px);
+}
+
+#psyc-page{
+  .box:first-child{
+    display: flex;
+  }
+}
+
+/* Columns */
+.flex {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.side-column {
+    margin: 0 0.5em;
+    flex: 1;
+}
+
+.main-column {
+    margin: 0 0.5em;
+    flex: 1.615;
+}
+
+.flex-one {
+    flex: 1;
+}
+
+@media only screen and (max-width: 400) {
+    .side-column {
+        width: 100%;
+    }
+    
+    .main-column {
+        width: 100%;
+    }
+    
+    .flex-one {
+        width: 100%;
+    }
+}

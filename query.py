@@ -13,6 +13,10 @@ from _sha256 import sha256
 from uuid import uuid4 #this is in place of js's guid
 from jose import jws
 from jose import jwt
+import requests
+import time
+import json
+import hashlib
 
 
 
@@ -187,9 +191,16 @@ class query(object):
         except:
             return None
 
-    def getDescendingConsultations(self):
+    def getUnpaidConsultations(self):
         try:
-            consultations = db.consultation.select().order_by(db.consultation.paid.desc())
+            consultations = db.consultation.select().where(db.consultation.paid == 'n').order_by(db.consultation.cnslt_id.desc())
+            return consultations
+        except:
+            return None
+
+    def getPaidConsultations(self):
+        try:
+            consultations = db.consultation.select().where(db.consultation.paid == 'y').order_by(db.consultation.cnslt_id.desc())
             return consultations
         except:
             return None
@@ -312,12 +323,18 @@ class query(object):
         u = db.user.get(db.user.user_id == u_id)
         u.email = email
         u.save()
+
     def updateName(self, u_id, fname, lname):
         u = db.user.get(db.user.user_id == u_id)
 
         u.first_name = fname
         u.last_name = lname
         u.save()
+
+    def updateLengthFee(self, length, fee):
+        l = db.consultation_fee.get(db.consultation_fee.cnslt_fee_id == length)
+        l.fee = fee
+        l.save()
 
 # End Jason's code
 
@@ -480,7 +497,7 @@ class query(object):
                                .join(db.consultation, JOIN_INNER, db.consultation.cnslt_id == db.consult_time.cnslt)\
                                .join(db.child, JOIN_INNER, db.consultation.child == db.child.child_id)\
                                .where(db.psychologist.psyc_id == psyc_id)\
-                               .order_by(db.consult_time.time_st.desc())\
+                               .order_by(db.consult_time.time_st.asc())\
                                .naive()
         
         wib = pytz.timezone('Asia/Jakarta')
@@ -686,6 +703,7 @@ class query(object):
                                 .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
                                 .where((db.role.role_nm == 'psyc') & db.user.active)\
                                 .tuples()
+
         result = [{
             'psyc_id': t[0],
             'child_id': t[1],
@@ -702,7 +720,7 @@ class query(object):
         wib = pytz.timezone('Asia/Jakarta')
                 
         # Let's say the calendar is only valid up to 30 days ahead of today.
-        today = pytz.utc.localize(datetime.datetime.utcnow()).astimezone(wib)
+        today = pytz.utc.localize(datetime.datetime.utcnow()).astimezone(wib).replace(tzinfo=None)
         for day_offset in range(31):
             day = today + datetime.timedelta(day_offset)
 
@@ -713,8 +731,9 @@ class query(object):
                 a_wkd = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
 
                 if wkd == a_wkd:
-                    st = datetime.datetime.combine(day.date(), a['time_st'], tzinfo=wib).astimezone(pytz.utc).replace(tzinfo=None)
-                    end = datetime.datetime.combine(day.date(), a['time_end'], tzinfo=wib).astimezone(pytz.utc).replace(tzinfo=None)
+                    
+                    st = wib.localize(datetime.datetime.combine(day.date(), a['time_st'])).astimezone(pytz.utc).replace(tzinfo=None)
+                    end = wib.localize(datetime.datetime.combine(day.date(), a['time_end'])).astimezone(pytz.utc).replace(tzinfo=None)
 
                     # Add this availability to the result
                     slots.append({
@@ -775,7 +794,7 @@ class query(object):
             del s['valid']
 
         for slot in slots:
-            st = pytz.utc.localize(slot['st']).astimezone(wib)
+            st = pytz.utc.localize(slot['st']).astimezone(wib).replace(tzinfo=None)
             slot['st'] = {
                 'year': st.year,
                 'month': st.month,
@@ -785,7 +804,7 @@ class query(object):
                 'weekday': st.weekday()
             }
             
-            end = pytz.utc.localize(slot['end']).astimezone(wib)
+            end = pytz.utc.localize(slot['end']).astimezone(wib).replace(tzinfo=None)
             slot['end'] = {
                 'year': end.year,
                 'month': end.month,
@@ -864,39 +883,63 @@ class query(object):
         c.save()
 
     def postConsult(self, child_id):
-        try:
-            end = db.consultation.select(db.consult_time.time_end).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()[0]
-            print('getting end')
-            if end is not None:
-                l = list(end)[0]
+        query = db.consult_time.select().where(db.consultation.child == child_id).join(db.consultation, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc())
+        print('getting end')
+        for ct in query:
+            l = ct.time_end
 
-                print('in end if')
+            print('in end if')
 
-                print(l)
+            print(datetime.datetime.utcnow())
+            print(l)
 
-                if l < datetime.datetime.today():
-                    print('true')
-                    return True
-                else:
-                    print('fale')
-                    return False
-            else:
-                print('true 2')
-                return True
-        except IndexError:
-            print('true 3')
-            return True
+            if l >= datetime.datetime.utcnow():
+                print('fale')
+                return False
+        
+        print('true 2')
+        return True
 
 
     def haveTime(self, child_id):
-        start = db.consultation.select(db.consult_time.time_st).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()[0]
-        start = list(start)[0]
-        return start
+        start = db.consult_time.select().where(db.consultation.child == child_id).join(db.consultation, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).get()
+        wib = pytz.timezone('Asia/Jakarta')
+        start = pytz.utc.localize(start.time_st).astimezone(wib)
+        return babel.dates.format_datetime(start, format='EEEE, d MMMM yyyy hh:mm a (z)', tzinfo=wib, locale='id_ID')
 
     def generateToken(self, content):
-        signed = jws.sign(payload=content, key='5c2ccb9d-a143-e5b8-cd1d-0ee4dbf6666c', algorithm='HS256')
+        api_key = '65e63b43-a69b-7ea1-49f7-06046fa21aee'
+        secret_key = '9369f8e0-fff8-e5a6-d2a4-363254aa5dbe'
+        payload = {"jti": uuid4().hex,
+                   "iss": api_key,
+                   "iat": int(time.time()),
+                   "sub": hashlib.sha256(content).hexdigest(),
+                   "exp": int(time.time() + 10)}
+        signed = jwt.encode(claims=payload, key=secret_key)
         return signed
 
+    # def generateUrl(self):
+    #     url = 'https://interviews.skype.com/api/interviews'
+    #
+    #     payload = {"code": "passion", "title": "passion consultation"}
+    #
+    #     data = json.dumps(payload).encode('ascii')
+    #     token = query.generateToken(self, data)  # stores the token
+    #
+    #     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+    #                'Content-Type': 'application/json',
+    #                'Authorization': 'Bearer ' + token}
+    #     req = requests.post(url=url, data=data, headers=headers)
+    #     # print(req.text)
+    #     body = req.__dict__
+    #     requrl = json.loads(body.get('_content', {})).get('urls', {})[0].get('url')
+    #     return requrl
+
+    def updateConsult(self, consult_id, link):
+        c = db.consultation.select(db.consultation.link).where(db.consultation.cnsl_id == consult_id).join(db.consultation, JOIN_INNER, db.consultation.child == db.child.child_id).tuples()
+        c.link = db.consultation(link=link)
+        c.save()
+        return True
     #End of Gabe's code
 
     #Nolan's Code

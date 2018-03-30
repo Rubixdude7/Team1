@@ -40,9 +40,11 @@
                         <li>
                             <a href="{{ url_for('index') }}">HOME</a>
                         </li>
-                        <!--<li>
-                            <a href="{{ url_for('videoConf') }}">VIDEOCONF</a>
-                        </li>-->
+                        {% if current_user.is_authenticated %}
+                            <li>
+                                <a target="_blank" href="{{ url_for('videoConf') }}">VIDEOCONF</a>
+                            </li>
+                        {% endif %}
                         {% if current_user.is_authenticated and current_user.is_in_role("user") %}
                             <li>
                                 <a href="{{ url_for('parent') }}">PARENTS</a>
