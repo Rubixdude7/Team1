@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<main id="mainHome">
+    <div class="box">
+        <h1 class="title">Admin Portal</h1>
+    </div>
+
+    <div class="box">
+        <h1 class="title">Tools</h1>
+
+        <hr>
+        <div id="admin-portal">
+            <form action="/admin"> <!--TODO Please use url_for() -->
+                    <button class="btn btn-primary" type="submit">User Management</button>
+            </form>&nbsp;&nbsp;&nbsp;
+            <form action="/questions">
+                    <button class="btn btn-primary" type="submit" >Question Management</button>
+            </form>
+            <!--
+            <form action="/feeAdjust" style="display: inline-block">
+                <button type="submit">Fee Adjust</button>
+            </form>
+            -->
+        </div>
+    </div>
+
+
+</main>
+{% endblock %}

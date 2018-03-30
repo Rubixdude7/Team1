@@ -60,7 +60,7 @@
                     var avails = [];
                     for (var i = 0; i < allAvails.length; i++) {
                         if (allAvails[i]["psyc_id"] == psyc_id) {
-                            avails[avails.length] = allAvails[i];
+                            avails.push(allAvails[i]);
                         }
                     }
                     cal.setAvailabilities(avails);
@@ -98,7 +98,8 @@
                         var psycs_day = [];
                         for (var i = 0; i < allAvails.length; i++) {
                             if (allAvails[i]["st"]["year"] == year && allAvails[i]["st"]["month"] == month && allAvails[i]["st"]["day"] == day) {
-                                psycs_day.push(allAvails[i]);
+                                // Copy the availability object to prevent messing with it inside the calendar code
+                                psycs_day.push(JSON.parse(JSON.stringify(allAvails[i])));
                             }
                         }
 
@@ -110,10 +111,35 @@
                         $('#schedule-appt').empty();
 
                         for(var i = 0; i < psycs_day.length; i++){
+
+                            if (psycs_day[i]['st']['hour'] < 12) {
+                                if (psycs_day[i]['st']['hour'] == 0) psycs_day[i]['st']['hour'] = 12;
+                                psycs_day[i]['st']['ind'] = 'am';
+                            }
+                            else{
+                                psycs_day[i]['st']['hour'] = psycs_day[i]['st']['hour'] - 12;
+                                psycs_day[i]['st']['ind'] = 'pm';
+                            }
+
+                            if (psycs_day[i]['end']['hour'] < 12) {
+                                if (psycs_day[i]['end']['hour'] == 0) psycs_day[i]['end']['hour'] = 12;
+                                psycs_day[i]['end']['ind'] = 'am';
+                            }
+                            else{
+                                psycs_day[i]['end']['hour'] = psycs_day[i]['end']['hour'] - 12;
+                                psycs_day[i]['end']['ind'] = 'pm';
+                            }
+
+                            if (psycs_day[i]['st']['minute'] < 10) psycs_day[i]['st']['minute'] = "0" + psycs_day[i]['st']['minute'];
+                            if (psycs_day[i]['end']['minute'] < 10) psycs_day[i]['end']['minute'] = "0" + psycs_day[i]['end']['minute'];
+
+                            
                             for(var j = 0; j < psycs.length; j++) {
+                                
+
                                 var k = i.toString() + j.toString();
 
-
+ 
                                 var len_fee_str = "<div class=\"select\">" +
                                                         "<select class=\"length\">";
 
@@ -125,21 +151,28 @@
                                 len_fee_str +=          "</select>" +
                                                     "</div>";
 
-                                var end_min = psycs_day[i]["end"]["minute"], st_min = psycs_day[i]["st"]["minute"];
-                                if (end_min == 0) end_min = "00";
-                                if (st_min == 0) st_min = "00";
-
-
                                 var time_select = "<div class=\"select\">" +
                                                         "<select id=\"time-st\">";
 
-                                for (var l = psycs_day[i]["st"]["hour"]; l < psycs_day[i]["end"]["hour"]; l++){
-                                    time_select += "<option value=\"" + l + "\">" + l + "</option>";
+                                for (var l = 1; l < 13; l++){
+                                    time_select += "<option value=\"" + l + "\">" + l + "</option>"; //TODO this sucks, find a better way instead of all from 1 to 12. i only want the range
 
                                 }
 
                                 time_select +=          "</select>" +
                                                     "</div>";
+                                
+                                var time_ind_select ="<div class=\"select\">" +
+                                                        "<select id=\"time-ind\">"+
+                                                            "<option value=\"" + psycs_day[i]['st']['ind'] + "\">" + psycs_day[i]['st']['ind'] + "</option>";
+                                
+                                if (psycs_day[i]['st']['ind'] != psycs_day[i]['end']['ind']) {
+                                    time_ind_select +=          "<option value=\"" + psycs_day[i]['end']['ind'] + "\">" + psycs_day[i]['end']['ind'] + "</option>";
+                                }
+                                
+                                 time_ind_select +=      "</select>" +
+                                                    "</div>";
+            
 
                                 if(psycs_day[i]["psyc_id"] == psycs[j]["psyc_id"] && psyc == "all"){
                                     $('#schedule-appt').append(
@@ -152,8 +185,8 @@
                                                     "<h4>" + psycs[j]["first_name"] + " " + psycs[j]["last_name"] + "</h4>" +
                                                     "<div>" +
                                                         "<div>" +
-                                                            "<h5>Start: " + psycs_day[i]["st"]["hour"] + ":" + st_min + "</h5>" +
-                                                            "<h5> End: " + psycs_day[i]["end"]["hour"] + ":" + end_min + "</h5>" +
+                                                            "<h5>Start: " + psycs_day[i]["st"]["hour"] + ":" + psycs_day[i]['st']['minute'] + " " + psycs_day[i]['st']['ind'] + "</h5>" +
+                                                            "<h5> End: " + psycs_day[i]["end"]["hour"] + ":" + psycs_day[i]['end']['minute'] + " " + psycs_day[i]['end']['ind'] + "</h5>" +
                                                         "</div>" +
                                                         "<div>" +
                                                             "<label class=\"btn btn-success\" for=\"" + psycs_day[i]["psyc_id"] + "" + psycs_day[i]["st"]["hour"] + "\"> Book </label>" +
@@ -172,6 +205,7 @@
                                                                 "<option value=\"30\"> 30 </option>" +
                                                             "</select>" +
                                                         "</div>" +
+                                                        time_ind_select +
                                                     "</div>" +
                                                     "<input type=\"hidden\" id=\"time-end-hr\" value=\"" + psycs_day[i]["end"]["hour"] + "\">" +
                                                     "<input type=\"hidden\" id=\"time-end-mn\" value=\"" + psycs_day[i]["end"]["minute"] + "\">" +
@@ -228,6 +262,8 @@
                 var child_id= {{ child_id|tojson|safe }};
                 var psyc_id = parseInt($('#' + id).find('#psyc-id').val());
                 var st_tm_hr = parseInt($('#' + id).find('#time-st').val());
+                if ($('#' + id).find('#time-ind').val() == 'pm') st_tm_hr += 12;
+                if (st_tm_hr == 24) st_tm_hr = 0;
                 var st_tm_mn = parseInt($('#' + id).find('#time-st-mn').val());
                 var st_dt = $('#' + id).find('#year').val() + "-" + (parseInt($('#' + id).find('#month').val()) + 1) + "-" +$('#' + id).find('#day').val() + "-" + st_tm_hr + "-" + st_tm_mn;
                 st_tm_mn = st_tm_mn/60;

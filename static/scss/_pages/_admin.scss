@@ -10,3 +10,19 @@ table{
     width: 100%;
   }
 }
+
+#admin-form{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#admin-portal{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  button{
+    margin: 0 1em;
+  }
+}

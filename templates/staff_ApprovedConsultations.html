@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Paid Consultations{% endblock %}
+{% block content %}
+<main>
+
+        <a href="{{ url_for('approvePayments') }}">
+        View Unapproved Consultations
+        </a>
+
+
+    <!--- Just in case we need the old code
+    <div>
+    <div class="box">
+        <h1 class="title">Approved Consultations</h1>
+    </div>
+        {% for consultation in consultations %}
+            <li class="list-group-item" style="list-style: none">
+                <div class="box">
+                    <p>
+                        Name: {{ children[loop.index0].child_nm_fst }} {{ children[loop.index0].child_nm_lst }} <br>
+                        Start Time: {{ times[loop.index0].time_st }}<br>
+                        End Time: {{ times[loop.index0].time_end }}<br>
+                        Approved: <input type="checkbox" checked disabled><br>
+                        <input type="hidden" name="consult_id" value={{ consultation.cnslt_id }}>
+                    </p>
+                </div>
+            </li>
+        {% endfor %}
+    </div>
+    --->
+    <table style="width: 100%" border="1 px solid black">
+        <tr>
+            <th>Name</th>
+            <th>Consultation Start</th>
+            <th>Consultation End</th>
+            <th>Approved</th>
+        </tr>
+        {% for consultation in consultations %}
+            <tr>
+                <td>
+                    {{ children[loop.index0].child_nm_fst }} {{ children[loop.index0].child_nm_lst }}
+                </td>
+                <td>
+                    {{ times[loop.index0].time_st }}
+                </td>
+                <td>
+                    {{ times[loop.index0].time_end }}
+                </td>
+                <td>
+                    <input type="checkbox" checked disabled>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+</main>
+{% endblock %}

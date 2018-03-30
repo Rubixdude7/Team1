@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<main id="mainHome">
+    <div class="box">
+        <h1 class="title">Adjust Fee</h1>
+    </div>
+
+    <div class="box">
+        <form action="" method="POST">
+            {{ form.hidden_tag() }}
+
+            {{ form.oneHourFee.label }}
+            {{ form.oneHourFee }}
+            <br>
+            {{ form.onePointFiveFee.label }}
+            {{ form.onePointFiveFee }}
+            <br>
+            {{ form.twoHourFee.label }}
+            {{ form.twoHourFee }}
+            <br>
+            {{ form.submit(class="btn btn-success") }}
+        </form>
+    </div>
+
+</main>
+{% endblock %}

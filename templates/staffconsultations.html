@@ -1,10 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Consultations{% endblock %}
+{% block title %}Unpaid Consultations{% endblock %}
 {% block content %}
 <main>
+
+ <a href="{{ url_for('viewApprovedConsultations') }}">
+        View Approved Consultations
+        </a>
+
+<!--- Just in case we need the old code
     <div>
     <div class="box">
-        <h1 class="title">Approve Payments</h1>
+        <h1 class="title">Pending Consultations</h1>
     </div>
     <form action="/staffconsultations/approvals" method="post">
         {% for consultation in consultations %}
@@ -12,17 +18,10 @@
                     <div class="box">
                         <p>
                             Name: {{ children[loop.index0].child_nm_fst }} {{ children[loop.index0].child_nm_lst }} <br>
-                            {% if consultation.paid == 'y' %}
-                                Start Time: {{ times[loop.index0].time_st }}<br>
-                                End Time: {{ times[loop.index0].time_end }}<br>
-                                Approved: <input type="checkbox" checked disabled><br>
-                                <input type="hidden" name="consult_id" value={{ consultation.cnslt_id }}>
-                            {% else %}
-                                Start Time: {{ times[loop.index0].time_st }}<br>
-                                End Time: {{ times[loop.index0].time_end }}<br>
-                                Approved: <input type="checkbox" name="{{ consultation.cnslt_id }}"><br>
-                                <input type="hidden" name="consult_id" value={{ consultation.cnslt_id }}>
-                            {% endif %}
+                            Start Time: {{ times[loop.index0].time_st }}<br>
+                            End Time: {{ times[loop.index0].time_end }}<br>
+                            Approved: <input type="checkbox" name="{{ consultation.cnslt_id }}"><br>
+                            <input type="hidden" name="consult_id" value={{ consultation.cnslt_id }}>
                         </p>
                     </div>
                 </li>
@@ -34,5 +33,41 @@
         </div>
     </form>
     </div>
+    --->
+
+
+
+<form action="/staffconsultations/approvals" method="post">
+    <table style="width: 100%" border="1 px solid black">
+        <tr>
+            <th>Name</th>
+            <th>Consultation Start</th>
+            <th>Consultation End</th>
+            <th>Approved</th>
+        </tr>
+        {% for consultation in consultations %}
+            <tr>
+                <td>
+                    {{ children[loop.index0].child_nm_fst }} {{ children[loop.index0].child_nm_lst }}
+                </td>
+                <td>
+                    {{ times[loop.index0].time_st }}
+                </td>
+                <td>
+                    {{ times[loop.index0].time_end }}
+                </td>
+                <td>
+                     <input type="checkbox" name="{{ consultation.cnslt_id }}"><br>
+                     <input type="hidden" name="consult_id" value={{ consultation.cnslt_id }}>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <div class="box">
+            <button class="btn btn-success" type="submit">
+                Submit Approvals
+            </button>
+        </div>
+    </form>
 </main>
 {% endblock %}

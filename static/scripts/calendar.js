@@ -259,20 +259,20 @@ var calendarModule = (function() {
         for (var i = 0; i < this.avails.length; i++) {
             var a = this.avails[i];
 
-            var a_st = new Date(a['st']['year'], a['st']['month'], a['st']['day'], a['st']['hour'], a['st']['minute']);
-            var a_end = new Date(a['end']['year'], a['end']['month'], a['end']['day'], a['end']['hour'], a['end']['minute']);
+            var a_st = new Date(Date.UTC(a['st']['year'], a['st']['month'], a['st']['day'], a['st']['hour'] - 7, a['st']['minute']));
+            var a_end = new Date(Date.UTC(a['end']['year'], a['end']['month'], a['end']['day'], a['end']['hour'] - 7, a['end']['minute']));
 
-            var topleft_time = new Date(this.year, this.month, 1 - daysFromPrevMonth);
+            var topleft_time = new Date(Date.UTC(this.year, this.month, 1 - daysFromPrevMonth, -7));
 
-            var strip_start = (a_st - topleft_time) / 1000;
-            var strip_end = (a_end - topleft_time) / 1000;
+            var strip_start = (a_st - topleft_time) / (24.0*60.0*60.0*1000.0);
+            var strip_end = (a_end - topleft_time) / (24.0*60.0*60.0*1000.0);
 
             stripGroup.add(strip_start, strip_end);
         }
         
         stripGroup.normalize();
         stripGroup.combine();
-        stripGroup.splitAtIntervals(24*60*60);
+        stripGroup.splitAtIntervals(1.0);
         
         var cal = this;
         this.elem.find('.cal-day').each(function (index, dayElem) {
@@ -287,15 +287,15 @@ var calendarModule = (function() {
                 var dayNum = (index - daysFromPrevMonth) + 1;
                 var html = "<div class=\"cal-day-number\">" + dayNum.toString() + "</div>";
 
-                var lastEnd = index*24*60*60;
-                stripGroup.eachInRange(index*24*60*60, (index+1)*24*60*60, function(start, end) {
-                    html += "<div class=\"cal-space-slot\" style=\"width: " + ((start - lastEnd) * 100 / (24*60*60)) + "%;\"></div>";
-                    html += "<div class=\"cal-ok-slot\" style=\"width: " + ((end - start) * 100 / (24*60*60)) + "%;\"></div>";
+                var lastEnd = index;
+                stripGroup.eachInRange(index, (index+1), function(start, end) {
+                    html += "<div class=\"cal-space-slot\" style=\"width: " + ((start - lastEnd)*100) + "%;\"></div>";
+                    html += "<div class=\"cal-ok-slot\" style=\"width: " + ((end - start)*100) + "%;\"></div>";
                     
                     lastEnd = end;
                 });
                 
-                html += "<div class=\"cal-space-slot\" style=\"width: " + (((index+1)*24*60*60 - lastEnd) * 100 / (24*60*60)) + "%;\"></div>";
+                html += "<div class=\"cal-space-slot\" style=\"width: " + (((index+1) - lastEnd) * 100) + "%;\"></div>";
                 
                 dayElem.html(html);
                 dayElem.attr("data-this-month", "true");

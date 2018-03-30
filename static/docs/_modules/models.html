@@ -1,0 +1,441 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>models &#8212; Passion Konsultan Web App 1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for models</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">peewee</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Brandon Duke&quot;</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;http://bduke.net&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">models:</span>
+
+<span class="sd">Contains classes that are models for tables in the database</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot; the database connection string &quot;&quot;&quot;</span>
+<span class="n">allow_auto_seed</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="c1"># DEV Jason&#39;s</span>
+<span class="c1">#db = MySQLDatabase(&quot;db42576e98688b4ab28226a87601334c89&quot;, host=&quot;42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com&quot;, port=3306, user=&quot;mgqmsvhuvgtovyte&quot;, passwd=&quot;Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU&quot;)</span>
+
+<span class="c1"># DEV2 sqlite (local)</span>
+<span class="c1">#db = SqliteDatabase(&quot;local.db&quot;)</span>
+<span class="c1">#allow_auto_seed = True</span>
+
+<span class="c1"># Production Brandon&#39;s</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">MySQLDatabase</span><span class="p">(</span><span class="s2">&quot;db9a6e80b2e34b41f3bd8da871003e804d&quot;</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s2">&quot;9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s2">&quot;bgrwfoetjnrliplh&quot;</span><span class="p">,</span> <span class="n">passwd</span><span class="o">=</span><span class="s2">&quot;GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MySQLModel"><a class="viewcode-back" href="../modules/models.html#models.MySQLModel">[docs]</a><span class="k">class</span> <span class="nc">MySQLModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A base model that will use our MySQL database&quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">database</span> <span class="o">=</span> <span class="n">db</span></div>
+
+
+<div class="viewcode-block" id="user"><a class="viewcode-back" href="../modules/models.html#models.user">[docs]</a><span class="k">class</span> <span class="nc">user</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">user_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">confirmed_at</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">active</span> <span class="o">=</span> <span class="n">BooleanField</span><span class="p">()</span>
+    <span class="n">first_name</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">last_name</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;user&quot;</span></div>
+
+
+<div class="viewcode-block" id="child"><a class="viewcode-back" href="../modules/models.html#models.child">[docs]</a><span class="k">class</span> <span class="nc">child</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">child_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;user_id&quot;</span><span class="p">)</span>
+    <span class="n">child_nm_fst</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">child_nm_lst</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">child_dob</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">q_comp_dtm</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;child&quot;</span></div>
+
+
+<div class="viewcode-block" id="psychologist"><a class="viewcode-back" href="../modules/models.html#models.psychologist">[docs]</a><span class="k">class</span> <span class="nc">psychologist</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">psyc_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;user_id&quot;</span><span class="p">)</span>
+    <span class="n">photo</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">qualifications</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;psychologist&quot;</span></div>
+
+
+<div class="viewcode-block" id="contact"><a class="viewcode-back" href="../modules/models.html#models.contact">[docs]</a><span class="k">class</span> <span class="nc">contact</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">contact_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;user_id&quot;</span><span class="p">)</span>
+    <span class="n">phone_no</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">address_1</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">address_2</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">city</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">providence</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">zip</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;contact&quot;</span></div>
+
+
+<div class="viewcode-block" id="psychologist_child_xref"><a class="viewcode-back" href="../modules/models.html#models.psychologist_child_xref">[docs]</a><span class="k">class</span> <span class="nc">psychologist_child_xref</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">pcx_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">psyc</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">psychologist</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;psyc_id&quot;</span><span class="p">)</span>
+    <span class="n">child</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;child_id&quot;</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;psychologist_child_xref&quot;</span></div>
+
+
+<div class="viewcode-block" id="consultation"><a class="viewcode-back" href="../modules/models.html#models.consultation">[docs]</a><span class="k">class</span> <span class="nc">consultation</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">cnslt_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">child</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;child_id&quot;</span><span class="p">)</span>
+    <span class="n">fee</span> <span class="o">=</span> <span class="n">DoubleField</span><span class="p">()</span>
+    <span class="n">paid</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">DoubleField</span><span class="p">()</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;consultation&quot;</span></div>
+
+
+<div class="viewcode-block" id="consult_time"><a class="viewcode-back" href="../modules/models.html#models.consult_time">[docs]</a><span class="k">class</span> <span class="nc">consult_time</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">cnslt_tm_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">cnslt</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">consultation</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;cnslt_id&quot;</span><span class="p">)</span>
+    <span class="n">psyc</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">psychologist</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;psyc_id&quot;</span><span class="p">)</span>
+    <span class="n">time_st</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">time_end</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">approved</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;consult_time&quot;</span></div>
+
+
+<div class="viewcode-block" id="notes"><a class="viewcode-back" href="../modules/models.html#models.notes">[docs]</a><span class="k">class</span> <span class="nc">notes</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">note_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">cnslt</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">consultation</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;cnslt_id&quot;</span><span class="p">)</span>
+    <span class="n">note</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">user_id_crea</span> <span class="o">=</span> <span class="n">BigIntegerField</span><span class="p">()</span>
+    <span class="n">crea_dtm</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">user_id_upd</span> <span class="o">=</span> <span class="n">BigIntegerField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">updt_dtm</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">void_ind</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;notes&quot;</span></div>
+
+
+<div class="viewcode-block" id="consultation_fee"><a class="viewcode-back" href="../modules/models.html#models.consultation_fee">[docs]</a><span class="k">class</span> <span class="nc">consultation_fee</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">cnslt_fee_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">fee</span> <span class="o">=</span> <span class="n">DoubleField</span><span class="p">()</span>
+    <span class="n">void_ind</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;consultation_fee&quot;</span></div>
+
+
+<div class="viewcode-block" id="consultation_length"><a class="viewcode-back" href="../modules/models.html#models.consultation_length">[docs]</a><span class="k">class</span> <span class="nc">consultation_length</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">cnslt_len_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">DoubleField</span><span class="p">()</span>
+    <span class="n">cnslt_fee</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">consultation_fee</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;cnslt_fee_id&quot;</span><span class="p">)</span>
+    <span class="n">void_ind</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;consultation_length&quot;</span></div>
+
+
+<div class="viewcode-block" id="questions"><a class="viewcode-back" href="../modules/models.html#models.questions">[docs]</a><span class="k">class</span> <span class="nc">questions</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">q_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">question</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">user_id_crea</span> <span class="o">=</span> <span class="n">BigIntegerField</span><span class="p">()</span>
+    <span class="n">crea_dtm</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">user_id_upd</span> <span class="o">=</span> <span class="n">BigIntegerField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">upd_dtm</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">active</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">void_ind</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;n&#39;</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;questions&quot;</span></div>
+
+
+<div class="viewcode-block" id="question_answers"><a class="viewcode-back" href="../modules/models.html#models.question_answers">[docs]</a><span class="k">class</span> <span class="nc">question_answers</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">qa_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">child</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;child_id&quot;</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">questions</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;q_id&quot;</span><span class="p">)</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">qa_crea_dtm</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">qa_upt_dtm</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">void_ind</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;question_answers&quot;</span></div>
+
+
+<div class="viewcode-block" id="blog"><a class="viewcode-back" href="../modules/models.html#models.blog">[docs]</a><span class="k">class</span> <span class="nc">blog</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">blog_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">psyc</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">psychologist</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;psyc_id&quot;</span><span class="p">)</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">crea_dtm</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">user_id_upd</span> <span class="o">=</span> <span class="n">BigIntegerField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">updt_dtm</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">void_ind</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;blog&quot;</span></div>
+
+
+<div class="viewcode-block" id="day_typ_cd"><a class="viewcode-back" href="../modules/models.html#models.day_typ_cd">[docs]</a><span class="k">class</span> <span class="nc">day_typ_cd</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">day_typ_cd</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">db_column</span><span class="o">=</span><span class="s1">&#39;day_tp_cd&#39;</span><span class="p">)</span>
+    <span class="n">day</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;day_typ_cd&quot;</span></div>
+
+
+<div class="viewcode-block" id="calendar"><a class="viewcode-back" href="../modules/models.html#models.calendar">[docs]</a><span class="k">class</span> <span class="nc">calendar</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">cal_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">psyc</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">psychologist</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;psyc_id&quot;</span><span class="p">)</span>
+    <span class="n">time_st</span> <span class="o">=</span> <span class="n">TimeField</span><span class="p">()</span>
+    <span class="n">time_end</span> <span class="o">=</span> <span class="n">TimeField</span><span class="p">()</span>
+    <span class="n">day_typ_cd</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">day_typ_cd</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;day_typ_cd&quot;</span><span class="p">,</span> <span class="n">db_column</span><span class="o">=</span><span class="s2">&quot;day_typ_cd&quot;</span><span class="p">)</span>
+    <span class="n">void_ind</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;calendar&quot;</span></div>
+
+
+<div class="viewcode-block" id="review"><a class="viewcode-back" href="../modules/models.html#models.review">[docs]</a><span class="k">class</span> <span class="nc">review</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">rev_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">cnslt</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">consultation</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;cnslt_id&quot;</span><span class="p">)</span>
+    <span class="n">review</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">stars</span> <span class="o">=</span> <span class="n">DoubleField</span><span class="p">()</span>
+    <span class="n">approved</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">void_ind</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;review&quot;</span></div>
+
+
+<div class="viewcode-block" id="role"><a class="viewcode-back" href="../modules/models.html#models.role">[docs]</a><span class="k">class</span> <span class="nc">role</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">role_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">role_nm</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;role&quot;</span></div>
+
+
+<div class="viewcode-block" id="user_roles"><a class="viewcode-back" href="../modules/models.html#models.user_roles">[docs]</a><span class="k">class</span> <span class="nc">user_roles</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">user_role_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;user_id&quot;</span><span class="p">)</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">role</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;role_id&quot;</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;user_roles&quot;</span></div>
+
+<div class="viewcode-block" id="vacation"><a class="viewcode-back" href="../modules/models.html#models.vacation">[docs]</a><span class="k">class</span> <span class="nc">vacation</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">vac_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">psyc</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">psychologist</span><span class="p">,</span> <span class="n">to_field</span><span class="o">=</span><span class="s2">&quot;psyc_id&quot;</span><span class="p">)</span>
+    <span class="n">vac_st</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">vac_end</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">annual</span> <span class="o">=</span> <span class="n">BooleanField</span><span class="p">()</span>
+    
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;vacation&quot;</span></div>
+
+<div class="viewcode-block" id="slider"><a class="viewcode-back" href="../modules/models.html#models.slider">[docs]</a><span class="k">class</span> <span class="nc">slider</span><span class="p">(</span><span class="n">MySQLModel</span><span class="p">):</span>
+    <span class="n">slider_id</span> <span class="o">=</span> <span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">version</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">alt</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s2">&quot;slider&quot;</span></div>
+
+
+<span class="n">MODELS</span> <span class="o">=</span> <span class="p">[</span><span class="n">blog</span><span class="p">,</span>
+          <span class="n">calendar</span><span class="p">,</span>
+          <span class="n">child</span><span class="p">,</span>
+          <span class="n">consult_time</span><span class="p">,</span>
+          <span class="n">consultation</span><span class="p">,</span>
+          <span class="n">consultation_fee</span><span class="p">,</span>
+          <span class="n">consultation_length</span><span class="p">,</span>
+          <span class="n">contact</span><span class="p">,</span>
+          <span class="n">day_typ_cd</span><span class="p">,</span>
+          <span class="n">notes</span><span class="p">,</span>
+          <span class="n">psychologist</span><span class="p">,</span>
+          <span class="n">psychologist_child_xref</span><span class="p">,</span>
+          <span class="n">question_answers</span><span class="p">,</span>
+          <span class="n">questions</span><span class="p">,</span>
+          <span class="n">review</span><span class="p">,</span>
+          <span class="n">role</span><span class="p">,</span>
+          <span class="n">user</span><span class="p">,</span>
+          <span class="n">user_roles</span><span class="p">,</span>
+          <span class="n">vacation</span><span class="p">]</span>
+
+<span class="c1"># This function does nothing if the db is already populated.</span>
+<span class="k">def</span> <span class="nf">create_tables_and_seed_if_necessary</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">allow_auto_seed</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">create_tables</span><span class="p">(</span><span class="n">MODELS</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="c1"># Figure out which day_typ_cd entities we need</span>
+        <span class="n">dtc_needed</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;m&#39;</span><span class="p">:</span> <span class="s1">&#39;Senin&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="s1">&#39;Selasa&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="s1">&#39;Rabu&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;th&#39;</span><span class="p">:</span> <span class="s1">&#39;Kamis&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;f&#39;</span><span class="p">:</span> <span class="s1">&#39;Jumat&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="s1">&#39;Sabtu&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;su&#39;</span><span class="p">:</span> <span class="s1">&#39;Minggu&#39;</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">dtc</span> <span class="ow">in</span> <span class="n">day_typ_cd</span><span class="o">.</span><span class="n">select</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">dtc</span><span class="o">.</span><span class="n">day_typ_cd</span> <span class="ow">in</span> <span class="n">dtc_needed</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">dtc_needed</span><span class="p">[</span><span class="n">dtc</span><span class="o">.</span><span class="n">day_typ_cd</span><span class="p">]</span>
+                
+        <span class="c1"># Make them</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dtc_needed</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">day_typ_cd</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">day_typ_cd</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
+        
+        <span class="c1"># Same thing for roles</span>
+        <span class="n">roles_needed</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;admin&#39;</span><span class="p">,</span> <span class="s1">&#39;staff&#39;</span><span class="p">,</span> <span class="s1">&#39;psyc&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">role</span><span class="o">.</span><span class="n">select</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">role_nm</span> <span class="ow">in</span> <span class="n">roles_needed</span><span class="p">:</span>
+                <span class="n">roles_needed</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">role_nm</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">roles_needed</span><span class="p">:</span>
+            <span class="n">role</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">role_nm</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        
+        <span class="c1"># If there are no users, make default users for each role</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">admin</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;PassionAdmin&#39;</span><span class="p">,</span>
+                                <span class="n">password</span><span class="o">=</span><span class="s1">&#39;$2b$12$WGvSy4WqRbMogeSQBzQt8uMzLIfPm0swohryo469ShterBWJTk5SK&#39;</span><span class="p">,</span>
+                                <span class="n">email</span><span class="o">=</span><span class="s1">&#39;passion.kon.psi@gmail.com&#39;</span><span class="p">,</span>
+                                <span class="n">confirmed_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+                                <span class="n">active</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                <span class="n">first_name</span><span class="o">=</span><span class="s1">&#39;Passion&#39;</span><span class="p">,</span>
+                                <span class="n">last_name</span><span class="o">=</span><span class="s1">&#39;Admin&#39;</span><span class="p">)</span>
+            
+            <span class="c1"># Give them the admin role</span>
+            <span class="n">admin_role</span> <span class="o">=</span> <span class="n">role</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">role</span><span class="o">.</span><span class="n">role_nm</span> <span class="o">==</span> <span class="s1">&#39;admin&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="n">user_roles</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">admin</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">admin_role</span><span class="o">.</span><span class="n">role_id</span><span class="p">)</span>
+            
+            <span class="n">staff</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;PassionStaff&#39;</span><span class="p">,</span>
+                                <span class="n">password</span><span class="o">=</span><span class="s1">&#39;$2b$12$WGvSy4WqRbMogeSQBzQt8uMzLIfPm0swohryo469ShterBWJTk5SK&#39;</span><span class="p">,</span>
+                                <span class="n">email</span><span class="o">=</span><span class="s1">&#39;passion.kon.psi@gmail.com&#39;</span><span class="p">,</span>
+                                <span class="n">confirmed_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+                                <span class="n">active</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                <span class="n">first_name</span><span class="o">=</span><span class="s1">&#39;Passion&#39;</span><span class="p">,</span>
+                                <span class="n">last_name</span><span class="o">=</span><span class="s1">&#39;Staff&#39;</span><span class="p">)</span>
+            
+            <span class="c1"># Give them the staff role</span>
+            <span class="n">staff_role</span> <span class="o">=</span> <span class="n">role</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">role</span><span class="o">.</span><span class="n">role_nm</span> <span class="o">==</span> <span class="s1">&#39;staff&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="n">user_roles</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">staff</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">staff_role</span><span class="o">.</span><span class="n">role_id</span><span class="p">)</span>
+            
+            <span class="n">psyc</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;PassionPsyc&#39;</span><span class="p">,</span>
+                               <span class="n">password</span><span class="o">=</span><span class="s1">&#39;$2b$12$WGvSy4WqRbMogeSQBzQt8uMzLIfPm0swohryo469ShterBWJTk5SK&#39;</span><span class="p">,</span>
+                               <span class="n">email</span><span class="o">=</span><span class="s1">&#39;passion.kon.psi@gmail.com&#39;</span><span class="p">,</span>
+                               <span class="n">confirmed_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+                               <span class="n">active</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                               <span class="n">first_name</span><span class="o">=</span><span class="s1">&#39;Passion&#39;</span><span class="p">,</span>
+                               <span class="n">last_name</span><span class="o">=</span><span class="s1">&#39;Psyc&#39;</span><span class="p">)</span>
+            
+            <span class="c1"># Give them the psyc role</span>
+            <span class="n">psyc_role</span> <span class="o">=</span> <span class="n">role</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">role</span><span class="o">.</span><span class="n">role_nm</span> <span class="o">==</span> <span class="s1">&#39;psyc&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="n">user_roles</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">psyc</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">psyc_role</span><span class="o">.</span><span class="n">role_id</span><span class="p">)</span>
+            
+            <span class="c1"># Add a psychologist entity for them too</span>
+            <span class="n">psychologist</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">psyc</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">photo</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">qualifications</span><span class="o">=</span><span class="s1">&#39;A good psychologist.&#39;</span><span class="p">)</span>
+            
+            <span class="n">u</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;PassionUser&#39;</span><span class="p">,</span>
+                            <span class="n">password</span><span class="o">=</span><span class="s1">&#39;$2b$12$WGvSy4WqRbMogeSQBzQt8uMzLIfPm0swohryo469ShterBWJTk5SK&#39;</span><span class="p">,</span>
+                            <span class="n">email</span><span class="o">=</span><span class="s1">&#39;passion.kon.psi@gmail.com&#39;</span><span class="p">,</span>
+                            <span class="n">confirmed_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+                            <span class="n">active</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                            <span class="n">first_name</span><span class="o">=</span><span class="s1">&#39;Passion&#39;</span><span class="p">,</span>
+                            <span class="n">last_name</span><span class="o">=</span><span class="s1">&#39;User&#39;</span><span class="p">)</span>
+            
+            <span class="c1"># Give them the user role</span>
+            <span class="n">u_role</span> <span class="o">=</span> <span class="n">role</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">role</span><span class="o">.</span><span class="n">role_nm</span> <span class="o">==</span> <span class="s1">&#39;user&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="n">user_roles</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">u_role</span><span class="o">.</span><span class="n">role_id</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Seven Kapybaras and an Aquarium.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -19,7 +19,8 @@
         <link rel="icon" type="image/png" href="{{ url_for('static', filename='contents/fav/favicon-16x16.png') }}" sizes="16x16" />
         <link rel="icon" type="image/png" href="{{ url_for('static', filename='contents/fav/favicon-128.png') }}" sizes="128x128" />
         <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">
-        <link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/releases/v5.0.6/css/all.css">
+        <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/solid.js" integrity="sha384-+Ga2s7YBbhOD6nie0DzrZpJes+b2K1xkpKxTFFcx59QmVPaSA8c7pycsNaFwUK6l" crossorigin="anonymous"></script>
+        <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/fontawesome.js" integrity="sha384-7ox8Q2yzO/uWircfojVuCQOZl+ZZBg2D2J5nkpLqzH1HY0C1dHlTKIbpRz/LG23c" crossorigin="anonymous"></script>
         <script src="{{url_for('static', filename='scripts/common.js')}}" type="text/javascript"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" type="text/javascript"></script>
     {% endblock %}
@@ -39,24 +40,38 @@
                         <li>
                             <a href="{{ url_for('index') }}">HOME</a>
                         </li>
-                        <!--<li>
-                            <a href="{{ url_for('videoConf') }}">VIDEOCONF</a>
-                        </li>-->
+                        {% if current_user.is_authenticated %}
+                            <li>
+                                <a target="_blank" href="{{ url_for('videoConf') }}">VIDEOCONF</a>
+                            </li>
+                        {% endif %}
                         {% if current_user.is_authenticated and current_user.is_in_role("user") %}
                             <li>
                                 <a href="{{ url_for('parent') }}">PARENTS</a>
                             </li>
                         {% endif %}
+                        {% if not current_user.is_authenticated or (current_user.is_authenticated and not current_user.is_in_role("psyc")) %}
                         <li>
                             <a href="{{ url_for('psikolog') }}">PSYCHOLOGISTS</a>
                         </li>
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.is_in_role("psyc") %}
+                            <li>
+                                <a href="{{ url_for('psikolog_dashboard') }}">DASHBOARD</a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('psikolog_appointments') }}">APPOINTMENTS</a>
+                            </li>
+                        {% endif %}
                         {% if current_user.is_authenticated and current_user.is_in_role("admin") %}
                             <li>
-                                <a href="{{ url_for('admin') }}">ADMIN</a>
+                                <a href="{{ url_for('adminPortal') }}">ADMIN</a>
                             </li>
+                            <!--
                             <li>
                                 <a href="{{ url_for('questions') }}">QUESTIONS</a>
                             </li>
+                            -->
                         {% endif %}
                         {% if current_user.is_authenticated and current_user.is_in_role("staff") %}
                             <li>
@@ -97,7 +112,7 @@
                  {% if messages %}
                     <div class="flash">
                        {% for message in messages %}
-                           <p class="title">{{ message }}</p>
+                           <p class="title">{{ message|safe }}</p>
                        {% endfor %}
                     </div>
                  {% endif %}

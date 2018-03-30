@@ -1,6 +1,8 @@
 import os
 
 import sqlalchemy.exc
+import babel
+import pytz
 from flask import Flask, render_template, request, redirect, url_for, Markup, jsonify, json
 import datetime
 from flask_sqlalchemy import SQLAlchemy
@@ -23,11 +25,18 @@ import models
 import math
 from flask import flash, render_template, request, redirect
 from jose import jwt
+import urllib.request
+import urllib.parse
+from _sha256 import sha256
+from uuid import uuid4 #this is in place of js's guid
+import requests
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
 # DEV Jason's database
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://mgqmsvhuvgtovyte:Aqyg6kb6tqDJjNvvoJEDGqJv8xTytGnRm8L28MPrnQjztPMk3xupApKjNchFyKKU@42576e98-688b-4ab2-8226-a87601334c89.mysql.sequelizer.com/db42576e98688b4ab28226a87601334c89'
+# DEV sqlite (local)
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local.db'
 # Production Brandon's databasee
 app.config[
     'SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://bgrwfoetjnrliplh:GRShWRVNEtekUUFPP647rgrHZSjGghQFxWjv8uMuAax4C8aL8bUxQC8AyipdFoGw@9a6e80b2-e34b-41f3-bd8d-a871003e804d.mysql.sequelizer.com/db9a6e80b2e34b41f3bd8da871003e804d'
@@ -109,7 +118,7 @@ querydb = query.query()
 def _db_connect():
     if models.db.is_closed():
         models.db.connect()
-
+        models.create_tables_and_seed_if_necessary()
 
 # This hook ensures that the connection is closed when we've finished
 # processing the request.
@@ -230,7 +239,19 @@ def questionDelete():
 @login_required
 def questions():  # TODO Breaks if there are no quesions in db
     questions = querydb.getAllQuestions()
+    if not questions:
+
+        return render_template("questions.html", questions=questions)
+
+
     return object_list("questions.html", paginate_by=3, query=questions, context_variable='questions')
+
+
+@app.route('/reviews')
+@login_required
+def reviews():  # TODO Breaks if there are no quesions in db
+    return render_template("reviews.html")
+
 
 
 @app.route('/questionsUserView/', methods=['GET', 'POST'])
@@ -257,12 +278,17 @@ def questionsUserView():
     questions = querydb.getAllQuestionsForUsers()
     # Brody code
     answers = []
+
     for q in questions:
+        print(q)
         answers.append(querydb.getAnswer(q.q_id, child_id))
     # end Brody code
     if totalQuestions is None:
         totalQuestions = len(questions)  # for progress bar
         totalQuestions = int(totalQuestions)
+    if not questions:
+
+        return render_template("questionsUserView.html", questions=questions)
 
     return object_list("questionsUserView.html", paginate_by=3, query=questions, context_variable='questions',
                        child_id=child_id, child_name=child_name, answers=answers, totalQuestions=totalQuestions,
@@ -300,16 +326,15 @@ def questionsUserView2():  # post QuestionUserView
     # End Brody code
 
     questionAnswerList = request.form.getlist('fname')
-
+    print(questionAnswerList)
     questionIdList = request.form.getlist('qField')
     childId = request.form.get('cField')
-
+    print(questionIdList)
     # Brody says: q = answer, q2 = questionId
     for (q, q2) in zip(questionAnswerList, questionIdList):
         # lack of this if was causing false "completed" question forms
         if q is not '':
             querydb.addQuestionAnswers(q, current_user.id, q2, childId)
-
     if page == totalPage:
         querydb.checkComp(child_id)
         return redirect(url_for('parent'))
@@ -379,14 +404,10 @@ def post_editQuestions():
     return redirect(url_for('parent'))
 
 
-@app.route('/videoConf')
-def videoConf():
-    return render_template('videoConf.html')
-
 
 #   End Jared
 
-# Gabe
+# Start Gabe
 @app.route('/parent')
 @login_required
 @roles_required('user')
@@ -413,6 +434,29 @@ def editContact():
                           request.form.get('zip'))
     return parent()
 
+
+@app.route('/videoConf')
+#@login_required
+#@roles_required('user', 'psyc')
+def videoConf():
+    url = 'https://interviews.skype.com/api/interviews'
+
+    payload = {}
+
+    data = json.dumps(payload).encode('ascii')
+    token = querydb.generateToken(data)  # stores the token
+
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+               'Content-Type': 'application/json',
+               'Authorization': 'Bearer ' + token}
+    req = requests.post(url=url, data=data, headers=headers)
+    print(req.text)
+    body = req.__dict__
+    requrl = json.loads(body.get('_content', {})).get('urls', {})[0].get('url')
+    print(requrl)
+    #print(querydb.generateUrl())
+
+    return redirect(requrl, code=302)
 
 # End Gabe
 
@@ -459,7 +503,7 @@ def savePaginateAnswers():
 @app.route('/staffconsultations', methods=['GET', 'POST'])
 @roles_required('staff')
 def approvePayments():
-    consultations = querydb.getDescendingConsultations()
+    consultations = querydb.getUnpaidConsultations()
     children = []
     times = []
     for c in consultations:
@@ -467,6 +511,19 @@ def approvePayments():
         children.append(querydb.getChildNameFromID(c.child))
         times.append(querydb.getConsultationTime(c.cnslt_id))
     return render_template('staffconsultations.html', children=children, consultations=consultations, times=times)
+
+
+@app.route('/staff_ApprovedConsultations', methods=['GET', 'POST'])
+@roles_required('staff')
+def viewApprovedConsultations():
+    consultations = querydb.getPaidConsultations()
+    children = []
+    times = []
+    for c in consultations:
+        print("Consultation ID: ", c.cnslt_id)
+        children.append(querydb.getChildNameFromID(c.child))
+        times.append(querydb.getConsultationTime(c.cnslt_id))
+    return render_template('staff_ApprovedConsultations.html', children=children, consultations=consultations, times=times)
 
 
 @app.route('/staffconsultations/approvals', methods=['GET', 'POST'])
@@ -526,7 +583,35 @@ class SearchBar(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class FeeAssign(FlaskForm):
+    oneHourFee = StringField('1 Hour')
+    onePointFiveFee = StringField('1.5 Hour')
+    twoHourFee = StringField('2 Hour')
+    submit = SubmitField('Submit')
+
+
 # Routes
+@app.route('/adminPortal')
+@roles_required('admin')
+def adminPortal():
+    return render_template('admin/adminPortal.html')
+
+
+@app.route('/feeAdjust', methods=['GET', 'POST'])
+@roles_required('admin')
+def feeAdjust():
+    form = FeeAssign()
+    if form.validate_on_submit():
+        feeOne = form.oneHourFee.data
+        feeOneFive = form.onePointFiveFee.data
+        feeTwo = form.twoHourFee.data
+        querydb.updateLengthFee(1,feeOne)
+        querydb.updateLengthFee(2,feeOneFive)
+        querydb.updateLengthFee(3,feeTwo)
+        return redirect(url_for('adminPortal'))
+    return render_template('admin/feeAdjust.html', form=form)
+
+
 @app.route('/admin', methods=['GET', 'POST'])
 @roles_required('admin')
 def admin():
@@ -635,6 +720,16 @@ def delete():
 
 # Begin Charlie's code
 
+@app.template_global()
+def display_datetime(dt):
+    wib = pytz.timezone('Asia/Jakarta')
+    pytz.utc.localize(dt).astimezone(wib)
+    return babel.dates.format_datetime(dt, format='EEEE, d MMMM yyyy hh:mm a (z)', tzinfo=wib, locale='id_ID')
+
+@app.template_global()
+def indonesian_locale():
+    return babel.Locale('id', 'ID')
+
 @app.route('/api/calendar')
 @app.route('/api/calendar/psyc/<int:psyc_id>')
 def api_calendar(psyc_id='all'):
@@ -653,6 +748,11 @@ def api_availabilities():
     avails = querydb.getAvailabilities(psyc_id)
     return jsonify(avails)
 
+@app.route('/api/blog/<psyc_id>')
+def api_blog(psyc_id):
+    page_num = int(request.args['page_num'])
+    page_size = int(request.args['page_size'])
+    return jsonify(querydb.apiBlog(psyc_id, page_num, page_size))
 
 @app.route('/my_psikolog_page')
 @roles_required('psyc')
@@ -669,6 +769,20 @@ def schedule():  # TODO make sure only child of that parent can get here
                            psyc_names=querydb.getPsychologistNames(),
                            len_fee=querydb.get_len_fee(), child_id=child_id)
 
+@app.route('/api/appointments')
+@roles_required('psyc')
+def api_appointments():
+    psyc_id = querydb.getPsycId(current_user.id)
+    
+    page_num = int(request.args['page_num'])
+    page_size = int(request.args['page_size'])
+    
+    return jsonify(querydb.apiAppointments(psyc_id, page_num, page_size))
+
+@app.route('/psikolog/appointments')
+@roles_required('psyc')
+def psikolog_appointments():
+    return render_template('psikolog/appointments.html')
 
 @app.route('/psikolog/')
 @app.route('/psikolog/<int:id>')
@@ -701,6 +815,13 @@ def psikolog(id=None):
     # In both cases, show a list of psychologists.
     return render_template('list_psikolog.html', psychologist_links=querydb.psychologistLinks())
 
+@app.route('/psikolog/dashboard')
+@roles_required('psyc')
+def psikolog_dashboard():
+    psyc_id = querydb.getPsycId(current_user.id)
+    psyc_info = querydb.lookupPsychologist(psyc_id)
+    avatar_url = querydb.getAvatar(psyc_id)
+    return render_template('psikolog/dashboard.html', psyc_info=psyc_info, avatar_url=avatar_url)
 
 @app.route('/psikolog/<int:psyc_id>/<int:year>/<int:month>/<int:day>')
 def view_day(psyc_id, year, month, day):
@@ -720,8 +841,15 @@ def write_blog_post():
         psyc_id = querydb.getPsycId(current_user.id)
         querydb.createBlogPost(current_user.id, psyc_id, subject, text)
         flash('Your blog post has been published.')
-        return redirect(url_for('psikolog', id=psyc_id))
+        return redirect(url_for('psikolog_dashboard'))
 
+@app.route('/psikolog/delete_blog_post/<int:blog_id>')
+@roles_required('psyc')
+def delete_blog_post(blog_id):
+    psyc_id = querydb.getPsycId(current_user.id)
+    querydb.deleteBlogPost(blog_id, psyc_id)
+    flash('Blog post successfully deleted.')
+    return redirect(url_for('psikolog_dashboard'))
 
 @app.route('/psikolog/change_avatar', methods=['GET', 'POST'])
 @roles_required('psyc')
@@ -732,7 +860,7 @@ def change_avatar():
         psyc_id = querydb.getPsycId(current_user.id)
         querydb.updateAvatar(psyc_id, request.files['avatar'])
         flash('Avatar updated.')
-        return redirect(url_for('psikolog', id=psyc_id))
+        return redirect(url_for('psikolog_dashboard'))
 
 
 @app.route('/psikolog/edit_qualifications', methods=['GET', 'POST'])
@@ -744,7 +872,7 @@ def edit_qualifications():
         psyc_id = querydb.getPsycId(current_user.id)
         querydb.updateQualifications(psyc_id, request.form['qualifications'])
         flash('Qualifications updated.')
-        return redirect(url_for('psikolog', id=psyc_id))
+        return redirect(url_for('psikolog_dashboard'))
 
 
 @app.route('/psikolog/edit_availability_list')
@@ -761,6 +889,130 @@ def edit_availability_list(page=1):
     return render_template('edit_availability_list.html', psyc_id=psyc_id, avails=avail_list, weekdays=weekdays,
                            page=page)
 
+@app.route('/psikolog/add_vacation', methods=['GET', 'POST'])
+@roles_required('psyc')
+def add_vacation():
+    if request.method == 'GET':
+        return render_template('add_vacation.html', current_year=datetime.datetime.now().year)
+    elif request.method == 'POST':
+        psyc_id = querydb.getPsycId(current_user.id)
+        
+        vac_st_day = int(request.form['vac_st_day'], 10)
+        vac_st_month = int(request.form['vac_st_month'], 10)
+        vac_st_year = int(request.form['vac_st_year'], 10)
+        vac_st_hour, vac_st_minute = request.form['vac_st_time'].split(':')
+        vac_st_hour = int(vac_st_hour, 10)
+        vac_st_minute = int(vac_st_minute, 10)
+        vac_st = pytz.timezone('Asia/Jakarta').localize(datetime.datetime(vac_st_year,
+                                                                          vac_st_month,
+                                                                          vac_st_day,
+                                                                          vac_st_hour,
+                                                                          vac_st_minute))
+        vac_st = vac_st.astimezone(pytz.utc)
+        
+        vac_end_day = int(request.form['vac_end_day'], 10)
+        vac_end_month = int(request.form['vac_end_month'], 10)
+        vac_end_year = int(request.form['vac_end_year'], 10)
+        vac_end_hour, vac_end_minute = request.form['vac_end_time'].split(':')
+        vac_end_hour = int(vac_end_hour, 10)
+        vac_end_minute = int(vac_end_minute, 10)
+        vac_end = pytz.timezone('Asia/Jakarta').localize(datetime.datetime(vac_end_year,
+                                                                           vac_end_month,
+                                                                           vac_end_day,
+                                                                           vac_end_hour,
+                                                                           vac_end_minute))
+        vac_end = vac_end.astimezone(pytz.utc)
+
+        if vac_st > vac_end:
+            temp = vac_end
+            vac_end = vac_st
+            vac_st = temp
+            
+        querydb.addVacation(psyc_id, vac_st, vac_end, False)
+
+        flash('Your vacation has been added to the system.')
+
+        return redirect(url_for('edit_vacation_list'))
+
+@app.route('/psikolog/edit_vacation/<int:vac_id>', methods=['GET', 'POST'])
+@roles_required('psyc')
+def edit_vacation(vac_id):
+    wib = pytz.timezone('Asia/Jakarta')
+    
+    if request.method == 'GET':
+        psyc_id = querydb.getPsycId(current_user.id)
+        
+        vac = querydb.getVacation(psyc_id, vac_id)
+        
+        # Convert times to WIB timezone
+        vac = {
+            'vac_id': vac.vac_id,
+            'vac_st': pytz.utc.localize(vac.vac_st).astimezone(wib),
+            'vac_end': pytz.utc.localize(vac.vac_end).astimezone(wib)
+        }
+        
+        return render_template('edit_vacation.html',
+                               vac=vac,
+                               current_year=datetime.datetime.now().year)
+    elif request.method == 'POST':
+        psyc_id = querydb.getPsycId(current_user.id)
+        
+        vac_st_day = int(request.form['vac_st_day'], 10)
+        vac_st_month = int(request.form['vac_st_month'], 10)
+        vac_st_year = int(request.form['vac_st_year'], 10)
+        vac_st_hour, vac_st_minute = request.form['vac_st_time'].split(':')
+        vac_st_hour = int(vac_st_hour, 10)
+        vac_st_minute = int(vac_st_minute, 10)
+        vac_st = wib.localize(datetime.datetime(vac_st_year,
+                                                vac_st_month,
+                                                vac_st_day,
+                                                vac_st_hour,
+                                                vac_st_minute))
+        vac_st = vac_st.astimezone(pytz.utc)
+        
+        vac_end_day = int(request.form['vac_end_day'], 10)
+        vac_end_month = int(request.form['vac_end_month'], 10)
+        vac_end_year = int(request.form['vac_end_year'], 10)
+        vac_end_hour, vac_end_minute = request.form['vac_end_time'].split(':')
+        vac_end_hour = int(vac_end_hour, 10)
+        vac_end_minute = int(vac_end_minute, 10)
+        vac_end = wib.localize(datetime.datetime(vac_end_year,
+                                                 vac_end_month,
+                                                 vac_end_day,
+                                                 vac_end_hour,
+                                                 vac_end_minute))
+        vac_end = vac_end.astimezone(pytz.utc)
+
+        if vac_st > vac_end:
+            temp = vac_end
+            vac_end = vac_st
+            vac_st = temp
+
+        querydb.updateVacation(psyc_id, vac_id, vac_st, vac_end, False)
+
+        flash('Your vacation has been updated.')
+
+        return redirect(url_for('edit_vacation_list'))
+
+@app.route('/psikolog/delete_vacation/<int:vac_id>')
+@roles_required('psyc')
+def delete_vacation(vac_id):
+    psyc_id = querydb.getPsycId(current_user.id)
+    querydb.deleteVacation(psyc_id, vac_id)
+    flash('Vacation deleted.')
+    return redirect(url_for('edit_vacation_list'))
+
+@app.route('/psikolog/edit_vacation_list')
+@app.route('/psikolog/edit_vacation_list/<int:page>')
+@roles_required('psyc')
+def edit_vacation_list(page=1):
+    if page < 1:
+        page = 1
+    
+    psyc_id = querydb.getPsycId(current_user.id)
+    vac_list = querydb.getVacations(psyc_id, page=page)
+    
+    return render_template('edit_vacation_list.html', page=page, vac_list=vac_list)
 
 @app.route('/psikolog/delete_availability/<int:avail_id>')
 @roles_required('psyc')
@@ -789,6 +1041,25 @@ def add_availability():
 
         return redirect(url_for('edit_availability_list'))
 
+@app.route('/psikolog/edit_blog_post/<int:blog_id>', methods=['GET', 'POST'])
+@roles_required('psyc')
+def edit_blog_post(blog_id):
+    psyc_id = querydb.getPsycId(current_user.id)
+    
+    if request.method == 'GET':
+        post = querydb.getBlogPost(blog_id)
+        if post.psyc.psyc_id != psyc_id:
+            flash('You do not own that blog post.', 'error')
+            return redirect(url_for('psikolog_dashboard'))
+        
+        return render_template('psikolog/edit_blog_post.html', post=post)
+    else:
+        subject = request.form['subject']
+        text = request.form['text']
+        
+        querydb.updateBlogPost(blog_id, current_user.id, psyc_id, subject, text)
+        flash('Successfully updated blog post.')
+        return redirect(url_for('psikolog_dashboard'))
 
 @app.route('/psikolog/edit_availability/<int:avail_id>', methods=['GET', 'POST'])
 @roles_required('psyc')

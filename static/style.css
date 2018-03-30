@@ -23,7 +23,7 @@ body {
 }
 
 /*FONT*/
-* {
+body {
   font-family: 'roboto';
   color: #2F2F2F;
 }
@@ -147,6 +147,21 @@ main {
   text-align: center;
 }
 
+.box50 {
+  width: calc(50% - 1em) !important;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.box50:nth-child(2n + 1) {
+  margin: 1em 1em 1em 0;
+}
+
+.box50:nth-child(2n) {
+  margin: 1em 0 1em 1em;
+}
+
 .flash {
   background-color: rgba(0, 179, 0, 0.5) !important;
 }
@@ -155,7 +170,63 @@ main {
   margin: 0;
 }
 
+.input-icon {
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 82%;
+}
+
+img.avatar {
+  display: block;
+  margin: 6px;
+  padding: 3px;
+  width: 128px;
+  height: 128px;
+  border: 1px solid #999;
+}
+
+.psyc-info {
+  width: calc(100% - 148px);
+}
+
+#psyc-page .box:first-child, #psyc-page .flash:first-child {
+  display: flex;
+}
+
+/* Columns */
+.flex {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.side-column {
+  margin: 0 0.5em;
+  flex: 1;
+}
+
+.main-column {
+  margin: 0 0.5em;
+  flex: 1.615;
+}
+
+.flex-one {
+  flex: 1;
+}
+
+@media only screen and (max-width: 400) {
+  .side-column {
+    width: 100%;
+  }
+  .main-column {
+    width: 100%;
+  }
+  .flex-one {
+    width: 100%;
+  }
+}
+
 .btn {
+  text-decoration: none;
   display: inline-block;
   font-weight: 400;
   text-align: center;
@@ -282,6 +353,7 @@ input:checked + .btn-outline-success {
   cursor: pointer;
 }
 
+/*TODO Charlie, what can be condensed? */
 input[type=text],
 input[type=password],
 input[type=datetime-local],
@@ -389,29 +461,6 @@ button:disabled {
   border-color: #000;
   color: #000;
   cursor: auto;
-}
-
-.input-icon {
-  display: inline-block;
-  margin-right: 8px;
-  font-size: 82%;
-}
-
-img.avatar {
-  display: block;
-  margin: 6px;
-  padding: 3px;
-  width: 128px;
-  height: 128px;
-  border: 1px solid #999;
-}
-
-.psyc-info {
-  width: calc(100% - 148px);
-}
-
-#psyc-page .box:first-child, #psyc-page .flash:first-child {
-  display: flex;
 }
 
 .table {
@@ -1001,6 +1050,158 @@ footer {
   background-color: #000;
 }
 
+.paginationjs {
+  margin: auto;
+}
+
+.paginationjs-pages ul {
+  margin: 0;
+  padding: 0;
+}
+
+.paginationjs-pages li {
+  list-style-type: none;
+  display: inline;
+  padding: 0;
+  margin: 0;
+}
+
+.paginationjs-pages li a {
+  padding: 8px;
+  background-color: #E8E8E8;
+  border-color: #999;
+  border-style: solid;
+  border-width: 1px 0 1px 1px;
+  text-decoration: none;
+  color: #000;
+  box-shadow: inset 0 -2px 5px #AAC;
+}
+
+.paginationjs-pages li a:hover {
+  background-color: #FFF;
+  color: #000;
+}
+
+.paginationjs-pages li.paginationjs-prev a {
+  border-radius: 8px 0 0 8px;
+}
+
+.paginationjs-pages li.paginationjs-next a {
+  border-width: 1px;
+  border-radius: 0 8px 8px 0;
+}
+
+.paginationjs-pages li.active a {
+  background-color: #AAA;
+  box-shadow: inset 0 0 5px #77A;
+}
+
+.paginationjs-pages li.active a:hover {
+  background-color: #AAA;
+}
+
+.paginationjs-pages li.disabled a {
+  background-color: #FFF;
+  color: #AAA;
+  box-shadow: unset;
+}
+
+/* CC-0 licensed at https://loading.io/css/ */
+.lds-spinner {
+  color: official;
+  display: block;
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin: 1.5em auto;
+}
+
+.lds-spinner div {
+  transform-origin: 32px 32px;
+  animation: lds-spinner 1.2s linear infinite;
+}
+
+.lds-spinner div:after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 3px;
+  left: 29px;
+  width: 5px;
+  height: 14px;
+  border-radius: 20%;
+  background: #000;
+}
+
+.lds-spinner div:nth-child(1) {
+  transform: rotate(0deg);
+  animation-delay: -1.1s;
+}
+
+.lds-spinner div:nth-child(2) {
+  transform: rotate(30deg);
+  animation-delay: -1s;
+}
+
+.lds-spinner div:nth-child(3) {
+  transform: rotate(60deg);
+  animation-delay: -0.9s;
+}
+
+.lds-spinner div:nth-child(4) {
+  transform: rotate(90deg);
+  animation-delay: -0.8s;
+}
+
+.lds-spinner div:nth-child(5) {
+  transform: rotate(120deg);
+  animation-delay: -0.7s;
+}
+
+.lds-spinner div:nth-child(6) {
+  transform: rotate(150deg);
+  animation-delay: -0.6s;
+}
+
+.lds-spinner div:nth-child(7) {
+  transform: rotate(180deg);
+  animation-delay: -0.5s;
+}
+
+.lds-spinner div:nth-child(8) {
+  transform: rotate(210deg);
+  animation-delay: -0.4s;
+}
+
+.lds-spinner div:nth-child(9) {
+  transform: rotate(240deg);
+  animation-delay: -0.3s;
+}
+
+.lds-spinner div:nth-child(10) {
+  transform: rotate(270deg);
+  animation-delay: -0.2s;
+}
+
+.lds-spinner div:nth-child(11) {
+  transform: rotate(300deg);
+  animation-delay: -0.1s;
+}
+
+.lds-spinner div:nth-child(12) {
+  transform: rotate(330deg);
+  animation-delay: 0s;
+}
+
+@keyframes lds-spinner {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 /**********END GLOBAL CSS**********/
 /**********BEGIN HOME**********/
 #circle {
@@ -1025,6 +1226,22 @@ table {
 
 #slide img {
   width: 100%;
+}
+
+#admin-form {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#admin-portal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#admin-portal button {
+  margin: 0 1em;
 }
 
 /**********END ADMIN**********/

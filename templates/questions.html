@@ -13,6 +13,10 @@
                     <button class="btn btn-success"><i class="fa fa-plus"></i> Add Question</button>
                 </form>
             {% endif %}
+            {% if not questions %}
+            <p>No Questions Exist</p>
+            {%  else %}
+
             {% for u in questions %}
                 <!-- question list -->
                 <div class="question">
@@ -70,6 +74,7 @@
             {% if pagination.get_page_count() > page %}
                 <a id="next" class="btn btn-success" style="text-decoration: none;" href="./?page={{ page + 1 }}">Next</a>
             {% endif %}
+         {% endif %}
         </div>
     </main>
 {% endblock %}
