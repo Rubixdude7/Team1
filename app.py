@@ -438,30 +438,24 @@ def editContact():
 @app.route('/videoConf')
 def videoConf():
     url = 'https://interviews.skype.com/api/interviews'
-    content = {"jti": str(uuid4()),
-                        "iss": "7b36897b-f594-6f25-fb8d-440c854a2c24",
-                        "iat": str(int(time.time())),
-                        "sub": str(sha256()),
-                        "exp": str(int(time.time() + 10))}
-
-    print(querydb.generateToken(content)) #prints the token
-
-    data = urllib.parse.urlencode(content, encoding='utf-8')
+    payload = {}
+    data = json.dumps(payload).encode('ascii')
+    print(querydb.generateToken(data))  # prints the token
+    #data = urllib.parse.urlencode(payload, encoding='utf-8')
     print(data) #prints the encoded content
-    data = data.encode('ascii')
+    #data = data.encode('ascii')
     print(data) #prints the ascii encoded content
 
-    headers = {'User-Agent': 'Mozilla/5.0', 'Content-Type': 'application/json',
-               'Authorization': 'Bearer' + querydb.generateToken(content)}
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0', 'Content-Type': 'application/json',
+               'Authorization': 'Bearer ' + querydb.generateToken(data)}
 
     req = urllib.request.Request(url=url, data=data, headers=headers)
-    response = urllib.request.urlopen(req) #this is where it breaks, the request is sent but we never get the response
+    print(req)
+    # this is where it breaks, the request is sent but we never get the response
+    response = urllib.request.urlopen(req)
     the_page = response.read().decode("utf-8")
     print(the_page)
     return render_template('videoConf.html')
-
-
-
 
 # End Gabe
 

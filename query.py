@@ -13,6 +13,7 @@ from _sha256 import sha256
 from uuid import uuid4 #this is in place of js's guid
 from jose import jws
 from jose import jwt
+import time
 
 
 
@@ -901,7 +902,12 @@ class query(object):
         return start
 
     def generateToken(self, content):
-        signed = jws.sign(payload=content, key='5c2ccb9d-a143-e5b8-cd1d-0ee4dbf6666c', algorithm='HS256')
+        content = {"jti": str(uuid4()),
+                   "iss": "65e63b43-a69b-7ea1-49f7-06046fa21aee",
+                   "iat": int(time.time()),
+                   "sub": str(sha256(content)),
+                   "exp": int(time.time() + 10)}
+        signed = jws.sign(payload=content, key='9369f8e0-fff8-e5a6-d2a4-363254aa5dbe', algorithm='HS256')
         return signed
 
     #End of Gabe's code
