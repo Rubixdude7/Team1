@@ -29,7 +29,7 @@ import urllib.request
 import urllib.parse
 from _sha256 import sha256
 from uuid import uuid4 #this is in place of js's guid
-import time
+import requests
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
@@ -438,23 +438,21 @@ def editContact():
 @app.route('/videoConf')
 def videoConf():
     url = 'https://interviews.skype.com/api/interviews'
+
     payload = {}
+
     data = json.dumps(payload).encode('ascii')
-    print(querydb.generateToken(data))  # prints the token
-    #data = urllib.parse.urlencode(payload, encoding='utf-8')
-    print(data) #prints the encoded content
-    #data = data.encode('ascii')
-    print(data) #prints the ascii encoded content
+    token = querydb.generateToken(data)  # stores the token
 
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0', 'Content-Type': 'application/json',
-               'Authorization': 'Bearer ' + querydb.generateToken(data)}
+               'Authorization': 'Bearer ' + token}
+    req = requests.post(url=url, data=data, headers=headers)
+    print(req.text)
+    body = req.__dict__
+    requrl = json.loads(body.get('_content', {})).get('urls', {})[0].get('url')
+    print(body)
+    print(requrl)
 
-    req = urllib.request.Request(url=url, data=data, headers=headers)
-    print(req)
-    # this is where it breaks, the request is sent but we never get the response
-    response = urllib.request.urlopen(req)
-    the_page = response.read().decode("utf-8")
-    print(the_page)
     return render_template('videoConf.html')
 
 # End Gabe

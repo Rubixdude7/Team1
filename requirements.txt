@@ -12,3 +12,4 @@ bleach==2.1.2
 python-jose==2.0.2
 pytz
 Babel
+requests
