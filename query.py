@@ -13,7 +13,7 @@ from _sha256 import sha256
 from uuid import uuid4 #this is in place of js's guid
 from jose import jws
 from jose import jwt
-import jose
+import requests
 import time
 import json
 import hashlib
@@ -922,6 +922,25 @@ class query(object):
                    "exp": int(time.time() + 10)}
         signed = jwt.encode(claims=payload, key=secret_key)
         return signed
+
+    def generateUrl(self):
+        url = 'https://interviews.skype.com/api/interviews'
+
+        payload = {}
+
+        data = json.dumps(payload).encode('ascii')
+        token = query.generateToken(data)  # stores the token
+
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+                   'Content-Type': 'application/json',
+                   'Authorization': 'Bearer ' + token}
+        req = requests.post(url=url, data=data, headers=headers)
+        print(req.text)
+        body = req.__dict__
+        requrl = json.loads(body.get('_content', {})).get('urls', {})[0].get('url')
+        print(body)
+        print(requrl)
+        return requrl
 
     #End of Gabe's code
 

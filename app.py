@@ -444,16 +444,16 @@ def videoConf():
     data = json.dumps(payload).encode('ascii')
     token = querydb.generateToken(data)  # stores the token
 
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0', 'Content-Type': 'application/json',
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+               'Content-Type': 'application/json',
                'Authorization': 'Bearer ' + token}
     req = requests.post(url=url, data=data, headers=headers)
     print(req.text)
     body = req.__dict__
     requrl = json.loads(body.get('_content', {})).get('urls', {})[0].get('url')
-    print(body)
     print(requrl)
 
-    return render_template('videoConf.html')
+    return redirect(requrl, code=302)
 
 # End Gabe
 
