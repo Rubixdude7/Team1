@@ -4,20 +4,23 @@
 <main id="mainHome">
     <div class="box">
         <h1 class="title">Adjust Fee</h1>
-    </div>
-
-    <div class="box">
+        <hr>
         <form action="" method="POST">
             {{ form.hidden_tag() }}
-
+            <div class="form-control-1">
             {{ form.oneHourFee.label }}
             {{ form.oneHourFee }}
+            </div>
             <br>
+            <div class="form-control-2">
             {{ form.onePointFiveFee.label }}
             {{ form.onePointFiveFee }}
+            </div>
             <br>
+            <div class="form-control-2">
             {{ form.twoHourFee.label }}
             {{ form.twoHourFee }}
+            </div>
             <br>
             {{ form.submit(class="btn btn-success") }}
         </form>

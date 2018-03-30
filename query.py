@@ -332,10 +332,8 @@ class query(object):
         u.save()
 
     def updateLengthFee(self, length, fee):
-        if db.consultation_fee.select(db.consultation_fee.fee).contains(fee):
-            feeid = db.consultation_fee.get(fee==db.consultation_fee.fee)
-        l = db.consultation_length.get(db.consultation_length.cnslt_len_id==length)
-        l.cnslt_fee_id = feeid.cnslt_fee_id
+        l = db.consultation_fee.get(db.consultation_fee.cnslt_fee_id == length)
+        l.fee = fee
         l.save()
 
 # End Jason's code

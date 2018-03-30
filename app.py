@@ -608,6 +608,7 @@ def feeAdjust():
         querydb.updateLengthFee(1,feeOne)
         querydb.updateLengthFee(2,feeOneFive)
         querydb.updateLengthFee(3,feeTwo)
+        flash("Your changes have been saved")
         return redirect(url_for('adminPortal'))
     return render_template('admin/feeAdjust.html', form=form)
 
