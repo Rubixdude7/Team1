@@ -436,6 +436,8 @@ def editContact():
 
 
 @app.route('/videoConf')
+#@login_required
+#@roles_required('user', 'psyc')
 def videoConf():
     url = 'https://interviews.skype.com/api/interviews'
 
@@ -448,10 +450,11 @@ def videoConf():
                'Content-Type': 'application/json',
                'Authorization': 'Bearer ' + token}
     req = requests.post(url=url, data=data, headers=headers)
-    #print(req.text)
+    print(req.text)
     body = req.__dict__
     requrl = json.loads(body.get('_content', {})).get('urls', {})[0].get('url')
-    #print(requrl)
+    print(requrl)
+    #print(querydb.generateUrl())
 
     return redirect(requrl, code=302)
 

@@ -919,29 +919,33 @@ class query(object):
                    "iss": api_key,
                    "iat": int(time.time()),
                    "sub": hashlib.sha256(content).hexdigest(),
-                   "exp": int(time.time() + 10)}
+                   "exp": int(time.time() + 10),
+                   'code': 'passion', 'title': 'passion conference'}
         signed = jwt.encode(claims=payload, key=secret_key)
         return signed
 
     def generateUrl(self):
         url = 'https://interviews.skype.com/api/interviews'
 
-        payload = {}
+        payload = {"code": "passion", "title": "passion consultation"}
 
         data = json.dumps(payload).encode('ascii')
-        token = query.generateToken(data)  # stores the token
+        token = query.generateToken(self, data)  # stores the token
 
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
                    'Content-Type': 'application/json',
                    'Authorization': 'Bearer ' + token}
         req = requests.post(url=url, data=data, headers=headers)
-        print(req.text)
+        # print(req.text)
         body = req.__dict__
         requrl = json.loads(body.get('_content', {})).get('urls', {})[0].get('url')
-        print(body)
-        print(requrl)
         return requrl
 
+    def updateConsult(self, consult_id, link):
+        c = db.consultation.select().where(db.consultation.cnsl_id == consult_id).get()
+        c.link = db.consultation(link=link)
+        c.save()
+        return True
     #End of Gabe's code
 
     #Nolan's Code
