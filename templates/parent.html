@@ -56,64 +56,61 @@
         </p>
 
     </div>
-
-            {% for child in children %}
-                <li class="list-group-item" style="list-style: none">
-                    <div class="box">
-                        <p>
-
-
-                            First name: {{ child.child_nm_fst }}<br>
-                            Last name: {{ child.child_nm_lst }}<br>
-                            Age: {{ querydb.getAge(child) }}<br>
-                            {% if not child.child_id in updatedQuestions and child.q_comp_dtm != None %}
-                                    Questions completed on: {{ child.q_comp_dtm }}<br>
-                            {% endif %}
+    <div class="flex">
+        {% for child in children %}
+            <div class="box box50">
+                <p>
 
 
-                            {% if current_user.is_authenticated and current_user.is_in_role("user") %}
-                                {% if child.q_comp_dtm != None and not child.child_id in updatedQuestions %}
-                                    <form>
-                                        <button onclick="location.href='{{ url_for('parent_seeanswers', child_id=child.child_id) }}'" type="button" class="btn btn-info">
-                                            View Question Answers
-                                        </button>
-                                    </form>
-                                    <form>
-                                        <br>
-                                        <button class="btn-warning btn" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-warning">
-                                            Edit Answers!
-                                        </button>
-                                    </form>
-                                {% elif child.q_comp_dtm == None %}
-                                    <form>
-                                        <button class="btn-danger btn" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-danger">
-                                            Questionnaire Needs Completed!
-                                        </button>
-                                    </form>
-                                {% endif %}
-
-                                {% if child.child_id in updatedQuestions %}
-                                    <br>
-                                    <button class="btn-danger btn" onclick="location.href='{{ url_for('questionsUserView', child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-danger">
-                                        Answer New Questions!
-                                    </button>
-                                {% endif %}
-
-                                {% if not child.child_id in updatedQuestions and child.q_comp_dtm != None and querydb.postConsult(child.child_id) %}
-                                    <br>
-                                    <button onclick="location.href='{{ url_for('schedule', child_id=child.child_id) }}'" type="button" class="btn btn-success">Schedule Consultation</button>
-                                {% elif not querydb.postConsult(child.child_id) %}
-                                    <br>
-                                    Next Appointment: {{ querydb.haveTime(child.child_id) }}
-                                {% endif %}
-                            {% endif %}
-
-                        </p>
-                    </div>
-                </li>
+                    First name: {{ child.child_nm_fst }}<br>
+                    Last name: {{ child.child_nm_lst }}<br>
+                    Age: {{ querydb.getAge(child) }}<br>
+                    {% if not child.child_id in updatedQuestions and child.q_comp_dtm != None %}
+                            Questions completed on: {{ child.q_comp_dtm }}<br>
+                    {% endif %}
 
 
-            {% endfor %}
+                    {% if current_user.is_authenticated and current_user.is_in_role("user") %}
+                        {% if child.q_comp_dtm != None and not child.child_id in updatedQuestions %}
+                            <form>
+                                <button onclick="location.href='{{ url_for('parent_seeanswers', child_id=child.child_id) }}'" type="button" class="btn btn-info">
+                                    View Question Answers
+                                </button>
+                            </form>
+                            <form>
+                                <br>
+                                <button class="btn-warning btn" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-warning">
+                                    Edit Answers!
+                                </button>
+                            </form>
+                        {% elif child.q_comp_dtm == None %}
+                            <form>
+                                <button class="btn-danger btn" onclick="location.href='{{ url_for('questionsUserView',child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-danger">
+                                    Questionnaire Needs Completed!
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        {% if child.child_id in updatedQuestions %}
+                            <br>
+                            <button class="btn-danger btn" onclick="location.href='{{ url_for('questionsUserView', child_id=child.child_id, child_name=child.child_nm_fst) }}'" type="button" class="btn btn-danger">
+                                Answer New Questions!
+                            </button>
+                        {% endif %}
+
+                        {% if not child.child_id in updatedQuestions and child.q_comp_dtm != None and querydb.postConsult(child.child_id) %}
+                            <br>
+                            <button onclick="location.href='{{ url_for('schedule', child_id=child.child_id) }}'" type="button" class="btn btn-success">Schedule Consultation</button>
+                        {% elif not querydb.postConsult(child.child_id) %}
+                            <br>
+                            Next Appointment: {{ querydb.haveTime(child.child_id) }}
+                        {% endif %}
+                    {% endif %}
+
+                </p>
+            </div>
+        {% endfor %}
+    </div>
 </main>
 
 
