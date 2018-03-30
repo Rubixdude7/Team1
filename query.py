@@ -320,12 +320,20 @@ class query(object):
         u = db.user.get(db.user.user_id == u_id)
         u.email = email
         u.save()
+
     def updateName(self, u_id, fname, lname):
         u = db.user.get(db.user.user_id == u_id)
 
         u.first_name = fname
         u.last_name = lname
         u.save()
+
+    def updateLengthFee(self, length, fee):
+        if db.consultation_fee.select(db.consultation_fee.fee).contains(fee):
+            feeid = db.consultation_fee.get(fee==db.consultation_fee.fee)
+        l = db.consultation_length.get(db.consultation_length.cnslt_len_id==length)
+        l.cnslt_fee_id = feeid.cnslt_fee_id
+        l.save()
 
 # End Jason's code
 

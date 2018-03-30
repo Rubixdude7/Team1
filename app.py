@@ -582,11 +582,33 @@ class SearchBar(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class FeeAssign(FlaskForm):
+    oneHourFee = StringField('1 Hour')
+    onePointFiveFee = StringField('1.5 Hour')
+    twoHourFee = StringField('2 Hour')
+    submit = SubmitField('Submit')
+
+
 # Routes
 @app.route('/adminPortal')
 @roles_required('admin')
 def adminPortal():
     return render_template('admin/adminPortal.html')
+
+
+@app.route('/feeAdjust', methods=['GET', 'POST'])
+@roles_required('admin')
+def feeAdjust():
+    form = FeeAssign()
+    if form.validate_on_submit():
+        feeOne = form.oneHourFee.data
+        feeOneFive = form.onePointFiveFee.data
+        feeTwo = form.twoHourFee.data
+        querydb.updateLengthFee(1,feeOne)
+        querydb.updateLengthFee(2,feeOneFive)
+        querydb.updateLengthFee(3,feeTwo)
+        return redirect(url_for('adminPortal'))
+    return render_template('admin/feeAdjust.html', form=form)
 
 
 @app.route('/admin', methods=['GET', 'POST'])
