@@ -885,34 +885,29 @@ class query(object):
         c.save()
 
     def postConsult(self, child_id):
-        try:
-            end = db.consultation.select(db.consult_time.time_end).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()[0]
-            print('getting end')
-            if end is not None:
-                l = list(end)[0]
+        query = db.consult_time.select().where(db.consultation.child == child_id).join(db.consultation, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc())
+        print('getting end')
+        for ct in query:
+            l = ct.time_end
 
-                print('in end if')
+            print('in end if')
 
-                print(l)
+            print(datetime.datetime.utcnow())
+            print(l)
 
-                if l < datetime.datetime.today():
-                    print('true')
-                    return True
-                else:
-                    print('fale')
-                    return False
-            else:
-                print('true 2')
-                return True
-        except IndexError:
-            print('true 3')
-            return True
+            if l >= datetime.datetime.utcnow():
+                print('fale')
+                return False
+        
+        print('true 2')
+        return True
 
 
     def haveTime(self, child_id):
-        start = db.consultation.select(db.consult_time.time_st).where(db.consultation.child == child_id).join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).tuples()[0]
-        start = list(start)[0]
-        return start
+        start = db.consult_time.select().where(db.consultation.child == child_id).join(db.consultation, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).order_by(db.consult_time.time_end.desc()).get()
+        wib = pytz.timezone('Asia/Jakarta')
+        start = pytz.utc.localize(start.time_st).astimezone(wib)
+        return babel.dates.format_datetime(start, format='EEEE, d MMMM yyyy hh:mm a (z)', tzinfo=wib, locale='id_ID')
 
     def generateToken(self, content):
         api_key = '65e63b43-a69b-7ea1-49f7-06046fa21aee'
