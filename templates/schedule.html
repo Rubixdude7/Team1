@@ -60,7 +60,7 @@
                     var avails = [];
                     for (var i = 0; i < allAvails.length; i++) {
                         if (allAvails[i]["psyc_id"] == psyc_id) {
-                            avails[avails.length] = allAvails[i];
+                            avails.push(allAvails[i]);
                         }
                     }
                     cal.setAvailabilities(avails);
@@ -98,7 +98,8 @@
                         var psycs_day = [];
                         for (var i = 0; i < allAvails.length; i++) {
                             if (allAvails[i]["st"]["year"] == year && allAvails[i]["st"]["month"] == month && allAvails[i]["st"]["day"] == day) {
-                                psycs_day.push(allAvails[i]);
+                                // Copy the availability object to prevent messing with it inside the calendar code
+                                psycs_day.push(JSON.parse(JSON.stringify(allAvails[i])));
                             }
                         }
 
@@ -138,7 +139,7 @@
 
                                 var k = i.toString() + j.toString();
 
-
+ 
                                 var len_fee_str = "<div class=\"select\">" +
                                                         "<select class=\"length\">";
 

@@ -705,6 +705,7 @@ class query(object):
                                 .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
                                 .where((db.role.role_nm == 'psyc') & db.user.active)\
                                 .tuples()
+
         result = [{
             'psyc_id': t[0],
             'child_id': t[1],
@@ -721,7 +722,7 @@ class query(object):
         wib = pytz.timezone('Asia/Jakarta')
                 
         # Let's say the calendar is only valid up to 30 days ahead of today.
-        today = pytz.utc.localize(datetime.datetime.utcnow()).astimezone(wib)
+        today = pytz.utc.localize(datetime.datetime.utcnow()).astimezone(wib).replace(tzinfo=None)
         for day_offset in range(31):
             day = today + datetime.timedelta(day_offset)
 
@@ -732,8 +733,9 @@ class query(object):
                 a_wkd = ['m', 't', 'w', 'th', 'f', 's', 'su'].index(a['weekday'])
 
                 if wkd == a_wkd:
-                    st = datetime.datetime.combine(day.date(), a['time_st'], tzinfo=wib).astimezone(pytz.utc).replace(tzinfo=None)
-                    end = datetime.datetime.combine(day.date(), a['time_end'], tzinfo=wib).astimezone(pytz.utc).replace(tzinfo=None)
+                    
+                    st = wib.localize(datetime.datetime.combine(day.date(), a['time_st'])).astimezone(pytz.utc).replace(tzinfo=None)
+                    end = wib.localize(datetime.datetime.combine(day.date(), a['time_end'])).astimezone(pytz.utc).replace(tzinfo=None)
 
                     # Add this availability to the result
                     slots.append({
@@ -794,7 +796,7 @@ class query(object):
             del s['valid']
 
         for slot in slots:
-            st = pytz.utc.localize(slot['st']).astimezone(wib)
+            st = pytz.utc.localize(slot['st']).astimezone(wib).replace(tzinfo=None)
             slot['st'] = {
                 'year': st.year,
                 'month': st.month,
@@ -804,7 +806,7 @@ class query(object):
                 'weekday': st.weekday()
             }
             
-            end = pytz.utc.localize(slot['end']).astimezone(wib)
+            end = pytz.utc.localize(slot['end']).astimezone(wib).replace(tzinfo=None)
             slot['end'] = {
                 'year': end.year,
                 'month': end.month,
