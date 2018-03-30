@@ -247,6 +247,13 @@ def questions():  # TODO Breaks if there are no quesions in db
     return object_list("questions.html", paginate_by=3, query=questions, context_variable='questions')
 
 
+@app.route('/reviews')
+@login_required
+def reviews():  # TODO Breaks if there are no quesions in db
+    return render_template("reviews.html")
+
+
+
 @app.route('/questionsUserView/', methods=['GET', 'POST'])
 @login_required
 def questionsUserView():
