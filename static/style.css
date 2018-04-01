@@ -148,18 +148,29 @@ main {
 }
 
 .box50 {
-  width: calc(50% - 1em) !important;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+  /*NARROW SCREEN*/
+  /*WIDE SCREEN*/
 }
 
-.box50:nth-child(2n + 1) {
-  margin: 1em 1em 1em 0;
+@media only screen and (max-width: 1000px) {
+  .box50 {
+    width: 100%;
+  }
 }
 
-.box50:nth-child(2n) {
-  margin: 1em 0 1em 1em;
+@media only screen and (min-width: 1001px) {
+  .box50 {
+    width: calc(50% - 1em) !important;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  .box50:nth-child(2n + 1) {
+    margin: 1em 1em 1em 0;
+  }
+  .box50:nth-child(2n) {
+    margin: 1em 0 1em 1em;
+  }
 }
 
 .flash {
@@ -1239,16 +1250,22 @@ table {
   align-items: center;
   justify-content: center;
   /*NARROW SCREEN*/
+  /*WIDE SCREEN*/
 }
 
 @media only screen and (max-width: 1000px) {
   #admin-portal {
     flex-direction: column;
   }
+  #admin-portal button {
+    margin: 1em 0;
+  }
 }
 
-#admin-portal button {
-  margin: 0 1em;
+@media only screen and (min-width: 1001px) {
+  #admin-portal button {
+    margin: 0 1em;
+  }
 }
 
 /**********END ADMIN**********/

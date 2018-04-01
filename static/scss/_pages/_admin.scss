@@ -25,9 +25,17 @@ table{
   /*NARROW SCREEN*/
   @media only screen and (max-width: 1000px) {
     flex-direction: column;
+
+    button{
+      margin: 1em 0;
+    }
   }
 
-  button{
-    margin: 0 1em;
+  /*WIDE SCREEN*/
+  @media only screen and (min-width: 1001px) {
+
+    button {
+      margin: 0 1em;
+    }
   }
 }
