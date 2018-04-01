@@ -1238,6 +1238,13 @@ table {
   display: flex;
   align-items: center;
   justify-content: center;
+  /*NARROW SCREEN*/
+}
+
+@media only screen and (max-width: 1000px) {
+  #admin-portal {
+    flex-direction: column;
+  }
 }
 
 #admin-portal button {
