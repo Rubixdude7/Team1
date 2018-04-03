@@ -19,19 +19,13 @@ import json
 import hashlib
 
 
-
 class query(object):
-    """
-    query Class:
+    """A library of convenient database access methods. Ideally, all of the
+    database interaction should be in this class.
 
-    A class to do different queries to the database
-    """
+    When this class is instantiated, cloudinary is automatically configured."""
 
     def __init__(self):
-        """"
-        Default Constructor
-        There are no parameters, default is here as there has to be code in the constructor
-        """
         cloudinary.config(
             cloud_name="hbcgsvmyc",
             api_key="483847116472347",
@@ -340,6 +334,11 @@ class query(object):
 
 # Begin Charlie's code
     def getUserPsycId(self, u_id):
+        '''Retrieves and returns the psychologist ID associated with a user.
+
+        :param int u_id: the ID of the user
+        :return: the psychologist ID associated with the user, or -1 if not found
+        :rtype: int'''
         tuples = db.user.select(db.psychologist.psyc_id)\
                         .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
                         .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
@@ -351,6 +350,13 @@ class query(object):
         return tuples[0][0]
 
     def getBlogPostsBy(self, psyc_id):
+        ''':deprecated:
+
+        Retrieves blog posts by a particular psychologist.
+
+        :param int psyc_id: the ID of the psychologist.
+        :return: a list of :class:`models.blog` objects.
+        :rtype: list'''
         blg = db.blog.select()\
                      .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
                      .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
@@ -361,6 +367,14 @@ class query(object):
         return blg
 
     def getAllBlogPosts(self, page_num, items_per_page):
+        ''':deprecated:
+
+        Retrieves paginated blog posts posts.
+
+        :param int page_num: the page number
+        :param int items_per_page: the number of items per page
+        :return: a list of dicts
+        :rtype: list'''
         tuples = db.blog.select(db.blog.subject, db.blog.updt_dtm, db.blog.text, db.psychologist.psyc_id, db.user.first_name, db.user.last_name)\
                         .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
                         .join(db.user, JOIN_INNER, db.psychologist.user == db.user.user_id)\
@@ -379,6 +393,11 @@ class query(object):
         } for t in tuples]
 
     def getAvatar(self, psyc_id):
+        '''Returns the URL for a psychologist's avatar.
+
+        :param int psyc_id: the ID of the psychologist
+        :return: the URL of the psychologist's avatar
+        :rtype: str'''
         psyc = db.psychologist.get(db.psychologist.psyc_id == psyc_id)
         if psyc.photo is None or psyc.photo == '':
             return '/static/noavatar.png'
@@ -388,6 +407,9 @@ class query(object):
         return cloudinary.CloudinaryImage(public_id, version=version).build_url()
 
     def allowed_file(self, filename):
+        '''Returns whether a filename's extension indicates that it is an image.
+
+        :param str filename: Filename'''
         return '.' in filename and \
                filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
 
