@@ -22,7 +22,20 @@ table{
   align-items: center;
   justify-content: center;
 
-  button{
-    margin: 0 1em;
+  /*NARROW SCREEN*/
+  @media only screen and (max-width: 1000px) {
+    flex-direction: column;
+
+    button{
+      margin: 1em 0;
+    }
+  }
+
+  /*WIDE SCREEN*/
+  @media only screen and (min-width: 1001px) {
+
+    button {
+      margin: 0 1em;
+    }
   }
 }
