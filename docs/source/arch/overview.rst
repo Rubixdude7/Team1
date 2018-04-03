@@ -23,7 +23,7 @@ Three Python scripts perform most of the application's logic:
     the peewee_ ORM to protect the web app from SQL injections.
     
 :doc:`/modules/query`
-    This script defines a class called :class:query.query which has
+    This script defines a class called :class:`~query.query` which has
     convenient methods for accessing the database in a variety of ways.
 
 .. _peewee: http://docs.peewee-orm.com/en/2.10.2/

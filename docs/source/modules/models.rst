@@ -3,3 +3,4 @@
 
 .. automodule:: models
     :members:
+    :undoc-members:

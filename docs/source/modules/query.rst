@@ -1,5 +1,6 @@
 ``query.py`` - The query library
 ================================
 
-.. automodule: query
+.. automodule:: query
     :members:
+    :undoc-members:
