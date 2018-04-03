@@ -336,8 +336,8 @@ class query(object):
     def getUserPsycId(self, u_id):
         '''Retrieves and returns the psychologist ID associated with a user.
 
-        :param int u_id: the ID of the user
-        :return: the psychologist ID associated with the user, or -1 if not found
+        :param int u_id: The ID of the user.
+        :return: The psychologist ID associated with the user, or -1 if not found.
         :rtype: int'''
         tuples = db.user.select(db.psychologist.psyc_id)\
                         .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
@@ -371,9 +371,9 @@ class query(object):
 
         Retrieves paginated blog posts posts.
 
-        :param int page_num: the page number
-        :param int items_per_page: the number of items per page
-        :return: a list of dicts
+        :param int page_num: A page number.
+        :param int items_per_page: The number of items you want per page.
+        :return: A list of dicts.
         :rtype: list'''
         tuples = db.blog.select(db.blog.subject, db.blog.updt_dtm, db.blog.text, db.psychologist.psyc_id, db.user.first_name, db.user.last_name)\
                         .join(db.psychologist, JOIN_INNER, db.blog.psyc == db.psychologist.psyc_id)\
@@ -395,8 +395,8 @@ class query(object):
     def getAvatar(self, psyc_id):
         '''Returns the URL for a psychologist's avatar.
 
-        :param int psyc_id: the ID of the psychologist
-        :return: the URL of the psychologist's avatar
+        :param int psyc_id: The ID of the psychologist.
+        :return: The URL of the psychologist's avatar.
         :rtype: str'''
         psyc = db.psychologist.get(db.psychologist.psyc_id == psyc_id)
         if psyc.photo is None or psyc.photo == '':
@@ -409,11 +409,19 @@ class query(object):
     def allowed_file(self, filename):
         '''Returns whether a filename's extension indicates that it is an image.
 
-        :param str filename: Filename'''
+        :param str filename: A filename.
+        :return: Whether the filename has an recognized image file extension
+        :rtype: bool'''
         return '.' in filename and \
                filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
 
     def updateAvatar(self, psyc_id, avatar_file):
+        '''Updates the avatar of a psychologist.
+
+        :param int psyc_id: The ID of the psychologist.
+        :param file avatar_file: A filelike object found in **flask.request.files**.
+        :return: True if successful, False if unsuccessful.
+        :rtype: bool'''
         if not self.allowed_file(avatar_file.filename):
             return False
 
@@ -427,6 +435,11 @@ class query(object):
         return True
 
     def getPsycId(self, u_id):
+        '''Retrieves and returns the psychologist ID associated with a user.
+
+        :param int u_id: The ID of the user.
+        :return: The psychologist ID associated with the user, or -1 if not found.
+        :rtype: int'''
         results = db.user.select(db.psychologist.psyc_id)\
                         .join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user)\
                         .join(db.role, JOIN_INNER, db.user_roles.role == db.role.role_id)\
@@ -438,6 +451,15 @@ class query(object):
         return psyc_id
 
     def createBlogPost(self, u_id, psyc_id, subject, text):
+        '''Creates a blog post in the database. For this to work, *u_id* must
+        must be the ID of the user associated with the psychologist with ID
+        *psyc_id*. The blog's subject is set to *subject* and its body text is
+        set to *text*.
+
+        :param int u_id: The ID of the user.
+        :param int psyc_id: The psychologist ID associated with the user.
+        :param str subject: The subject of the blog post.
+        :param str text: The body text of the blog post.'''
         text = bleach.clean(text, tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', u'p'])
         now = pytz.utc.localize(datetime.datetime.utcnow()).replace(tzinfo=None)
         blog_post = db.blog(psyc=psyc_id,
