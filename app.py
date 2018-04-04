@@ -439,7 +439,12 @@ def editContact():
 def videoConf():
     url = 'https://interviews.skype.com/api/interviews'
 
-    payload = {}
+    payload = {
+        "capabilities": {
+            "codeEditor": False,
+            "notes": True
+        }
+    }
 
     data = json.dumps(payload).encode('ascii')
     token = querydb.generateToken(data)  # stores the token
@@ -447,6 +452,7 @@ def videoConf():
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
                'Content-Type': 'application/json',
                'Authorization': 'Bearer ' + token}
+
     req = requests.post(url=url, data=data, headers=headers)
     print(req.text)
     body = req.__dict__
