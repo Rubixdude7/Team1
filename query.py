@@ -217,15 +217,25 @@ class query(object):
 
 # Start Jason's code
 
-    def getAllUsers(self, page_num, page_size):
-        users = db.user.select().where(db.user.active).join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user).order_by(db.user_roles.role).paginate(page_num, page_size)
-        return users
+    def getAllUsers(self, page_num, page_size, return_total=False):
+        users = db.user.select().where(db.user.active).join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user).order_by(db.user_roles.role)
+        
+        if return_total:
+            total = users.count()
+            return total, users.paginate(page_num, page_size)
+        else:
+            return users.paginate(page_num, page_size)
 
-    def getSearchedUsers(self, search, page_num, page_size):
-        users = db.user.select().where(db.user.active & db.user.email.contains(search)).join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user).order_by(db.user_roles.role).paginate(page_num, page_size)
+    def getSearchedUsers(self, search, page_num, page_size, return_total=False):
+        users = db.user.select().where(db.user.active & (db.user.username.contains(search) | db.user.email.contains(search))).join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user).order_by(db.user_roles.role)
 
         # users = db.user.select().where(db.user.active & db.user.email.contains(search)).paginate(page_num, num_of_pages)
-        return users
+        
+        if return_total:
+            total = users.count()
+            return total, users.paginate(page_num, page_size)
+        else:
+            return users.paginate(page_num, page_size)
 
     def getUserCount(self):
         usercount = db.user.select().count()

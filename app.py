@@ -758,6 +758,27 @@ def api_blog(psyc_id):
     page_num = int(request.args['page_num'])
     page_size = int(request.args['page_size'])
     return jsonify(querydb.apiBlog(psyc_id, page_num, page_size))
+    
+@app.route('/api/admin/search_users')
+def api_admin_search_users():
+    page_num = int(request.args['page_num'])
+    page_size = int(request.args['page_size'])
+    
+    total = 0
+    users = None
+    if 'q' in request.args:
+        total, users = querydb.getSearchedUsers(request.args['q'], page_num, page_size, return_total=True)
+    else:
+        total, users = querydb.getAllUsers(page_num, page_size, return_total=True)
+    
+    return jsonify({
+        'total': total,
+        'users': [{
+            'id': u.user_id,
+            'email': u.email,
+            'role': querydb.role(u.user_id)
+        } for u in users]
+    })
 
 @app.route('/my_psikolog_page')
 @roles_required('psyc')
