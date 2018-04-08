@@ -5,91 +5,158 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     </head>
-    <style>
-
-    .rating {
-    float:left;
-    width:300px;
+<style>
+#comments {
+  visibility:hidden;
 }
-.rating span { float:right; position:relative; }
-.rating span input {
+fieldset {
     position:absolute;
-    top:0px;
-    left:0px;
-    opacity:0;
-}
-.rating span label {
-
-    display:inline-block;
-    width:30px;
-    height:30px;
-    text-align:center;
-    color:#FFF;
-    background:#ccc;
-    font-size:30px;
-    margin-right:2px;
-    line-height:30px;
-    border-radius:50%;
-    -webkit-border-radius:50%;
+    left: 40%;
 }
 
-.checked {
-    color: orange;
+.rating {
+    float:left;
 }
-.rating span:hover ~ span label,
-.rating span:hover label,
-.rating span.checked label,
-.rating span.checked ~ span label {
-    background:#F90;
-    color:#FFF;
+
+/* :not(:checked) is a filter, so that browsers that don’t support :checked don’t
+   follow these rules. Every browser that supports :checked also supports :not(), so
+   it doesn’t make the test unnecessarily selective */
+.rating:not(:checked) > input {
+    position:absolute;
+    top:-9999px;
+    clip:rect(0,0,0,0);
 }
+
+.rating:not(:checked) > label {
+    float:right;
+    width:1em;
+    padding:0 .1em;
+    overflow:hidden;
+    white-space:nowrap;
+    cursor:pointer;
+    font-size:400%;
+    line-height:1.2;
+    color:#ddd;
+    text-shadow:1px 1px #bbb, 2px 2px #666, .1em .1em .2em rgba(0,0,0,.5);
+}
+
+.rating:not(:checked) > label:before {
+    content: '★ ';
+}
+
+.rating > input:checked ~ label {
+    color: #f70;
+    text-shadow:1px 1px #c60, 2px 2px #940, .1em .1em .2em rgba(0,0,0,.5);
+}
+
+.rating:not(:checked) > label:hover,
+.rating:not(:checked) > label:hover ~ label {
+    color: gold;
+    text-shadow:1px 1px goldenrod, 2px 2px #B57340, .1em .1em .2em rgba(0,0,0,.5);
+}
+
+.rating > input:checked + label:hover,
+.rating > input:checked + label:hover ~ label,
+.rating > input:checked ~ label:hover,
+.rating > input:checked ~ label:hover ~ label,
+.rating > label:hover ~ input:checked ~ label {
+    color: #ea0;
+    text-shadow:1px 1px goldenrod, 2px 2px #B57340, .1em .1em .2em rgba(0,0,0,.5);
+}
+
+.rating > label:active {
+    position:relative;
+    top:2px;
+    left:2px;
+}
+
 </style>
 <script>
+var global1 = false;
+
 $(document).ready(function(){
+
    $("input[name='rating']").change(function(){
-        $("#div1").fadeIn(4000);
+
+       if (global1 == false) {
+           $("#comments").css('visibility', 'visible').hide().fadeIn(2000);
+           $("#submitButton").css('visibility', 'visible').hide().fadeIn(2000);
+           global1 = true;
+       }
     });
 });
 
 
 
     $(document).ready(function(){
-//  Check Radio-box
-    $(".rating input:radio").attr("checked", false);
-    $('.rating input').click(function () {
-        $(".rating span").removeClass('checked');
-        $(this).parent().addClass('checked');
-    });
 
     $('input:radio').change(
     function(){
         var userRating = this.value;
+
         alert(userRating);
+
+        document.getElementById("reviewAmount").value = userRating;
     });
 });
+
+
+
 </script>
-<main id="psyc-page">
+
+<script src="/static/scripts/tinymce/js/tinymce/tinymce.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    tinymce.init({
+        selector: 'textarea',
+        plugins: 'link',
+        menubar: false,
+        height: "100",
+        content_css : '/_review.scss',
+        theme: 'modern',
+        mobile: {
+            theme: 'mobile',
+            toolbar: ['undo', 'redo', 'bold', 'italic', 'link', 'unlink']
+        },
+        toolbar: 'undo redo | bold italic | link unlink'
+    });
+</script>
+
+
+<main id="reviews">
     <div class="box">
+        <form action="{{ url_for('write_review') }}" method="post" enctype="multipart/form-data">
+        <h1 class="title">Reviews Test Page</h1>
+        <hr>
+        <hr>
 
-        <span class="fa fa-star checked"></span>
-<span class="fa fa-star checked"></span>
-<span class="fa fa-star checked"></span>
-<span class="fa fa-star"></span>
-<span class="fa fa-star"></span>
+<fieldset class="rating">
 
-<div class="rating">
+    <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="Amazing!">5 stars</label>
+    <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="Not Bad!">4 stars</label>
+    <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="Could have been better">3 stars</label>
+    <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="Not really good">2 stars</label>
+    <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="Hated it">1 star</label>
+</fieldset>
+        <br>
+        <br>
+         <br>
+        <br>
+         <br>
+        <br>
+         <br>
+        <br>
 
-    <span><input type="radio" name="rating" id="str5" value="5"><label for="str5"></label></span>
-    <span><input type="radio" name="rating" id="str4" value="4"><label for="str4"></label></span>
-    <span><input type="radio" name="rating" id="str3" value="3"><label for="str3"></label></span>
-    <span><input type="radio" name="rating" id="str2" value="2"><label for="str2"></label></span>
-    <span><input type="radio" name="rating" id="str1" value="1"><label for="str1"></label></span>
-</div>
+            <label for="text">Enter comments here: </label>
+            <br>
+        <textarea name="text" placeholder="Enter your comments here"></textarea>
 
-       <textarea id="div1"rows="4" cols="50" style="display:none; margin-top:30px; resize:none" placeholder="Enter your comments here"></textarea>
+        <input id="reviewAmount" type="hidden" name="reviewAmount" value="9")>
+        <br>
 
+<input id="submitButton"class="btn btn-success" style="visibility:hidden;" type="submit" value="Submit">
 
-
+        </form>
     </div>
+
 </main>
 {% endblock %}

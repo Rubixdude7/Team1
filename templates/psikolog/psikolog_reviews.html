@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Staff Portal{% endblock %}
+{% block content %}
+<main id="Reviews">
+    <div class="box">
+        <h1 class="title">Reviews</h1>
+        <hr>
+        <p>{{ psyc_name }}</p>
+        <hr>
+        <ul class="list-group">
+<a href="{{ url_for('psikolog') }}">Back to Psychologists</a>
+        </ul>
+    </div>
+
+</main>
+{% endblock %}

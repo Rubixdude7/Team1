@@ -480,6 +480,24 @@ class query(object):
                             updt_dtm=now,
                             void_ind='n')
         blog_post.save()
+
+    def createReview(self, u_id, consult_id, reviewAmount, text): #basically charlies code
+        '''Creates a review.
+
+        :param int u_id: The ID of the user.
+        :param int consult_id: the id of the consultation.
+        :param str reviewAmount: The review amount of the blog post.
+        :param str text: The body text of the review.'''
+        text = bleach.clean(text,
+                            tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol',
+                                  u'strong', u'ul', u'p'])
+        now = pytz.utc.localize(datetime.datetime.utcnow()).replace(tzinfo=None)
+        review = db.review(cnslt=consult_id,
+                            review=text,
+                            stars=reviewAmount,
+                            approved="idk",
+                            void_ind='n')
+        review.save()
     
     def getBlogPost(self, blog_id):
         post = db.blog.select().where((db.blog.blog_id == blog_id) & (db.blog.void_ind == 'n')).get()

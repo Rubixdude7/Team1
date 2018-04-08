@@ -785,6 +785,11 @@ def api_admin_search_users():
 def my_psikolog_page():
     psyc_id = querydb.getPsycId(current_user.id)
     return redirect(url_for('psikolog', id=psyc_id))
+@app.route('/psikolog_reviews/')
+def psikolog_reviews():
+    psyc_id = request.args.get('psyc_id')
+    psyc_name = request.args.get('psyc_name')
+    return render_template("psikolog/psikolog_reviews.html", psyc_id=psyc_id, psyc_name=psyc_name)
 
 
 @app.route('/schedule')
@@ -868,6 +873,24 @@ def write_blog_post():
         querydb.createBlogPost(current_user.id, psyc_id, subject, text)
         flash('Your blog post has been published.')
         return redirect(url_for('psikolog_dashboard'))
+
+
+@app.route('/submit_review', methods=['GET', 'POST'])
+def write_review():
+    if request.method == 'GET':
+        return render_template('reviews.html')
+    elif request.method == 'POST':
+        reviewAmount = request.form['reviewAmount']
+        text = request.form['text']
+        user_id = current_user.id
+        consult_id= "1" #purely for testing
+        print(text)
+        print(user_id)
+        print(reviewAmount)
+        querydb.createReview(user_id, consult_id, reviewAmount, text)
+        #querydb.createBlogPost(current_user.id, psyc_id, subject, text)
+        flash('Your review has been published.')
+        return redirect(url_for('index'))
 
 @app.route('/psikolog/delete_blog_post/<int:blog_id>')
 @roles_required('psyc')
