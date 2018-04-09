@@ -18,14 +18,17 @@
         <hr>
         <p>Unapproved Children</p>
         <hr>
+        <form>
         <ul class="list-group">
             {% if unverifiedChildren|length == 0 %}
             <li class="list-group-item">There are no children</li>
             {% endif %}
             {% for child in unverifiedChildren %}
             <li class="list-group-item"><a href="{{ url_for('child', child_id=child.childID) }}">{{ child['firstName'] }} {{ child['lastName'] }}</a>, TIME: {{ child['time'] }}</li>
+            <input type="button" name="approve" value="Approve"/><input type="button" name="deny" value="Deny"/>
             {% endfor %}
         </ul>
+        </form>
     </div>
 
 </main>
