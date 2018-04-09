@@ -209,6 +209,7 @@
                                                     "</div>" +
                                                     "<input type=\"hidden\" id=\"time-end-hr\" value=\"" + psycs_day[i]["end"]["hour"] + "\">" +
                                                     "<input type=\"hidden\" id=\"time-end-mn\" value=\"" + psycs_day[i]["end"]["minute"] + "\">" +
+                                                    "<input type=\"hidden\" id=\"time-end-ind\" value=\"" + psycs_day[i]["end"]["ind"] + "\">" +
                                                     "<div>" +
                                                         len_fee_str +
                                                     "</div>" +
@@ -268,6 +269,7 @@
                 var st_dt = $('#' + id).find('#year').val() + "-" + (parseInt($('#' + id).find('#month').val()) + 1) + "-" +$('#' + id).find('#day').val() + "-" + st_tm_hr + "-" + st_tm_mn;
                 st_tm_mn = st_tm_mn/60;
                 var end_tm_hr = parseInt($('#' + id).find('#time-end-hr').val());
+                if ($('#' + id).find('#time-end-ind').val() == 'pm') end_tm_hr += 12;
                 var end_tm_mn = parseFloat($('#' + id).find('#time-end-mn').val());
                 end_tm_mn = end_tm_mn/60;
                 var len = parseFloat($('#' + id).find('.length').val());

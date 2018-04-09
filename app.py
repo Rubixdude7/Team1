@@ -250,6 +250,12 @@ def questions():  # TODO Breaks if there are no quesions in db
 def reviews():  # TODO Breaks if there are no quesions in db
     return render_template("reviews.html")
 
+@app.route('/review_approve')
+def reviewapprove():
+    r_id = request.args.get('r_id')
+    querydb.approveReview(r_id)
+    flash('You approved this review!')
+    return redirect(url_for('questions'))
 
 
 @app.route('/questionsUserView/', methods=['GET', 'POST'])
@@ -370,12 +376,21 @@ def parent_seeanswers():
         answers.append(querydb.getAnswer(q.q_id, child_id))
     # end Brody code
     return render_template("parent_seeanswers.html", child_id=child_id, answers=answers, questions=questions)
-
+@app.route('/approve_reviews')
+@login_required
+def approve_reviews():
+    reviews = querydb.getAllUnapprovedReviews()
+    reviews2 = querydb.getAllApprovedReviews()
+    return render_template("admin/approve_reviews.html", reviews=reviews, reviews2= reviews2)
+@app.route('/denied_review')
+@login_required
+def denied_review():
+    return render_template("admin/denied_review.html")
 
 @app.route('/add_questions')
 @login_required
 def add_questions():
-    return render_template("add_question.html")
+    return render_template("admin/approve_reviews.html")
 
 
 @app.route('/post_add_questions', methods=['GET', 'POST'])
@@ -439,7 +454,12 @@ def editContact():
 def videoConf():
     url = 'https://interviews.skype.com/api/interviews'
 
-    payload = {}
+    payload = {
+        "capabilities": {
+            "codeEditor": False,
+            "notes": True
+        }
+    }
 
     data = json.dumps(payload).encode('ascii')
     token = querydb.generateToken(data)  # stores the token
@@ -447,6 +467,7 @@ def videoConf():
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
                'Content-Type': 'application/json',
                'Authorization': 'Bearer ' + token}
+
     req = requests.post(url=url, data=data, headers=headers)
     print(req.text)
     body = req.__dict__
@@ -752,12 +773,38 @@ def api_blog(psyc_id):
     page_num = int(request.args['page_num'])
     page_size = int(request.args['page_size'])
     return jsonify(querydb.apiBlog(psyc_id, page_num, page_size))
+    
+@app.route('/api/admin/search_users')
+def api_admin_search_users():
+    page_num = int(request.args['page_num'])
+    page_size = int(request.args['page_size'])
+    
+    total = 0
+    users = None
+    if 'q' in request.args:
+        total, users = querydb.getSearchedUsers(request.args['q'], page_num, page_size, return_total=True)
+    else:
+        total, users = querydb.getAllUsers(page_num, page_size, return_total=True)
+    
+    return jsonify({
+        'total': total,
+        'users': [{
+            'id': u.user_id,
+            'email': u.email,
+            'role': querydb.role(u.user_id)
+        } for u in users]
+    })
 
 @app.route('/my_psikolog_page')
 @roles_required('psyc')
 def my_psikolog_page():
     psyc_id = querydb.getPsycId(current_user.id)
     return redirect(url_for('psikolog', id=psyc_id))
+@app.route('/psikolog_reviews/')
+def psikolog_reviews():
+    psyc_id = request.args.get('psyc_id')
+    psyc_name = request.args.get('psyc_name')
+    return render_template("psikolog/psikolog_reviews.html", psyc_id=psyc_id, psyc_name=psyc_name)
 
 
 @app.route('/schedule')
@@ -841,6 +888,25 @@ def write_blog_post():
         querydb.createBlogPost(current_user.id, psyc_id, subject, text)
         flash('Your blog post has been published.')
         return redirect(url_for('psikolog_dashboard'))
+
+
+@app.route('/submit_review', methods=['GET', 'POST'])
+def write_review():
+    if request.method == 'GET':
+        return render_template('reviews.html')
+    elif request.method == 'POST':
+        reviewAmount = request.form['reviewAmount']
+        text = request.form['text']
+        user_id = current_user.id
+        consult_id= "1" #purely for testing
+        print(text)
+        print(user_id)
+        print(reviewAmount)
+        approved = "n"
+        querydb.createReview(user_id, consult_id, reviewAmount, text, approved)
+        #querydb.createBlogPost(current_user.id, psyc_id, subject, text)
+        flash('Your review has been published.')
+        return redirect(url_for('index'))
 
 @app.route('/psikolog/delete_blog_post/<int:blog_id>')
 @roles_required('psyc')

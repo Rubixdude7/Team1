@@ -1,9 +1,31 @@
 <!-- put these at top otherwise it doesn't show year for some reason-->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <script src="{{ url_for('static', filename='scripts/question.js') }}" type="text/jscript"></script>
+
 {% extends "base.html" %}
 {% block title %}Questions{% endblock %}
 {% block content %}
+    <script>
+     $(document).ready(function () {
+
+            $("#next").click(function () {
+                $.ajax({
+                    url: "./?page={{ page + 1 }}", success: function (result) {
+                        $("body").html(result);
+                    }
+                });
+            });
+        });
+        $(document).ready(function () {
+            $("#prev").click(function () {
+                $.ajax({
+                    url: "./?page={{ page - 1 }}", success: function (result) {
+                        $("body").html(result);
+                    }
+                });
+            });
+        });
+    </script>
     <main>
         <div class="box" id="box">
             <h1 class="title">Question List</h1>
@@ -26,7 +48,6 @@
                         <input type="text" id="q" name="fname" class="stored" disabled>
                     </form>
 
-                    <br>
                     <!--DROPDOWN CONTENT YOU CAN TEST ADMIN HERE!!! -->
                     <div class="dropdown">
                         {% if current_user.is_authenticated and current_user.is_in_role("admin") %}
@@ -69,9 +90,11 @@
             <br>
             <br>
             {% if page > 1 %}
+
                 <a id="previous" class="btn btn-warning" style="text-decoration: none;" href="./?page={{ page - 1 }}">Previous</a>
             {% endif %}
             {% if pagination.get_page_count() > page %}
+                 <a id="next" class="next" style="font-size:30px;" href="./?page={{ page + 1 }}">Next</a>
                 <a id="next" class="btn btn-success" style="text-decoration: none;" href="./?page={{ page + 1 }}">Next</a>
             {% endif %}
          {% endif %}

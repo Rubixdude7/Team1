@@ -3,9 +3,7 @@
 {% block content %}
 <main>
 
- <a href="{{ url_for('viewApprovedConsultations') }}">
-        View Approved Consultations
-        </a>
+
 
 <!--- Just in case we need the old code
     <div>
@@ -35,34 +33,46 @@
     </div>
     --->
 
-
+<div class="box">
+    <h1 class="title">Unpaid Consultations</h1>
+    <hr>
+     <a href="{{ url_for('viewApprovedConsultations') }}">View Paid Consultations</a>
+</div>
 
 <form action="/staffconsultations/approvals" method="post">
-    <table style="width: 100%" border="1 px solid black">
-        <tr>
-            <th>Name</th>
-            <th>Consultation Start</th>
-            <th>Consultation End</th>
-            <th>Approved</th>
-        </tr>
-        {% for consultation in consultations %}
-            <tr>
-                <td>
-                    {{ children[loop.index0].child_nm_fst }} {{ children[loop.index0].child_nm_lst }}
-                </td>
-                <td>
-                    {{ times[loop.index0].time_st }}
-                </td>
-                <td>
-                    {{ times[loop.index0].time_end }}
-                </td>
-                <td>
-                     <input type="checkbox" name="{{ consultation.cnslt_id }}"><br>
-                     <input type="hidden" name="consult_id" value={{ consultation.cnslt_id }}>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
+    <div class="box">
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Consultation Start</th>
+                        <th>Consultation End</th>
+                        <th>Approved</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consultation in consultations %}
+                        <tr>
+                            <td>
+                                {{ children[loop.index0].child_nm_fst }} {{ children[loop.index0].child_nm_lst }}
+                            </td>
+                            <td>
+                                {{ times[loop.index0].time_st }}
+                            </td>
+                            <td>
+                                {{ times[loop.index0].time_end }}
+                            </td>
+                            <td>
+                                 <input type="checkbox" name="{{ consultation.cnslt_id }}"><br>
+                                 <input type="hidden" name="consult_id" value={{ consultation.cnslt_id }}>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
     <div class="box">
             <button class="btn btn-success" type="submit">
                 Submit Approvals
