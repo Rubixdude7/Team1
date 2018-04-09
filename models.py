@@ -181,6 +181,8 @@ class blog(MySQLModel):
     psyc = ForeignKeyField(psychologist, to_field="psyc_id")
     subject = CharField()
     text = CharField()
+    img_id = CharField()
+    img_ver = CharField()
     crea_dtm = DateTimeField()
     user_id_upd = BigIntegerField(null=True)
     updt_dtm = DateTimeField(null=True)
@@ -249,15 +251,6 @@ class vacation(MySQLModel):
     class Meta:
         db_table = "vacation"
 
-class slider(MySQLModel):
-    slider_id = PrimaryKeyField()
-    img = CharField()
-    version = CharField()
-    desc = CharField()
-    alt = CharField()
-
-    class Meta:
-        db_table = "slider"
 
 
 MODELS = [blog,
