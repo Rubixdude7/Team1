@@ -216,6 +216,7 @@ class review(MySQLModel):
     review = CharField()
     stars = DoubleField()
     approved = CharField()
+    crea_dtm = DateTimeField()
     void_ind = CharField()
 
     class Meta:
