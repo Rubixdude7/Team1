@@ -25,7 +25,7 @@
             {% endif %}
             {% for child in unverifiedChildren %}
             <li class="list-group-item"><a href="{{ url_for('child', child_id=child.childID) }}">{{ child['firstName'] }} {{ child['lastName'] }}</a>, TIME: {{ child['time'] }}</li>
-            <input type="button" name="approve" value="Approve"/><input type="button" name="deny" value="Deny"/>
+            <input type="button" name="approve" value="Approve" onclick="confirmChild()"/><input type="button" name="deny" value="Deny" onclick="denyChild()"/>
             {% endfor %}
         </ul>
         </form>
