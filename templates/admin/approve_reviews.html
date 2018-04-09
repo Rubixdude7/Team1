@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<main id="mainHome">
+    <div class="box">
+       {% if not reviews %}
+            <p>No UnApproved Reviews Exist</p>
+        {%  else %}
+     {% for i in reviews %}
+         <p>Unapproved Reviews</p>
+         <p>Review</p>
+         <p>{{ i.review }}</p>
+         <p> {{ i.stars }}</p>
+         <p> {{ i.rev_id }}</p>
+          <button class="btn-warning btn" onclick="location.href='{{ url_for('reviewapprove',r_id=i.rev_id) }}'" type="button" class="btn btn-success">
+                                    Approve Review!
+                                </button>
+  <button class="btn-warning btn" onclick="location.href='{{ url_for('denied_review', r_id=i.rev_id) }}'" type="button" class="btn btn-warning">
+                                    Deny Review!
+  </button>
+
+
+
+
+     {% endfor %}
+     {% endif %}
+    </div>
+    <div class="box">
+       {% if not reviews2 %}
+            <p>No Approved Reviews Exist</p>
+        {%  else %}
+     {% for j in reviews2 %}
+         <p>Approved Reviews</p>
+         <p>Review</p>
+         <p>{{ j.review }}</p>
+         <p> {{ j.stars }}</p>
+         <p> {{ j.rev_id }}</p>
+
+
+
+
+
+     {% endfor %}
+     {% endif %}
+    </div>
+
+</main>
+{% endblock %}

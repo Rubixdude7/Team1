@@ -250,6 +250,12 @@ def questions():  # TODO Breaks if there are no quesions in db
 def reviews():  # TODO Breaks if there are no quesions in db
     return render_template("reviews.html")
 
+@app.route('/review_approve')
+def reviewapprove():
+    r_id = request.args.get('r_id')
+    querydb.approveReview(r_id)
+    flash('You approved this review!')
+    return redirect(url_for('questions'))
 
 
 @app.route('/questionsUserView/', methods=['GET', 'POST'])
@@ -370,12 +376,21 @@ def parent_seeanswers():
         answers.append(querydb.getAnswer(q.q_id, child_id))
     # end Brody code
     return render_template("parent_seeanswers.html", child_id=child_id, answers=answers, questions=questions)
-
+@app.route('/approve_reviews')
+@login_required
+def approve_reviews():
+    reviews = querydb.getAllUnapprovedReviews()
+    reviews2 = querydb.getAllApprovedReviews()
+    return render_template("admin/approve_reviews.html", reviews=reviews, reviews2= reviews2)
+@app.route('/denied_review')
+@login_required
+def denied_review():
+    return render_template("admin/denied_review.html")
 
 @app.route('/add_questions')
 @login_required
 def add_questions():
-    return render_template("add_question.html")
+    return render_template("admin/approve_reviews.html")
 
 
 @app.route('/post_add_questions', methods=['GET', 'POST'])
@@ -887,7 +902,8 @@ def write_review():
         print(text)
         print(user_id)
         print(reviewAmount)
-        querydb.createReview(user_id, consult_id, reviewAmount, text)
+        approved = "n"
+        querydb.createReview(user_id, consult_id, reviewAmount, text, approved)
         #querydb.createBlogPost(current_user.id, psyc_id, subject, text)
         flash('Your review has been published.')
         return redirect(url_for('index'))

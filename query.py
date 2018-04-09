@@ -138,6 +138,27 @@ class query(object):
             print("green")
         return questions
 
+    def getAllUnapprovedReviews(self):
+        reviews = db.review.select().where(db.review.approved == 'n').join(db.consultation, JOIN_INNER, db.review.cnslt == db.consultation.cnslt_id)
+        print(reviews)
+        liste = list(reviews.tuples())
+        print(liste)
+        if not liste:
+            print("green")
+        return reviews
+
+    def getAllApprovedReviews(self):
+        reviews = db.review.select().where(db.review.approved == 'y').join(db.consultation, JOIN_INNER,
+                                                                           db.review.cnslt == db.consultation.cnslt_id)
+
+        return reviews
+
+    def approveReview(self, r_id):
+        print(r_id)
+        review = db.review.get(db.review.rev_id == r_id)
+        review.approved = 'y'
+        review.save()
+
     def getAllQuestionsForUsers(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd' and db.questions.void_ind == 'n')
         return questions
@@ -219,7 +240,7 @@ class query(object):
 
     def getAllUsers(self, page_num, page_size, return_total=False):
         users = db.user.select().where(db.user.active).join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user).order_by(db.user_roles.role)
-        
+
         if return_total:
             total = users.count()
             return total, users.paginate(page_num, page_size)
@@ -481,7 +502,7 @@ class query(object):
                             void_ind='n')
         blog_post.save()
 
-    def createReview(self, u_id, consult_id, reviewAmount, text): #basically charlies code
+    def createReview(self, u_id, consult_id, reviewAmount, text, approved): #basically charlies code
         '''Creates a review.
 
         :param int u_id: The ID of the user.
@@ -495,7 +516,7 @@ class query(object):
         review = db.review(cnslt=consult_id,
                             review=text,
                             stars=reviewAmount,
-                            approved="idk",
+                            approved=approved,
                             void_ind='n')
         review.save()
     

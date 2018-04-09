@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<script src="/static/scripts/tinymce/js/tinymce/tinymce.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    tinymce.init({
+        selector: 'textarea',
+        plugins: 'link',
+        menubar: false,
+        height: "100",
+        content_css : '/_review.scss',
+        theme: 'modern',
+        mobile: {
+            theme: 'mobile',
+            toolbar: ['undo', 'redo', 'bold', 'italic', 'link', 'unlink']
+        },
+        toolbar: 'undo redo | bold italic | link unlink'
+    });
+</script>
+<main id="mainHome">
+
+    <div class="box">
+<form action="{{ url_for('write_review') }}" method="post" enctype="multipart/form-data">
+
+        <p>Optional Email to send to customer about review: </p>
+        <textarea name="text" placeholder="Enter your comments here"></textarea>
+    <input id="submitButton"class="btn btn-success" style="" type="submit" value="Submit">
+</form>
+    </div>
+
+</main>
+{% endblock %}
