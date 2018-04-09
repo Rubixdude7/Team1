@@ -138,6 +138,27 @@ class query(object):
             print("green")
         return questions
 
+    def getAllUnapprovedReviews(self):
+        reviews = db.review.select().where(db.review.approved == 'n').join(db.consultation, JOIN_INNER, db.review.cnslt == db.consultation.cnslt_id)
+        print(reviews)
+        liste = list(reviews.tuples())
+        print(liste)
+        if not liste:
+            print("green")
+        return reviews
+
+    def getAllApprovedReviews(self):
+        reviews = db.review.select().where(db.review.approved == 'y').join(db.consultation, JOIN_INNER,
+                                                                           db.review.cnslt == db.consultation.cnslt_id)
+
+        return reviews
+
+    def approveReview(self, r_id):
+        print(r_id)
+        review = db.review.get(db.review.rev_id == r_id)
+        review.approved = 'y'
+        review.save()
+
     def getAllQuestionsForUsers(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd' and db.questions.void_ind == 'n')
         return questions
@@ -217,15 +238,25 @@ class query(object):
 
 # Start Jason's code
 
-    def getAllUsers(self, page_num, page_size):
-        users = db.user.select().where(db.user.active).join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user).order_by(db.user_roles.role).paginate(page_num, page_size)
-        return users
+    def getAllUsers(self, page_num, page_size, return_total=False):
+        users = db.user.select().where(db.user.active).join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user).order_by(db.user_roles.role)
 
-    def getSearchedUsers(self, search, page_num, page_size):
-        users = db.user.select().where(db.user.active & db.user.email.contains(search)).join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user).order_by(db.user_roles.role).paginate(page_num, page_size)
+        if return_total:
+            total = users.count()
+            return total, users.paginate(page_num, page_size)
+        else:
+            return users.paginate(page_num, page_size)
+
+    def getSearchedUsers(self, search, page_num, page_size, return_total=False):
+        users = db.user.select().where(db.user.active & (db.user.username.contains(search) | db.user.email.contains(search))).join(db.user_roles, JOIN_INNER, db.user.user_id == db.user_roles.user).order_by(db.user_roles.role)
 
         # users = db.user.select().where(db.user.active & db.user.email.contains(search)).paginate(page_num, num_of_pages)
-        return users
+        
+        if return_total:
+            total = users.count()
+            return total, users.paginate(page_num, page_size)
+        else:
+            return users.paginate(page_num, page_size)
 
     def getUserCount(self):
         usercount = db.user.select().count()
@@ -470,6 +501,24 @@ class query(object):
                             updt_dtm=now,
                             void_ind='n')
         blog_post.save()
+
+    def createReview(self, u_id, consult_id, reviewAmount, text, approved): #basically charlies code
+        '''Creates a review.
+
+        :param int u_id: The ID of the user.
+        :param int consult_id: the id of the consultation.
+        :param str reviewAmount: The review amount of the blog post.
+        :param str text: The body text of the review.'''
+        text = bleach.clean(text,
+                            tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol',
+                                  u'strong', u'ul', u'p'])
+        now = pytz.utc.localize(datetime.datetime.utcnow()).replace(tzinfo=None)
+        review = db.review(cnslt=consult_id,
+                            review=text,
+                            stars=reviewAmount,
+                            approved=approved,
+                            void_ind='n')
+        review.save()
     
     def getBlogPost(self, blog_id):
         post = db.blog.select().where((db.blog.blog_id == blog_id) & (db.blog.void_ind == 'n')).get()
