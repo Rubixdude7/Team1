@@ -1104,12 +1104,6 @@ class query(object):
 
 # Begin Brandon
 
-    def get_len_fee(self):
-        len_fee = db.consultation_length.select(db.consultation_length.cnslt_len_id, db.consultation_length.length, db.consultation_fee.fee).where(db.consultation_length.void_ind == 'n').join(db.consultation_fee, JOIN_INNER, (db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id) & (db.consultation_fee.void_ind == 'n')).tuples()
-        len_fee = list(len_fee)
-
-        return len_fee
-
     def schecule_cnslt(self, args):
         fee = db.consultation_fee.select(db.consultation_fee.fee).where(db.consultation_fee.void_ind == 'n').join(db.consultation_length, JOIN_INNER, (args['len'] == db.consultation_length.length) & (db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id)).tuples()
         fee = list(fee)[0][0]
@@ -1143,7 +1137,31 @@ class query(object):
             cnslt_tm = db.consult_time(cnslt_id=cnslt.cnslt_id, psyc_id=args['psyc_id'], time_st=wib.localize(time_st).astimezone(pytz.utc).replace(tzinfo=None), time_end=wib.localize(time_end).astimezone(pytz.utc).replace(tzinfo=None), approved='y')
             cnslt_tm.save()
 
-            return True, "Your appointment has been made, contact office staff for payment processing."
+            user = db.user.select().where(db.user.user_id ==
+                                          db.child.select(db.child.user).where(db.child.child_id ==
+                                                                               db.consultation.select(
+                                                                                   db.consultation.child).where(
+                                                                                   db.consultation.cnslt_id == cnslt.cnslt_id)))
+
+            for u in user:
+                user = u
+
+            child = db.child.select(db.child.child_nm_fst, db.child.child_nm_lst).where(
+                db.child.user == user.user_id).tuples()
+            child = list(child)[0]
+            child = child[0] + " " + child[1]
+
+            length = args['len']
+            date = wib.localize(time_st).astimezone(pytz.utc).replace(tzinfo=None).strftime("%B %d, %Y %I:%M %p")
+
+            length = divmod(length, 1)
+            x = int(length[1] * 60)
+            y = int(length[0])
+            length = str(y) + " hr(s) and " + str(x) + " mins"
+
+
+
+            return True, "Your appointment has been made, contact office staff for payment processing.",user, child, date, length
         else:
             return False, "An invalid time range was specified."
 

@@ -189,6 +189,17 @@ def consultation():
 
     status = querydb.schecule_cnslt(req)
 
+    email = status[2], status[3], status[4], status[5]
+
+    if email is not None:
+        emails.send_email(email[0].email, render_template('flask_user/emails/consultation_booked_subject.txt'),
+                          render_template('flask_user/emails/consultation_booked_message.html', user=email[0],
+                                          child_name=email[1], appt_st_tm=email[2], appt_len=email[3],
+                                          app_name=current_app.user_manager.app_name),
+                          render_template('flask_user/emails/consultation_booked_message.txt', user=email[0],
+                                          child_name=email[1], appt_st_tm=email[2], appt_len=email[3],
+                                          app_name=current_app.user_manager.app_name))
+
     return jsonify({'status': status[0], 'message': status[1]})
 
 
