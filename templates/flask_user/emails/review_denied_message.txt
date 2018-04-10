@@ -1,0 +1,8 @@
+{% extends 'flask_user/emails/base_message.txt' %}
+
+{% block message %}
+
+The review has been denied. Sorry bud bud. You suck.
+Reason: {{ reason }}
+{%- endif %}
+{% endblock %}

@@ -141,25 +141,60 @@ class query(object):
         return questions
 
     def getAllUnapprovedReviews(self):
-        reviews = db.review.select().where(db.review.approved == 'n').join(db.consultation, JOIN_INNER, db.review.cnslt == db.consultation.cnslt_id)
-        print(reviews)
-        liste = list(reviews.tuples())
-        print(liste)
-        if not liste:
-            print("green")
-        return reviews
+        tuples = db.review.select(db.review.rev_id, db.review.cnslt, db.review.review, db.review.stars, db.review.approved, db.review.crea_dtm, db.review.void_ind, db.consultation.fee, db.consultation.finished, db.child.user, db.user.username, db.user.email).join(db.consultation, JOIN_INNER, db.review.cnslt == db.consultation.cnslt_id).where(db.review.approved == 'n').join(db.child, JOIN_INNER, db.consultation.child == db.child.child_id).join(db.user, JOIN_INNER, db.child.user == db.user.user_id).tuples()
+
+
+        return [{
+            'rev_id': t[0],
+            'cnslt': t[1],
+            'review': Markup(t[2]),
+            'stars': t[3],
+            'approved': t[4],
+            'time': t[5],
+            'void_ind': t[6],
+            'test': t[7],
+            'finished': t[8],
+            'user_id': t[9],
+            'user': t[10],
+            'email': t[11],
+
+        } for t in tuples]
+
 
     def getAllApprovedReviews(self):
-        reviews = db.review.select().where(db.review.approved == 'y').join(db.consultation, JOIN_INNER,
-                                                                           db.review.cnslt == db.consultation.cnslt_id)
+        tuples = db.review.select(db.review.rev_id, db.review.cnslt, db.review.review, db.review.stars,
+                                  db.review.approved, db.review.crea_dtm, db.review.void_ind, db.consultation.fee,
+                                  db.consultation.finished, db.child.user, db.user.username, db.user.email).join(
+            db.consultation, JOIN_INNER, db.review.cnslt == db.consultation.cnslt_id).where(
+            db.review.approved == 'y').join(db.child, JOIN_INNER, db.consultation.child == db.child.child_id).join(
+            db.user, JOIN_INNER, db.child.user == db.user.user_id).tuples()
 
-        return reviews
+        return [{
+            'rev_id': t[0],
+            'cnslt': t[1],
+            'review': Markup(t[2]),
+            'stars': t[3],
+            'approved': t[4],
+            'time': t[5],
+            'void_ind': t[6],
+            'test': t[7],
+            'finished': t[8],
+            'user_id': t[9],
+            'user': t[10],
+            'email': t[11],
+
+        } for t in tuples]
 
     def approveReview(self, r_id):
         print(r_id)
         review = db.review.get(db.review.rev_id == r_id)
         review.approved = 'y'
         review.save()
+    def denyReview(self, r_id):
+        review = db.review.get(db.review.rev_id == r_id)
+        review.approved = 'd' #denied, no code to test denied. soft del
+        review.save()
+
 
     def getAllQuestionsForUsers(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd' and db.questions.void_ind == 'n')

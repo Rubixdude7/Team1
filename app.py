@@ -266,7 +266,30 @@ def reviewapprove():
     r_id = request.args.get('r_id')
     querydb.approveReview(r_id)
     flash('You approved this review!')
-    return redirect(url_for('questions'))
+    return redirect(url_for('approve_reviews'))
+@app.route('/review_deny', methods=['GET', 'POST'])
+def reviewdeny():
+
+    rev_id = request.args.get('rev_id')
+    email = request.args.get('email')
+    reason = Markup(request.form.get('reason'))
+    print(reason)
+    if email is not None:
+        emails.send_email(email, render_template('flask_user/emails/review_denied_subject.txt'),
+                          render_template('flask_user/emails/review_denied_message.html',
+                                          app_name=current_app.user_manager.app_name, reason=reason),
+                          render_template('flask_user/emails/review_denied_message.txt',
+                                          app_name=current_app.user_manager.app_name, reason=reason))
+
+
+
+    querydb.denyReview(rev_id)
+
+
+
+
+    flash('You denied this review!')
+    return redirect(url_for('approve_reviews'))
 
 
 @app.route('/questionsUserView/', methods=['GET', 'POST'])
@@ -396,7 +419,10 @@ def approve_reviews():
 @app.route('/denied_review')
 @login_required
 def denied_review():
-    return render_template("admin/denied_review.html")
+    user = request.args.get('user')
+    rev_id = request.args.get('rev_id')
+    email = request.args.get('email')
+    return render_template("admin/denied_review.html", rev_id=rev_id, user=user, email=email)
 
 @app.route('/add_questions')
 @login_required
