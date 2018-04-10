@@ -3,14 +3,14 @@ import os
 import sqlalchemy.exc
 import babel
 import pytz
-from flask import Flask, render_template, request, redirect, url_for, Markup, jsonify, json
+from flask import Flask, render_template, request, redirect, url_for, Markup, jsonify, json, current_app
 import datetime
 from flask_sqlalchemy import SQLAlchemy
 from playhouse.flask_utils import object_list
 from flask import request
 from flask_user import login_required, roles_required, UserManager, UserMixin, SQLAlchemyAdapter, current_user
 from flask_user import login_required, roles_required, UserManager, UserMixin, SQLAlchemyAdapter, current_user, \
-    user_registered
+    user_registered, emails
 from flask_user.forms import RegisterForm
 from flask_mail import Mail
 from flask_wtf import FlaskForm
@@ -554,8 +554,13 @@ def getPaymentChanges():
             b = request.form.get(str(c))
             if b == 'on':
                 print("Marking paid: ", c)
-                querydb.markConsultApproved(c)
-        except:
+                email = querydb.markConsultApproved(c)
+                if email is not None:
+                    emails.send_email(email[0].email, render_template('flask_user/emails/payment_confirm_subject.txt'),
+                                      render_template('flask_user/emails/payment_confirm_message.html', user=email[0], child_name=email[1], appt_st_tm=email[4], appt_len=email[2], skype_link=email[3], app_name=current_app.user_manager.app_name),
+                                      render_template('flask_user/emails/payment_confirm_message.txt', user=email[0], child_name=email[1], appt_st_tm=email[4], appt_len=email[2], skype_link=email[3], app_name=current_app.user_manager.app_name))
+        except Exception as e:
+            print("email exception : " + str(e))
             print('Check box was off')
     return redirect(url_for('approvePayments'))
 

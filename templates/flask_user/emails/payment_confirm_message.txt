@@ -1,0 +1,11 @@
+{% extends 'flask_user/emails/base_message.txt' %}
+
+{% block message %}
+
+    The appointment for your child, {{ child_name }}, has been paid.
+    Their appointment has been scheduled for {{ appt_st_tm }}, the appointment will last {{ appt_len }}.
+    Please follow the link when it is time for your appointment, see you then!
+
+    {{ skype_link }}
+
+{% endblock %}

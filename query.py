@@ -17,6 +17,8 @@ import requests
 import time
 import json
 import hashlib
+from flask_mail import Message
+from flask import render_template
 
 
 class query(object):
@@ -225,8 +227,41 @@ class query(object):
             consultation = db.consultation.get(db.consultation.cnslt_id == consult_id)
             consultation.paid = 'y'
             consultation.save()
-        except:
+
+            user = db.user.select().where(db.user.user_id ==
+                                          db.child.select(db.child.user).where(db.child.child_id ==
+                                                                               db.consultation.select(db.consultation.child).where(db.consultation.cnslt_id == consult_id)))
+
+            for u in user:
+                user = u
+
+
+            child = db.child.select(db.child.child_nm_fst, db.child.child_nm_lst).where(db.child.user == user.user_id).tuples()
+            child = list(child)[0]
+            child = child[0] + " " + child[1]
+
+
+            cnslt_dtls = db.consultation.select(db.consultation.length, db.consultation.link, db.consult_time.time_st).where(db.consultation.cnslt_id == consult_id)\
+                .join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).tuples()
+
+            cnslt_dtls = list(cnslt_dtls)[0]
+
+            length = cnslt_dtls[0]
+            link = cnslt_dtls[1]
+            date = cnslt_dtls[2].strftime("%B %d, %Y %I:%M %p")
+
+            length = divmod(length, 1)
+            x = int(length[1] * 60)
+            y = int(length[0])
+            length = str(y) + " hr(s) and " + str(x) + " mins"
+
+
+            return user, child, length, link, date
+
+        except Exception as e:
+            print("approval error: " + str(e))
             print("Couldn't find consultation")
+            return None
 
     def getConsultationTime(self, consult_id):
         try:

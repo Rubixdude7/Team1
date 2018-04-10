@@ -1,0 +1,10 @@
+{% extends 'flask_user/emails/base_message.html' %}
+
+{% block message %}
+
+
+    <p>The appointment for your child, {{ child_name }}, has been paid.</p>
+    <p>Their appointment has been scheduled for {{ appt_st_tm }}, the appointment will last {{ appt_len }}.</p>
+    <p>Please follow this <a href="{{ skype_link }}">link</a> when it is time for your appointment, see you then!</p>
+
+{% endblock %}
