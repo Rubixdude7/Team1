@@ -816,6 +816,18 @@ def api_blog(psyc_id):
     page_size = int(request.args['page_size'])
     return jsonify(querydb.apiBlog(psyc_id, page_num, page_size))
     
+@app.route('/api/admin/questions')
+def api_admin_questions():
+	qquery = querydb.getAllQuestions()
+	mylist = []
+	for q in qquery:
+		mylist.append({
+			'question': q.question,
+			'q_id': q.q_id,
+			'void_ind': q.void_ind
+		})
+	return jsonify(mylist)
+
 @app.route('/api/admin/search_users')
 def api_admin_search_users():
     page_num = int(request.args['page_num'])

@@ -3,6 +3,7 @@ function dropItDown() {
     document.getElementById("dropdown-content").classList.toggle("show");
 }
 
+/*
 function pagination() {
 
     var divs = document.getElementsByClassName('question');
@@ -16,8 +17,8 @@ function pagination() {
 
 
 
-
 window.onload = pagination;
+*/
 
 function validateForm() {
     var x = document.forms["myForm"]["fname"].value;
