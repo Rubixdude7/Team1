@@ -85,6 +85,7 @@
 		function setupPagination() {
 			$('#pagination').pagination({
 				dataSource: questions,
+				pageSize: 3,
 				callback: function (data, pagination) {
 					var html = '';
 					
