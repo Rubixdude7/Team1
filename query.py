@@ -345,7 +345,7 @@ class query(object):
             child = child[0] + " " + child[1]
 
 
-            cnslt_dtls = db.consultation.select(db.consultation.length, db.consultation.link, db.consult_time.time_st).where(db.consultation.cnslt_id == consult_id)\
+            cnslt_dtls = db.consultation.select(db.consultation.length, db.consultation.link, db.consult_time.time_st, db.consult_time.time_end, db.consult_time.psyc).where(db.consultation.cnslt_id == consult_id)\
                 .join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).tuples()
 
             cnslt_dtls = list(cnslt_dtls)[0]
@@ -358,6 +358,22 @@ class query(object):
             x = int(length[1] * 60)
             y = int(length[0])
             length = str(y) + " hr(s) and " + str(x) + " mins"
+
+            # insert notifications
+            # payment success notif
+            notif = db.notification(user=user.user_id, not_typ_cd="pment_u_a", not_vars=json.dumps([child]), not_st_dtm=datetime.datetime.now(), not_end_dtm=cnslt_dtls[3])
+            notif.save()
+            # 10 min before start vid notif user
+            notif = db.notification(user=user.user_id, not_typ_cd="appt_st_u", not_vars=json.dumps([child, date]), not_st_dtm=cnslt_dtls[3] - datetime.timedelta(minutes=10), not_end_dtm=cnslt_dtls[3])
+            notif.save()
+            # let psyc know the appt is official
+            psyc = db.user.get(db.user.user_id ==
+                               db.psychologist.select(db.psychologist.user).where(db.psychologist.psyc_id == cnslt_dtls[4]))
+            notif = db.notification(user=psyc.user_id, not_typ_cd="appt_req_p", not_vars=json.dumps([child, date, length]), not_st_dtm=datetime.datetime.now(), not_end_dtm=cnslt_dtls[3])
+            notif.save()
+            # 10 min before start vid notif psyc
+            notif = db.notification(user=psyc.user_id, not_typ_cd="appt_st_p", not_vars=json.dumps([child, date]), not_st_dtm=cnslt_dtls[3] - datetime.timedelta(minutes=10), not_end_dtm=cnslt_dtls[3])
+            notif.save()
 
 
             return user, child, length, link, date
@@ -1322,6 +1338,7 @@ class query(object):
 
         notifs = []
         for n in notif:
+            print({"id": n[2], "notif": n[1] % tuple(json.loads(n[0]))})
             notifs.append({"id": n[2], "notif": n[1] % tuple(json.loads(n[0]))})
 
         return notifs
