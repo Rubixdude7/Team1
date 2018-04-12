@@ -1338,7 +1338,6 @@ class query(object):
 
         notifs = []
         for n in notif:
-            print({"id": n[2], "notif": n[1] % tuple(json.loads(n[0]))})
             notifs.append({"id": n[2], "notif": n[1] % tuple(json.loads(n[0]))})
 
         return notifs
