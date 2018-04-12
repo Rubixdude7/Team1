@@ -251,6 +251,25 @@ class vacation(MySQLModel):
     class Meta:
         db_table = "vacation"
 
+class notificaiton_type(MySQLModel):
+    not_typ_cd = CharField(primary_key=True)
+    not_typ = CharField()
+
+    class Meta:
+        db_table = "notification_type"
+
+class notification(MySQLModel):
+    not_id = PrimaryKeyField()
+    user = ForeignKeyField(user, to_field="user_id")
+    not_typ_cd = ForeignKeyField(notificaiton_type, to_field="not_typ_cd", db_column="not_typ_cd")
+    not_vars = CharField()
+    not_st_dtm = DateTimeField()
+    not_end_dtm = DateTimeField()
+    dismissed = CharField()
+
+    class Meta:
+        db_table = "notification"
+
 
 
 MODELS = [blog,
@@ -271,7 +290,9 @@ MODELS = [blog,
           role,
           user,
           user_roles,
-          vacation]
+          vacation,
+          notificaiton_type,
+          notification]
 
 # This function does nothing if the db is already populated.
 def create_tables_and_seed_if_necessary():

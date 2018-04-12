@@ -56,6 +56,7 @@
 
   .subNav {
       background-color: $mainColor;
+    min-width: 100%;
       left: 0;
       opacity: 0;
       position: absolute;
@@ -68,15 +69,15 @@
   }
   .subNav li {
       background-color: $mainColor;
-      width: 10em;
+      min-width: 100%;
   }
-  .navDropdown:hover>.subNav {
+  nav .nav-wrapper li:hover>.subNav {
       opacity: 1;
       top: 5em;
       visibility: visible;
       height: initial !important;
   }
-  .subNav li a {
+  .subNav li a{
       height: initial;
   }
 .navDropdown input,

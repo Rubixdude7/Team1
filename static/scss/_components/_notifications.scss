@@ -1,0 +1,12 @@
+#notif-subNav{
+  width: 50vw;
+  right: 0;
+  left: initial;
+}
+
+#notif-checkbox:checked ~ #notif-subNav{
+  opacity: 1;
+  top: 5em;
+  visibility: visible;
+  height: initial !important;
+}

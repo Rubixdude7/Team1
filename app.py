@@ -166,7 +166,15 @@ def handle_bad_request(e):
           "THE FIX IS TO REFRESH THE PAGE AND IN THE FUTURE THAT IS WHAT WILL HAPPEND"
           "BUT FOR NOW WE NEED TO SEND YOU HOME TO SEE IF THE ERROR IS EVEN BEING CAUGHT"
           "SO TELL BRANDON!!!!!")
-    return redirect(url_for('index'))
+    args = request.args.to_dict()
+
+    # Scopes will be passed as mutliple args, and to_dict() will only
+    # return one. So, we use getlist() to get all of the scopes.
+    args['scopes'] = request.args.getlist('scopes')
+    return_url = args.pop('return_url', None)
+    if return_url is None:
+        return_url = request.referrer or '/'
+    return redirect(return_url)
 
 
 @app.route('/')
@@ -189,18 +197,27 @@ def consultation():
 
     status = querydb.schecule_cnslt(req)
 
-    email = status[2], status[3], status[4], status[5]
+    email = status[2], status[3], status[4], status[5], status[6]
 
     if email is not None:
         emails.send_email(email[0].email, render_template('flask_user/emails/consultation_booked_subject.txt'),
                           render_template('flask_user/emails/consultation_booked_message.html', user=email[0],
-                                          child_name=email[1], appt_st_tm=email[2], appt_len=email[3],
+                                          child_name=email[1], appt_st_tm=email[2], appt_len=email[3], cnslt_total=email[4],
                                           app_name=current_app.user_manager.app_name),
                           render_template('flask_user/emails/consultation_booked_message.txt', user=email[0],
-                                          child_name=email[1], appt_st_tm=email[2], appt_len=email[3],
+                                          child_name=email[1], appt_st_tm=email[2], appt_len=email[3], cnslt_total=email[4],
                                           app_name=current_app.user_manager.app_name))
 
     return jsonify({'status': status[0], 'message': status[1]})
+
+
+@app.route('/notification', methods=['POST'])
+@login_required
+def notification():
+
+    notifs = querydb.getNotification(current_user.id)
+
+    return jsonify({'notifs': notifs})
 
 
 #           END BRANDON         #

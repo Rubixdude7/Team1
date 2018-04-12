@@ -79,11 +79,20 @@
                             </li>
                         {% endif %}
                         {% if current_user.is_authenticated %}
-                            <li class="navDropdown">
+                            <li>
                                 <a href="{{ url_for('user.profile') }}">WELCOME: {{ current_user.first_name.upper() }}</a>
                                 <ul class="subNav">
                                     <li>
                                         <a href="{{ url_for('user.logout') }}">LOG OUT</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="notif-checkbox">
+                                <img src="{{ url_for('static', filename='contents/icons/bell.svg') }}">
+                                <ul class="subNav" id="notif-subNav">
+                                    <li id="notifs">
+
                                     </li>
                                 </ul>
                             </li>
@@ -129,5 +138,33 @@
             </div>
         </footer>
     </div>
+
+    <script>
+        $(document).ready(function () {
+
+            $.ajax({
+                type : "POST",
+                url : "{{ url_for('notification') }}",
+                contentType: 'application/json;charset=UTF-8',
+                success: function(result) {
+                    alert(JSON.stringify(result))
+
+                    for (var i = 0; i < result.notifs.length; i++){
+                        $('#notifs').append(
+                            "<div>"+
+                                "<p>"+
+                                    result.notifs[i] +
+                                "</p>"+
+                            "</div>"
+                        );
+                    }
+                },
+                error: function(error) {
+                    alert(JSON.stringify(error));
+                }
+            });
+
+        })
+    </script>
 </body>
 </html>

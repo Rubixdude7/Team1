@@ -1204,11 +1204,40 @@ class query(object):
             y = int(length[0])
             length = str(y) + " hr(s) and " + str(x) + " mins"
 
+            # insert into notification
+            not_vars = [child]
+            notification = db.notification(user=user.user_id, not_typ_cd="appt_req_u", not_vars=json.dumps(not_vars), not_st_dtm=datetime.datetime.now(), not_end_dtm=cnslt_tm.time_st)
+            notification.save()
+            not_vars = [fee, cnslt_tm.time_st.strftime("%B %d, %Y %I:%M %p"), child]
+            notification = db.notification(user=user.user_id, not_typ_cd="appt_pment", not_vars=json.dumps(not_vars), not_st_dtm=datetime.datetime.now(), not_end_dtm=cnslt_tm.time_st)
+            notification.save()
 
-
-            return True, "Your appointment has been made, contact office staff for payment processing.",user, child, date, length
+            return True, "Your appointment has been made, contact office staff for payment processing.",user, child, date, length, fee
         else:
             return False, "An invalid time range was specified."
+
+
+    def getNotification(self, userID):
+
+        #update old notifications that may no longer be needed because of time
+
+        notif = db.notification.select().where(db.notification.not_end_dtm < datetime.datetime.now())
+
+        for n in notif:
+            n.dismissed = "y"
+            n.save()
+
+        notif = db.notification.select(db.notification.not_vars, db.notificaiton_type.not_typ).where((db.notification.dismissed == "n") & (db.notification.not_st_dtm <= datetime.datetime.now()) & (db.notification.not_end_dtm >= datetime.datetime.now()))\
+            .join(db.notificaiton_type, JOIN_INNER, db.notification.not_typ_cd == db.notificaiton_type.not_typ_cd).tuples()
+
+        notifs = []
+        for n in notif:
+            notifs.append(n[1] % tuple(json.loads(n[0])))
+
+        return notifs
+
+
+        #get current notifications
 
 
 
