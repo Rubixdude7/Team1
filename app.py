@@ -167,15 +167,15 @@ def handle_bad_request(e):
           "THE FIX IS TO REFRESH THE PAGE AND IN THE FUTURE THAT IS WHAT WILL HAPPEND"
           "BUT FOR NOW WE NEED TO SEND YOU HOME TO SEE IF THE ERROR IS EVEN BEING CAUGHT"
           "SO TELL BRANDON!!!!!")
-    args = request.args.to_dict()
+    #args = request.args.to_dict()
 
     # Scopes will be passed as mutliple args, and to_dict() will only
     # return one. So, we use getlist() to get all of the scopes.
-    args['scopes'] = request.args.getlist('scopes')
-    return_url = args.pop('return_url', None)
-    if return_url is None:
-        return_url = request.referrer or '/'
-    return redirect(return_url)
+    #args['scopes'] = request.args.getlist('scopes')
+    #return_url = args.pop('return_url', None)
+    #if return_url is None:
+     #   return_url = request.referrer or '/'
+    return redirect(request.path)
 
 
 @app.route('/')

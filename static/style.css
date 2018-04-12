@@ -538,7 +538,8 @@ button:disabled {
     z-index: 2;
   }
   .nav-wrapper > ul {
-    padding-right: 2.5em;
+    padding-right: 4.2em;
+    background-color: #ffcb05;
   }
   .nav-wrapper ul li {
     height: 100%;
@@ -1219,10 +1220,12 @@ footer {
 
 #notif-wrapper {
   width: 1.7em;
-}
-
-#notif-wrapper:hover {
-  background-color: #ffcb05 !important;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  right: 2.2em;
+  background-color: #ffcb05;
+  /*NARROW SCREEN*/
 }
 
 #notif-wrapper img {
@@ -1252,58 +1255,67 @@ footer {
   opacity: 0;
 }
 
-#notif-subNav {
+#notifs {
   width: 50vw;
+  position: absolute;
+  top: 0;
   right: 0;
   left: initial;
   line-height: 0;
+  opacity: 0;
+  visibility: hidden;
+  z-index: -1;
+  -webkit-transition: all .4s ease;
+  transition: all .4s ease;
 }
 
-#notif-subNav #notifs:hover {
-  background-color: #ffcb05 !important;
-}
-
-#notif-subNav #notifs input {
+#notifs input {
   display: none;
 }
 
-#notif-subNav #notifs > div {
+#notifs > div {
   background-color: #ffcb05;
   display: inline-block;
   width: 100%;
-  margin-bottom: 1em;
+  padding: .5em;
+  margin: .5em 0;
   line-height: 1.2em;
 }
 
-#notif-subNav #notifs > div .notif-dismiss {
+#notifs > div:nth-child(2) {
+  margin-top: 1em;
+}
+
+#notifs > div .notif-dismiss {
   float: left;
-  width: 1.6em;
+  width: 2em;
   text-align: center;
   transform: rotate(45deg);
 }
 
-#notif-subNav #notifs > div .notif-dismiss label {
+#notifs > div .notif-dismiss label {
   font-size: 2em;
+  color: red;
   cursor: pointer;
 }
 
-#notif-subNav #notifs > div .notif-cont {
-  width: calc(50vw - 1.6em);
+#notifs > div .notif-cont {
+  width: calc(50vw - 2em);
   float: right;
 }
 
-#notif-subNav #notifs > div .notif-cont p {
+#notifs > div .notif-cont p {
   font-size: 1.2em;
 }
 
-#notif-subNav #notifs input:checked + div {
+#notifs input:checked + div {
   animation-name: dismiss;
-  animation-duration: 2s;
+  animation-duration: 1.5s;
   animation-timing-function: ease-out;
   animation-fill-mode: forwards;
 }
 
-#notif-checkbox:checked ~ #notif-subNav {
+#notif-checkbox:checked ~ #notifs {
   opacity: 1;
   top: 5em;
   visibility: visible;
@@ -1312,17 +1324,20 @@ footer {
 
 @keyframes dismiss {
   20% {
-    max-height: 100vh;
     transform: translateX(0);
     opacity: 1;
+    max-height: 100vh;
   }
-  50% {
-    max-height: 0;
-  }
-  100% {
+  98% {
     transform: translateX(50vw);
     opacity: 0;
+  }
+  100% {
     max-height: 0;
+    padding: 0;
+    opacity: 0;
+    transform: translateX(50vw);
+    margin: 0;
   }
 }
 

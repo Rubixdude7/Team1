@@ -1,8 +1,15 @@
 #notif-wrapper{
   width: 1.7em;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  right: 2.2em;
+  background-color: $mainColor;
 
-  &:hover{
-    background-color: $mainColor !important;
+
+  /*NARROW SCREEN*/
+  @media only screen and (max-width: 1000px) {
+
   }
 
   img{
@@ -34,67 +41,72 @@
   }
 }
 
-#notif-subNav{
+#notifs{
   width: 50vw;
+  position: absolute;
+  top: 0;
   right: 0;
   left: initial;
   line-height: 0;
+  opacity: 0;
+  visibility: hidden;
+  z-index: -1;
 
-  #notifs{
+  -webkit-transition: all .4s ease;
+  transition: all .4s ease;
 
-    &:hover{
-      background-color: $mainColor !important;
-    }
-
-    input{
-      display: none;
-    }
-
-    &>div{
-      background-color: $mainColor;
-      display: inline-block;
-      width: 100%;
-      margin-bottom: 1em;
-      line-height: 1.2em;
-
-      .notif-dismiss{
-        float: left;
-        width: 1.6em;
-        text-align: center;
-        transform: rotate(45deg);
-
-        label{
-          font-size: 2em;
-          cursor: pointer;
-        }
-
-      }
-
-      .notif-cont{
-        width: calc(50vw - 1.6em);
-        float: right;
-
-        p{
-          font-size: 1.2em;
-        }
-      }
-
-    }
-
-    input{
-      //display: none;
-    }
-    input:checked + div{
-      animation-name: dismiss;
-      animation-duration: 2s;
-      animation-timing-function: ease-out;
-      animation-fill-mode: forwards;
-
-    }
+  input{
+    display: none;
   }
+
+  &>div{
+    background-color: $mainColor;
+    display: inline-block;
+    width: 100%;
+    padding: .5em;
+    margin: .5em 0;
+    line-height: 1.2em;
+
+    &:nth-child(2){
+      margin-top: 1em;
+    }
+
+    .notif-dismiss{
+      float: left;
+      width: 2em;
+      text-align: center;
+      transform: rotate(45deg);
+
+      label{
+        font-size: 2em;
+        color: red;
+        cursor: pointer;
+      }
+
+    }
+
+    .notif-cont{
+      width: calc(50vw - 2em);
+      float: right;
+
+      p{
+        font-size: 1.2em;
+      }
+    }
+
+  }
+
+  input:checked + div{
+    animation-name: dismiss;
+    animation-duration: 1.5s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+
+  }
+
 }
 
-#notif-checkbox:checked ~ #notif-subNav{
+#notif-checkbox:checked ~ #notifs{
   opacity: 1;
   top: 5em;
   visibility: visible;
@@ -104,19 +116,25 @@
 @keyframes dismiss {
 
   20%{
-    max-height: 100vh;
     transform: translateX(0);
     opacity: 1;
+    max-height: 100vh;
   }
 
-  50%{
-    max-height: 0;
-  }
 
-  100%{
+  98%{
     transform: translateX(50vw);
     opacity: 0;
+    //max-height: 0;
+  }
+
+
+  100%{
     max-height: 0;
+    padding: 0;
+    opacity: 0;
+    transform: translateX(50vw);
+    margin: 0;
   }
 
 
