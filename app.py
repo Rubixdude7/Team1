@@ -23,6 +23,7 @@ from wtforms.validators import DataRequired, ValidationError
 import query
 import models
 import math
+from collections import OrderedDict
 from flask import flash, render_template, request, redirect
 from jose import jwt
 import urllib.request
@@ -273,10 +274,15 @@ def questions():  # TODO Breaks if there are no quesions in db
     return object_list("questions.html", paginate_by=3, query=questions, context_variable='questions')
 
 
-@app.route('/reviews')
+@app.route('/reviews/<int:consult_id>')
 @login_required
-def reviews():  # TODO Breaks if there are no quesions in db
-    return render_template("reviews.html")
+def reviews(consult_id):
+    print("CONSUKLT", consult_id)
+    if querydb.checkConsultId(consult_id): #ensure consult_id exists and user is allowed to do this review
+        return render_template("reviews.html", consult_id=consult_id)
+    else:
+        return render_template('404.html'), 404
+
 
 @app.route('/review_approve')
 def reviewapprove():
@@ -289,14 +295,15 @@ def reviewdeny():
 
     rev_id = request.args.get('rev_id')
     email = request.args.get('email')
+    user = request.args.get('user')
     reason = Markup(request.form.get('reason'))
     print(reason)
     if email is not None:
         emails.send_email(email, render_template('flask_user/emails/review_denied_subject.txt'),
                           render_template('flask_user/emails/review_denied_message.html',
-                                          app_name=current_app.user_manager.app_name, reason=reason),
+                                          app_name=current_app.user_manager.app_name, reason=reason, user=user),
                           render_template('flask_user/emails/review_denied_message.txt',
-                                          app_name=current_app.user_manager.app_name, reason=reason))
+                                          app_name=current_app.user_manager.app_name, reason=reason, user=user))
 
 
 
@@ -479,7 +486,11 @@ def post_editQuestions():
 @login_required
 @roles_required('user')
 def parent():
+    childid = 1
+    x = querydb.checkIfReviewed(childid)
+    print(x)
     updatedQuestions = querydb.checkNewQuestions(current_user.id)
+
     return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name,
                            children=querydb.getChildren(current_user.id),
                            contact_info=querydb.contactID(current_user.id), querydb=querydb,
@@ -874,8 +885,29 @@ def my_psikolog_page():
 @app.route('/psikolog_reviews/')
 def psikolog_reviews():
     psyc_id = request.args.get('psyc_id')
+    reviewHolder = []
+    reviewMain = []
     psyc_name = request.args.get('psyc_name')
-    return render_template("psikolog/psikolog_reviews.html", psyc_id=psyc_id, psyc_name=psyc_name)
+    reviews, x1, x2, allReviews = querydb.getReviewsOfPsyc(psyc_id)
+    print("TOtal", x1)
+    print("TOTALSTARS", x2)
+    print(allReviews)
+    for i in reviews:
+        reviewHolder.append(reviews[0])
+    print(reviewHolder)
+
+    allReviews = sorted(allReviews)
+    if x1 != 0:
+        x2=x2/x1
+    for x in allReviews:
+        reviewMain.append(allReviews.count(x))
+    print("telo", reviewMain)
+
+
+    print("g", allReviews)
+    print(reviewMain)
+
+    return render_template("psikolog/psikolog_reviews.html", psyc_id=psyc_id, psyc_name=psyc_name, reviews=reviews, totalReviews=x1, totalStars=x2, allReviews=allReviews, reviewMain=reviewMain)
 
 
 @app.route('/schedule')
@@ -924,9 +956,17 @@ def psikolog(id=None):
 
             # Fetch the psychologist's avatar
             avatar_url = querydb.getAvatar(id)
+            reviews, totalReviews, totalStars, allReviews = querydb.getReviewsOfPsyc(id)
+            if totalReviews != 0:
+                totalStars = totalStars/totalReviews
+            else:
+                totalStars = 0
+            print("b" + str(totalReviews))
+            print("b" + str(totalStars))
+
 
             return render_template('psikolog/psikolog_page.html', psyc_info=psyc_info, blog_posts=blog_posts,
-                                   can_edit=can_edit, avatar_url=avatar_url)
+                                   can_edit=can_edit, avatar_url=avatar_url, reviews=reviews, totalReviews=totalReviews, totalStars=totalStars)
 
     # Either no id was given or no psychologist was found.
     # In both cases, show a list of psychologists.
@@ -961,7 +1001,7 @@ def write_blog_post():
         return redirect(url_for('psikolog_dashboard'))
 
 
-@app.route('/submit_review', methods=['GET', 'POST'])
+@app.route('/submit_review/', methods=['GET', 'POST'])
 def write_review():
     if request.method == 'GET':
         return render_template('reviews.html')
@@ -969,7 +1009,7 @@ def write_review():
         reviewAmount = request.form['reviewAmount']
         text = request.form['text']
         user_id = current_user.id
-        consult_id= "1" #purely for testing
+        consult_id = request.args.get('consult_id')
         print(text)
         print(user_id)
         print(reviewAmount)
