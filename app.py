@@ -278,7 +278,7 @@ def questions():  # TODO Breaks if there are no quesions in db
 @login_required
 def reviews(consult_id):
     print("CONSUKLT", consult_id)
-    if querydb.checkConsultId(consult_id): #ensure consult_id exists and user is allowed to do this review
+    if querydb.checkConsultId(consult_id, current_user.id): #ensure consult_id exists and user is allowed to do this review
         return render_template("reviews.html", consult_id=consult_id)
     else:
         return render_template('404.html'), 404

@@ -144,10 +144,12 @@ class query(object):
         check = list(current.tuples())
         if check:
             return current[-1].cnslt_id
-    def checkConsultId(self, consult_id):
+    def checkConsultId(self, consult_id, user_id):
         print("CONSULT2", consult_id)
         try:
             current = db.consultation.get(db.consultation.cnslt_id == consult_id, db.consultation.finished == 'y')
+            child = current.child_id
+            current2 = db.child.get(db.child.child_id == child, db.child.user == user_id) #ensure this review can be accessed by user.
         except:
             return False
 
