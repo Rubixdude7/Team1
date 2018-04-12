@@ -32,9 +32,10 @@
        {% if not reviews2 %}
             <p>No Approved Reviews Exist</p>
         {%  else %}
-     {% for j in reviews2 %}
-         <p>Approved Reviews</p>
-         <p>Review</p>
+        <p>Approved Reviews</p>
+        {% for j in reviews2 %}
+
+        <p><b>Review</b></p>
          <p><i>{{ j.review }}</i></p>
          <p> {{ j.stars }}</p>
          <p> {{ j.rev_id }}</p>
