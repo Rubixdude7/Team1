@@ -17,6 +17,8 @@ import requests
 import time
 import json
 import hashlib
+from flask_mail import Message
+from flask import render_template
 
 
 class query(object):
@@ -137,27 +139,131 @@ class query(object):
         if not liste:
             print("green")
         return questions
+    def reviewsForChildren(self, child_id):
+        current = db.consultation.select().where(db.consultation.child == child_id, db.consultation.finished == 'y')
+        check = list(current.tuples())
+
+        if check:
+            x = current[-1].cnslt_id
+
+
+            return x
+    def checkConsultId(self, consult_id, user_id):
+        print("CONSULT2", consult_id)
+        try:
+            current = db.consultation.get(db.consultation.cnslt_id == consult_id, db.consultation.finished == 'y')
+            child = current.child_id
+            current2 = db.child.get(db.child.child_id == child, db.child.user == user_id) #ensure this review can be accessed by user.
+        except:
+            return False
+
+        if current:
+            return True
+        return False
+    def checkIfReviewed(self, child_id):
+        print("Ccre", child_id)
+        try:
+            x = db.consultation.get(db.consultation.child == child_id)
+            id = x.cnslt_id
+            print("id", id)
+            z = db.review.get(db.review.cnslt == id)
+            if z:
+                if z.approved == 'd': #user can remake review
+                    return False
+                else:
+                    return True
+            else:
+                return False
+        except:
+            return False
+
+    def checkDupeChildName(self, first_name, last_name):
+        try:
+            x = db.child.get(db.child.child_nm_fst == first_name, db.child.child_nm_lst ==last_name)
+            return True
+        except:
+            return False
+    def checkExitingEditQuestion(self, q_id):
+        try:
+            x = db.questions.get(db.questions.q_id == q_id)
+            return True
+        except:
+            return False
 
     def getAllUnapprovedReviews(self):
-        reviews = db.review.select().where(db.review.approved == 'n').join(db.consultation, JOIN_INNER, db.review.cnslt == db.consultation.cnslt_id)
-        print(reviews)
-        liste = list(reviews.tuples())
-        print(liste)
-        if not liste:
-            print("green")
-        return reviews
+        tuples = db.review.select(db.review.rev_id, db.review.cnslt, db.review.review, db.review.stars, db.review.approved, db.review.crea_dtm, db.review.void_ind, db.consultation.fee, db.consultation.finished, db.child.user, db.user.username, db.user.email).join(db.consultation, JOIN_INNER, db.review.cnslt == db.consultation.cnslt_id).where(db.review.approved == 'n').join(db.child, JOIN_INNER, db.consultation.child == db.child.child_id).join(db.user, JOIN_INNER, db.child.user == db.user.user_id).tuples()
+
+
+        return [{
+            'rev_id': t[0],
+            'cnslt': t[1],
+            'review': Markup(t[2]),
+            'stars': t[3],
+            'approved': t[4],
+            'time': t[5],
+            'void_ind': t[6],
+            'test': t[7],
+            'finished': t[8],
+            'user_id': t[9],
+            'user': t[10],
+            'email': t[11],
+
+        } for t in tuples]
+
 
     def getAllApprovedReviews(self):
-        reviews = db.review.select().where(db.review.approved == 'y').join(db.consultation, JOIN_INNER,
-                                                                           db.review.cnslt == db.consultation.cnslt_id)
+        tuples = db.review.select(db.review.rev_id, db.review.cnslt, db.review.review, db.review.stars,
+                                  db.review.approved, db.review.crea_dtm, db.review.void_ind, db.consultation.fee,
+                                  db.consultation.finished, db.child.user, db.user.username, db.user.email).join(
+            db.consultation, JOIN_INNER, db.review.cnslt == db.consultation.cnslt_id).where(
+            db.review.approved == 'y').join(db.child, JOIN_INNER, db.consultation.child == db.child.child_id).join(
+            db.user, JOIN_INNER, db.child.user == db.user.user_id).tuples()
 
-        return reviews
+        return [{
+            'rev_id': t[0],
+            'cnslt': t[1],
+            'review': Markup(t[2]),
+            'stars': t[3],
+            'approved': t[4],
+            'time': t[5],
+            'void_ind': t[6],
+            'test': t[7],
+            'finished': t[8],
+            'user_id': t[9],
+            'user': t[10],
+            'email': t[11],
 
+        } for t in tuples]
+    def getReviewsOfPsyc(self, psyc_id):
+        tuples = db.review.select(db.review.stars, db.review.review, db.consult_time.psyc, db.review.crea_dtm).join(db.consult_time, JOIN_INNER, db.review.cnslt == db.consult_time.cnslt).where(db.consult_time.psyc == psyc_id and db.review.approved =='y').tuples()
+        totalReviews = len(tuples)
+        totalStars = 0
+        allReviews =[]
+        for t in tuples:
+            totalStars += int(t[0])
+            allReviews.append(t[0])
+        print("t" + str(totalReviews))
+        print("t" + str(totalStars))
+
+        return [ {
+            'starAmount': t[0],
+            'review': Markup(t[1]),
+            'psyc_id': t[2],
+            'crea_dtm': t[3],
+        }
+
+        for t in tuples], totalReviews, totalStars, allReviews
     def approveReview(self, r_id):
         print(r_id)
         review = db.review.get(db.review.rev_id == r_id)
         review.approved = 'y'
         review.save()
+    def denyReview(self, r_id):
+        review = db.review.get(db.review.rev_id == r_id)
+        review.approved = 'd' #denied, no code to test denied. soft del
+
+        review.save()
+
 
     def getAllQuestionsForUsers(self):
         questions = db.questions.select().where(db.questions.void_ind != 'd' and db.questions.void_ind == 'n')
@@ -225,8 +331,57 @@ class query(object):
             consultation = db.consultation.get(db.consultation.cnslt_id == consult_id)
             consultation.paid = 'y'
             consultation.save()
-        except:
+
+            user = db.user.select().where(db.user.user_id ==
+                                          db.child.select(db.child.user).where(db.child.child_id ==
+                                                                               db.consultation.select(db.consultation.child).where(db.consultation.cnslt_id == consult_id)))
+
+            for u in user:
+                user = u
+
+
+            child = db.child.select(db.child.child_nm_fst, db.child.child_nm_lst).where(db.child.user == user.user_id).tuples()
+            child = list(child)[0]
+            child = child[0] + " " + child[1]
+
+
+            cnslt_dtls = db.consultation.select(db.consultation.length, db.consultation.link, db.consult_time.time_st, db.consult_time.time_end, db.consult_time.psyc).where(db.consultation.cnslt_id == consult_id)\
+                .join(db.consult_time, JOIN_INNER, db.consult_time.cnslt == db.consultation.cnslt_id).tuples()
+
+            cnslt_dtls = list(cnslt_dtls)[0]
+
+            length = cnslt_dtls[0]
+            link = cnslt_dtls[1]
+            date = cnslt_dtls[2].strftime("%B %d, %Y %I:%M %p")
+
+            length = divmod(length, 1)
+            x = int(length[1] * 60)
+            y = int(length[0])
+            length = str(y) + " hr(s) and " + str(x) + " mins"
+
+            # insert notifications
+            # payment success notif
+            notif = db.notification(user=user.user_id, not_typ_cd="pment_u_a", not_vars=json.dumps([child]), not_st_dtm=datetime.datetime.now(), not_end_dtm=cnslt_dtls[3])
+            notif.save()
+            # 10 min before start vid notif user
+            notif = db.notification(user=user.user_id, not_typ_cd="appt_st_u", not_vars=json.dumps([child, date]), not_st_dtm=cnslt_dtls[3] - datetime.timedelta(minutes=10), not_end_dtm=cnslt_dtls[3])
+            notif.save()
+            # let psyc know the appt is official
+            psyc = db.user.get(db.user.user_id ==
+                               db.psychologist.select(db.psychologist.user).where(db.psychologist.psyc_id == cnslt_dtls[4]))
+            notif = db.notification(user=psyc.user_id, not_typ_cd="appt_req_p", not_vars=json.dumps([child, date, length]), not_st_dtm=datetime.datetime.now(), not_end_dtm=cnslt_dtls[3])
+            notif.save()
+            # 10 min before start vid notif psyc
+            notif = db.notification(user=psyc.user_id, not_typ_cd="appt_st_p", not_vars=json.dumps([child, date]), not_st_dtm=cnslt_dtls[3] - datetime.timedelta(minutes=10), not_end_dtm=cnslt_dtls[3])
+            notif.save()
+
+
+            return user, child, length, link, date
+
+        except Exception as e:
+            print("approval error: " + str(e))
             print("Couldn't find consultation")
+            return None
 
     def getConsultationTime(self, consult_id):
         try:
@@ -357,7 +512,11 @@ class query(object):
         u.save()
 
     def updateLengthFee(self, length, fee):
-        l = db.consultation_fee.get(db.consultation_fee.cnslt_fee_id == length)
+        try:
+            l = db.consultation_fee.get(db.consultation_fee.cnslt_fee_id == length)
+        except:
+            l = db.consultation_fee(fee=fee, void_ind="n")
+
         l.fee = fee
         l.save()
 
@@ -513,12 +672,29 @@ class query(object):
                             tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol',
                                   u'strong', u'ul', u'p'])
         now = pytz.utc.localize(datetime.datetime.utcnow()).replace(tzinfo=None)
-        review = db.review(cnslt=consult_id,
-                            review=text,
-                            stars=reviewAmount,
-                            approved=approved,
-                            void_ind='n')
-        review.save()
+        check = None
+        try:
+             check = db.review.get(db.review.cnslt == consult_id)
+        except:
+
+             review = db.review(cnslt=consult_id,
+                             review=text,
+                             stars=reviewAmount,
+                              approved=approved,
+                             void_ind='n',
+                             crea_dtm = datetime.datetime.now())
+             review.save()
+
+        if check != None:
+            print("B1")
+            if check.approved == 'd':
+                print("T1")
+                check.review=text
+                check.stars=reviewAmount
+                check.approved= 'n'
+                check.save()
+            else:
+                print("UNABLE TO SAVE, CONSULT ID EXISTS WITH A REVIEW")
     
     def getBlogPost(self, blog_id):
         post = db.blog.select().where((db.blog.blog_id == blog_id) & (db.blog.void_ind == 'n')).get()
@@ -1070,7 +1246,11 @@ class query(object):
 # Begin Brandon
 
     def get_len_fee(self):
-        len_fee = db.consultation_length.select(db.consultation_length.cnslt_len_id, db.consultation_length.length, db.consultation_fee.fee).where(db.consultation_length.void_ind == 'n').join(db.consultation_fee, JOIN_INNER, (db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id) & (db.consultation_fee.void_ind == 'n')).tuples()
+        len_fee = db.consultation_length.select(db.consultation_length.cnslt_len_id, db.consultation_length.length,
+                                                db.consultation_fee.fee).where(
+            db.consultation_length.void_ind == 'n').join(db.consultation_fee, JOIN_INNER, (
+                    db.consultation_length.cnslt_fee == db.consultation_fee.cnslt_fee_id) & (
+                                                                     db.consultation_fee.void_ind == 'n')).tuples()
         len_fee = list(len_fee)
 
         return len_fee
@@ -1108,9 +1288,69 @@ class query(object):
             cnslt_tm = db.consult_time(cnslt_id=cnslt.cnslt_id, psyc_id=args['psyc_id'], time_st=wib.localize(time_st).astimezone(pytz.utc).replace(tzinfo=None), time_end=wib.localize(time_end).astimezone(pytz.utc).replace(tzinfo=None), approved='y')
             cnslt_tm.save()
 
-            return True, "Your appointment has been made, contact office staff for payment processing."
+            user = db.user.select().where(db.user.user_id ==
+                                          db.child.select(db.child.user).where(db.child.child_id ==
+                                                                               db.consultation.select(
+                                                                                   db.consultation.child).where(
+                                                                                   db.consultation.cnslt_id == cnslt.cnslt_id)))
+
+            for u in user:
+                user = u
+
+            child = db.child.select(db.child.child_nm_fst, db.child.child_nm_lst).where(
+                db.child.user == user.user_id).tuples()
+            child = list(child)[0]
+            child = child[0] + " " + child[1]
+
+            length = args['len']
+            date = wib.localize(time_st).astimezone(pytz.utc).replace(tzinfo=None).strftime("%B %d, %Y %I:%M %p")
+
+            length = divmod(length, 1)
+            x = int(length[1] * 60)
+            y = int(length[0])
+            length = str(y) + " hr(s) and " + str(x) + " mins"
+
+            # insert into notification
+            not_vars = [child]
+            notification = db.notification(user=user.user_id, not_typ_cd="appt_req_u", not_vars=json.dumps(not_vars), not_st_dtm=datetime.datetime.now(), not_end_dtm=cnslt_tm.time_st)
+            notification.save()
+            not_vars = [fee, cnslt_tm.time_st.strftime("%B %d, %Y %I:%M %p"), child]
+            notification = db.notification(user=user.user_id, not_typ_cd="appt_pment", not_vars=json.dumps(not_vars), not_st_dtm=datetime.datetime.now(), not_end_dtm=cnslt_tm.time_st)
+            notification.save()
+
+            return True, "Your appointment has been made, contact office staff for payment processing.",user, child, date, length, fee
         else:
             return False, "An invalid time range was specified."
+
+
+    def getNotification(self, userID):
+
+        # update old notifications that may no longer be needed because of time
+
+        notif = db.notification.select().where(db.notification.not_end_dtm < datetime.datetime.now())
+
+        for n in notif:
+            n.dismissed = "y"
+            n.save()
+
+        notif = db.notification.select(db.notification.not_vars, db.notificaiton_type.not_typ, db.notification.not_id).where((db.notification.dismissed == "n") & (db.notification.user == userID) & (db.notification.not_st_dtm <= datetime.datetime.now()) & (db.notification.not_end_dtm >= datetime.datetime.now()))\
+            .join(db.notificaiton_type, JOIN_INNER, db.notification.not_typ_cd == db.notificaiton_type.not_typ_cd).tuples()
+
+        # get current notifications
+
+        notifs = []
+        for n in notif:
+            notifs.append({"id": n[2], "notif": n[1] % tuple(json.loads(n[0]))})
+
+        return notifs
+
+    def dismissNotification(self, id):
+
+        notif = db.notification.get(db.notification.not_id == id)
+
+        notif.dismissed = "y"
+
+        notif.save()
 
 
 

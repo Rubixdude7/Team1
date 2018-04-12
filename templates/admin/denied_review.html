@@ -20,10 +20,12 @@
 <main id="mainHome">
 
     <div class="box">
-<form action="{{ url_for('write_review') }}" method="post" enctype="multipart/form-data">
-
-        <p>Optional Email to send to customer about review: </p>
-        <textarea name="text" placeholder="Enter your comments here"></textarea>
+<form action="{{ url_for('reviewdeny', rev_id=rev_id, email=email) }}" method="post" enctype="multipart/form-data">
+        <p>{{ user }}</p>
+        <p> {{ rev_id }}</p>
+        <p> {{ email }}</p>
+        <p>Optional Reason: </p>
+        <textarea input id="reason" name="reason" placeholder="Enter your comments here"></textarea>
     <input id="submitButton"class="btn btn-success" style="" type="submit" value="Submit">
 </form>
     </div>

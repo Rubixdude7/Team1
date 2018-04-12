@@ -1,0 +1,9 @@
+{% extends 'flask_user/emails/base_message.txt' %}
+
+{% block message %}
+
+    The appointment for your child, {{ child_name }}, has been scheduled.
+    Their appointment has been scheduled for {{ appt_st_tm }}, the appointment will last {{ appt_len }}.
+    Your consultation will not happen until proper payment had been received, please contact our office staff to process your payment of {{ cnslt_total }}.
+
+{% endblock %}

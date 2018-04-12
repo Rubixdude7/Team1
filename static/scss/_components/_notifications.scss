@@ -1,0 +1,124 @@
+#notif-wrapper{
+  width: 1.7em;
+
+  &:hover{
+    background-color: $mainColor !important;
+  }
+
+  img{
+    width: 1.7em;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+
+    -webkit-transition: ease-in-out .5s;
+    -moz-transition: ease-in-out .5s;
+    -ms-transition: ease-in-out .5s;
+    -o-transition: ease-in-out .5s;
+    transition: ease-in-out .5s;
+  }
+
+  #have-notifs{
+    opacity: 0;
+  }
+
+  &>input{
+    width: 1.7em;
+    height: 1.7em;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    cursor: pointer;
+    opacity: 0;
+  }
+}
+
+#notif-subNav{
+  width: 50vw;
+  right: 0;
+  left: initial;
+  line-height: 0;
+
+  #notifs{
+
+    &:hover{
+      background-color: $mainColor !important;
+    }
+
+    input{
+      display: none;
+    }
+
+    &>div{
+      background-color: $mainColor;
+      display: inline-block;
+      width: 100%;
+      margin-bottom: 1em;
+      line-height: 1.2em;
+
+      .notif-dismiss{
+        float: left;
+        width: 1.6em;
+        text-align: center;
+        transform: rotate(45deg);
+
+        label{
+          font-size: 2em;
+          cursor: pointer;
+        }
+
+      }
+
+      .notif-cont{
+        width: calc(50vw - 1.6em);
+        float: right;
+
+        p{
+          font-size: 1.2em;
+        }
+      }
+
+    }
+
+    input{
+      //display: none;
+    }
+    input:checked + div{
+      animation-name: dismiss;
+      animation-duration: 2s;
+      animation-timing-function: ease-out;
+      animation-fill-mode: forwards;
+
+    }
+  }
+}
+
+#notif-checkbox:checked ~ #notif-subNav{
+  opacity: 1;
+  top: 5em;
+  visibility: visible;
+  height: initial !important;
+}
+
+@keyframes dismiss {
+
+  20%{
+    max-height: 100vh;
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  50%{
+    max-height: 0;
+  }
+
+  100%{
+    transform: translateX(50vw);
+    opacity: 0;
+    max-height: 0;
+  }
+
+
+
+}

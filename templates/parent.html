@@ -105,6 +105,15 @@
                             <br>
                             Next Appointment: {{ querydb.haveTime(child.child_id) }}
                         {% endif %}
+                        {% if querydb.reviewsForChildren(child.child_id) %}
+                            {% if not querydb.checkIfReviewed(child.child_id) %}
+                            <button class="btn-success btn" onclick="location.href='{{ url_for('reviews', consult_id=querydb.reviewsForChildren(child.child_id)) }}'" type="button" >
+                                Review your Appointment
+                            </button>
+                            {% else %}
+                                <p>Already Reviewed!</p>
+                            {% endif %}
+                        {% endif %}
                     {% endif %}
 
                 </p>

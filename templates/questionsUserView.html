@@ -104,9 +104,9 @@
                         <p id="questiontitle"><b><u>{{ u.question }}</u></b></p>
                         <!-- Brody code -->
                         {% if answers[loop.index0] != None or '' %}
-                            <input type="text" name="fname" value="{{ answers[loop.index0] }}" )>
+                            <input type="text" maxlength="50" name="fname" value="{{ answers[loop.index0] }}" )>
                         {% else %}
-                            <input type="text" name="fname" )>
+                            <input type="text" name="fname" maxlength="50" )>
                         {% endif %}
                         <!-- end Brody Code -->
                         <input type="hidden" name="qField" value="{{ u.q_id }}" )>

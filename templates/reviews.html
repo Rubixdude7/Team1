@@ -124,9 +124,8 @@ $(document).ready(function(){
 
 <main id="reviews">
     <div class="box">
-        <form action="{{ url_for('write_review') }}" method="post" enctype="multipart/form-data">
-        <h1 class="title">Reviews Test Page</h1>
-        <hr>
+        <form action="{{ url_for('write_review', consult_id=consult_id) }}" method="post" enctype="multipart/form-data">
+        <h1 class="title">Review</h1>
         <hr>
 
 <fieldset class="rating">

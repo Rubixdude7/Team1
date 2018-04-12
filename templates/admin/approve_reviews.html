@@ -4,18 +4,21 @@
 <main id="mainHome">
     <div class="box">
        {% if not reviews %}
-            <p>No UnApproved Reviews Exist</p>
+            <p>No Unapproved Reviews Exist</p>
         {%  else %}
      {% for i in reviews %}
          <p>Unapproved Reviews</p>
-         <p>Review</p>
-         <p>{{ i.review }}</p>
-         <p> {{ i.stars }}</p>
-         <p> {{ i.rev_id }}</p>
+         <p>Review ID: {{ i.rev_id }}</p>
+         <p>Rating: {{ i.stars }}</p>
+         <p>Review Content: {{ i.review }}</p>
+         <p>Username of Review: {{ i.user }}</p>
+         <p>Email of Review: {{ i.email }}</p>
+
+
           <button class="btn-warning btn" onclick="location.href='{{ url_for('reviewapprove',r_id=i.rev_id) }}'" type="button" class="btn btn-success">
                                     Approve Review!
                                 </button>
-  <button class="btn-warning btn" onclick="location.href='{{ url_for('denied_review', r_id=i.rev_id) }}'" type="button" class="btn btn-warning">
+  <button class="btn-warning btn" onclick="location.href='{{ url_for('denied_review', rev_id=i.rev_id, user=i.user, email=i.email) }}'" type="button" class="btn btn-warning">
                                     Deny Review!
   </button>
 

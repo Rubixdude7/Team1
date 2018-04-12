@@ -3,14 +3,14 @@ import os
 import sqlalchemy.exc
 import babel
 import pytz
-from flask import Flask, render_template, request, redirect, url_for, Markup, jsonify, json
+from flask import Flask, render_template, request, redirect, url_for, Markup, jsonify, json, current_app
 import datetime
 from flask_sqlalchemy import SQLAlchemy
 from playhouse.flask_utils import object_list
 from flask import request
 from flask_user import login_required, roles_required, UserManager, UserMixin, SQLAlchemyAdapter, current_user
 from flask_user import login_required, roles_required, UserManager, UserMixin, SQLAlchemyAdapter, current_user, \
-    user_registered
+    user_registered, emails
 from flask_user.forms import RegisterForm
 from flask_mail import Mail
 from flask_wtf import FlaskForm
@@ -23,6 +23,7 @@ from wtforms.validators import DataRequired, ValidationError
 import query
 import models
 import math
+from collections import OrderedDict
 from flask import flash, render_template, request, redirect
 from jose import jwt
 import urllib.request
@@ -166,7 +167,15 @@ def handle_bad_request(e):
           "THE FIX IS TO REFRESH THE PAGE AND IN THE FUTURE THAT IS WHAT WILL HAPPEND"
           "BUT FOR NOW WE NEED TO SEND YOU HOME TO SEE IF THE ERROR IS EVEN BEING CAUGHT"
           "SO TELL BRANDON!!!!!")
-    return redirect(url_for('index'))
+    args = request.args.to_dict()
+
+    # Scopes will be passed as mutliple args, and to_dict() will only
+    # return one. So, we use getlist() to get all of the scopes.
+    args['scopes'] = request.args.getlist('scopes')
+    return_url = args.pop('return_url', None)
+    if return_url is None:
+        return_url = request.referrer or '/'
+    return redirect(return_url)
 
 
 @app.route('/')
@@ -189,7 +198,37 @@ def consultation():
 
     status = querydb.schecule_cnslt(req)
 
+    email = status[2], status[3], status[4], status[5], status[6]
+
+    if email is not None:
+        emails.send_email(email[0].email, render_template('flask_user/emails/consultation_booked_subject.txt'),
+                          render_template('flask_user/emails/consultation_booked_message.html', user=email[0],
+                                          child_name=email[1], appt_st_tm=email[2], appt_len=email[3], cnslt_total=email[4],
+                                          app_name=current_app.user_manager.app_name),
+                          render_template('flask_user/emails/consultation_booked_message.txt', user=email[0],
+                                          child_name=email[1], appt_st_tm=email[2], appt_len=email[3], cnslt_total=email[4],
+                                          app_name=current_app.user_manager.app_name))
+
     return jsonify({'status': status[0], 'message': status[1]})
+
+
+@app.route('/notification', methods=['POST'])
+@login_required
+def notification():
+
+    notifs = querydb.getNotification(current_user.id)
+
+    return jsonify({'notifs': notifs})
+
+@app.route('/notification-dismiss', methods=['POST'])
+@login_required
+def notification_dismiss():
+
+    print(request.json['id'])
+
+    querydb.dismissNotification(request.json['id'])
+
+    return jsonify({'status': 'ok'})
 
 
 #           END BRANDON         #
@@ -198,6 +237,11 @@ def consultation():
 @app.route('/editQuestion', methods=['GET', 'POST'])
 def editQuestion():
     q_id = request.args.get('q_id')
+    x = querydb.checkExitingEditQuestion(q_id) #ensure q_id exists
+    if x == False:
+        flash('Question doesnt exist')
+        return redirect(url_for('questions'))
+
     getQuestion = querydb.getQuestion(q_id)
     form = QuestionEdit(request.form)
     if form.validate_on_submit():
@@ -212,6 +256,10 @@ def editQuestion():
 @app.route('/questiondeactivate')
 def questiondeactivate():
     q_id = request.args.get('q_id')
+    x = querydb.checkExitingEditQuestion(q_id)  # ensure q_id exists
+    if x == False:
+        flash('Question doesnt exist')
+        return redirect(url_for('questions'))
     querydb.deactivateQuestion(q_id)
     flash('Your blog post has been deactivated!')
     return redirect(url_for('questions'))
@@ -220,6 +268,10 @@ def questiondeactivate():
 @app.route('/questionreactivate')
 def questionreactivate():
     q_id = request.args.get('q_id')
+    x = querydb.checkExitingEditQuestion(q_id)  # ensure q_id exists
+    if x == False:
+        flash('Question doesnt exist')
+        return redirect(url_for('questions'))
     querydb.reactivateQuestion(q_id)
     flash('Your blog post has been reactivated!')
     return redirect(url_for('questions'))
@@ -228,14 +280,19 @@ def questionreactivate():
 @app.route('/questionDelete')
 def questionDelete():
     q_id = request.args.get('q_id')
+    x = querydb.checkExitingEditQuestion(q_id)  # ensure q_id exists
+    if x == False:
+        flash('Question doesnt exist')
+        return redirect(url_for('questions'))
     querydb.questionDelete(q_id)
     flash('Question has been deleted!')
     return redirect(url_for('questions'))
 
 
 @app.route('/questions/')
+@roles_required('admin')
 @login_required
-def questions():  # TODO Breaks if there are no quesions in db
+def questions():
     questions = querydb.getAllQuestions()
     if not questions:
 
@@ -245,17 +302,48 @@ def questions():  # TODO Breaks if there are no quesions in db
     return object_list("questions.html", paginate_by=3, query=questions, context_variable='questions')
 
 
-@app.route('/reviews')
+@app.route('/reviews/<int:consult_id>')
 @login_required
-def reviews():  # TODO Breaks if there are no quesions in db
-    return render_template("reviews.html")
+def reviews(consult_id):
+    print("CONSUKLT", consult_id)
+    if querydb.checkConsultId(consult_id, current_user.id): #ensure consult_id exists and user is allowed to do this review
+        return render_template("reviews.html", consult_id=consult_id)
+    else:
+        return render_template('404.html'), 404
+
 
 @app.route('/review_approve')
 def reviewapprove():
     r_id = request.args.get('r_id')
     querydb.approveReview(r_id)
     flash('You approved this review!')
-    return redirect(url_for('questions'))
+    return redirect(url_for('approve_reviews'))
+@app.route('/review_deny', methods=['GET', 'POST'])
+def reviewdeny():
+
+    rev_id = request.args.get('rev_id')
+    email = request.args.get('email')
+    print("EMAIL", email)
+    print("REV ID", rev_id)
+    user = request.args.get('user')
+    reason = Markup(request.form.get('reason'))
+    print(reason)
+    if email is not None and reason != "" and len(reason) > 3:
+        emails.send_email(email, render_template('flask_user/emails/review_denied_subject.txt'),
+                          render_template('flask_user/emails/review_denied_message.html',
+                                          app_name=current_app.user_manager.app_name, reason=reason, user=email),
+                          render_template('flask_user/emails/review_denied_message.txt',
+                                          app_name=current_app.user_manager.app_name, reason=reason, user=email))
+
+
+
+    querydb.denyReview(rev_id)
+
+
+
+
+    flash('You denied this review!')
+    return redirect(url_for('approve_reviews'))
 
 
 @app.route('/questionsUserView/', methods=['GET', 'POST'])
@@ -285,6 +373,8 @@ def questionsUserView():
 
     for q in questions:
         print(q)
+
+
         answers.append(querydb.getAnswer(q.q_id, child_id))
     # end Brody code
     if totalQuestions is None:
@@ -385,7 +475,10 @@ def approve_reviews():
 @app.route('/denied_review')
 @login_required
 def denied_review():
-    return render_template("admin/denied_review.html")
+    user = request.args.get('user')
+    rev_id = request.args.get('rev_id')
+    email = request.args.get('email')
+    return render_template("admin/denied_review.html", rev_id=rev_id, user=user, email=email)
 
 @app.route('/add_questions')
 @login_required
@@ -404,6 +497,7 @@ def post_questions():
 
 
 @app.route('/post_edit_questionAnswers', methods=['GET', 'POST'])
+@roles_required('admin')
 def post_editQuestions():
     questionAnswerList = request.form.getlist('fname')
     questionIdList = request.form.getlist('qField')
@@ -425,7 +519,11 @@ def post_editQuestions():
 @login_required
 @roles_required('user')
 def parent():
+    childid = 1
+    x = querydb.checkIfReviewed(childid)
+    print(x)
     updatedQuestions = querydb.checkNewQuestions(current_user.id)
+
     return render_template('parent.html', user=current_user.first_name + " " + current_user.last_name,
                            children=querydb.getChildren(current_user.id),
                            contact_info=querydb.contactID(current_user.id), querydb=querydb,
@@ -491,6 +589,9 @@ def childform():
 @app.route('/childform', methods=['POST'])
 @roles_required('user')
 def addChild():
+    if len(request.form.get('dateofbirth')) > 10:
+        flash('Error with date of birth, please ensure it follows format', 'error')
+        return parent()
     born = datetime.datetime.strptime(request.form.get('dateofbirth'), "%Y-%m-%d")
     today = datetime.date.today()
     age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
@@ -501,6 +602,16 @@ def addChild():
         flash('Error with childs age', 'error')
         return parent()
 
+
+    firstnamedup = request.form.get('firstname')
+    lastnamedup = request.form.get('lastname')
+    x = querydb.checkDupeChildName(firstnamedup, lastnamedup)
+
+    if x==True: #janky fix for if user spam clicks submit button
+        flash('error, child exists', 'error')
+        return parent()
+    print("KI-----------------------")
+    print("SAS", request.form.get('dateofbirth'))
     querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'),
                      request.form.get('dateofbirth'))
     return parent()
@@ -554,8 +665,13 @@ def getPaymentChanges():
             b = request.form.get(str(c))
             if b == 'on':
                 print("Marking paid: ", c)
-                querydb.markConsultApproved(c)
-        except:
+                email = querydb.markConsultApproved(c)
+                if email is not None:
+                    emails.send_email(email[0].email, render_template('flask_user/emails/payment_confirm_subject.txt'),
+                                      render_template('flask_user/emails/payment_confirm_message.html', user=email[0], child_name=email[1], appt_st_tm=email[4], appt_len=email[2], skype_link=email[3], app_name=current_app.user_manager.app_name),
+                                      render_template('flask_user/emails/payment_confirm_message.txt', user=email[0], child_name=email[1], appt_st_tm=email[4], appt_len=email[2], skype_link=email[3], app_name=current_app.user_manager.app_name))
+        except Exception as e:
+            print("email exception : " + str(e))
             print('Check box was off')
     return redirect(url_for('approvePayments'))
 
@@ -603,9 +719,9 @@ class SearchBar(FlaskForm):
 
 
 class FeeAssign(FlaskForm):
-    oneHourFee = StringField('1 Hour')
-    onePointFiveFee = StringField('1.5 Hour')
-    twoHourFee = StringField('2 Hour')
+    oneHourFee = StringField('1.0 Hour Fee: ')
+    onePointFiveFee = StringField('1.5 Hour Fee: ')
+    twoHourFee = StringField('2.0 Hour Fee: ')
     submit = SubmitField('Submit')
 
 
@@ -624,6 +740,16 @@ def feeAdjust():
         feeOne = form.oneHourFee.data
         feeOneFive = form.onePointFiveFee.data
         feeTwo = form.twoHourFee.data
+        try:
+            var = int(feeOne)
+            var2 = int(feeOneFive)
+            var3 = int(feeTwo)
+        except ValueError:
+            flash('Values need to numbers')
+            return render_template('admin/feeAdjust.html', form=form)
+        if (len(feeOne) > 10 or len(feeOneFive) > 10 or len(feeTwo) > 10):
+            flash('Values need to be less than 10 digits')
+            return render_template('admin/feeAdjust.html', form=form)
         querydb.updateLengthFee(1,feeOne)
         querydb.updateLengthFee(2,feeOneFive)
         querydb.updateLengthFee(3,feeTwo)
@@ -774,6 +900,18 @@ def api_blog(psyc_id):
     page_size = int(request.args['page_size'])
     return jsonify(querydb.apiBlog(psyc_id, page_num, page_size))
     
+@app.route('/api/admin/questions')
+def api_admin_questions():
+	qquery = querydb.getAllQuestions()
+	mylist = []
+	for q in qquery:
+		mylist.append({
+			'question': q.question,
+			'q_id': q.q_id,
+			'void_ind': q.void_ind
+		})
+	return jsonify(mylist)
+
 @app.route('/api/admin/search_users')
 def api_admin_search_users():
     page_num = int(request.args['page_num'])
@@ -803,8 +941,29 @@ def my_psikolog_page():
 @app.route('/psikolog_reviews/')
 def psikolog_reviews():
     psyc_id = request.args.get('psyc_id')
+    reviewHolder = []
+    reviewMain = []
     psyc_name = request.args.get('psyc_name')
-    return render_template("psikolog/psikolog_reviews.html", psyc_id=psyc_id, psyc_name=psyc_name)
+    reviews, x1, x2, allReviews = querydb.getReviewsOfPsyc(psyc_id)
+    print("TOtal", x1)
+    print("TOTALSTARS", x2)
+    print(allReviews)
+    for i in reviews:
+        reviewHolder.append(reviews[0])
+    print(reviewHolder)
+
+    allReviews = sorted(allReviews)
+    if x1 != 0:
+        x2=x2/x1
+    for x in allReviews:
+        reviewMain.append(allReviews.count(x))
+    print("telo", reviewMain)
+
+
+    print("g", allReviews)
+    print(reviewMain)
+
+    return render_template("psikolog/psikolog_reviews.html", psyc_id=psyc_id, psyc_name=psyc_name, reviews=reviews, totalReviews=x1, totalStars=x2, allReviews=allReviews, reviewMain=reviewMain)
 
 
 @app.route('/schedule')
@@ -853,9 +1012,17 @@ def psikolog(id=None):
 
             # Fetch the psychologist's avatar
             avatar_url = querydb.getAvatar(id)
+            reviews, totalReviews, totalStars, allReviews = querydb.getReviewsOfPsyc(id)
+            if totalReviews != 0:
+                totalStars = totalStars/totalReviews
+            else:
+                totalStars = 0
+            print("b" + str(totalReviews))
+            print("b" + str(totalStars))
+
 
             return render_template('psikolog/psikolog_page.html', psyc_info=psyc_info, blog_posts=blog_posts,
-                                   can_edit=can_edit, avatar_url=avatar_url)
+                                   can_edit=can_edit, avatar_url=avatar_url, reviews=reviews, totalReviews=totalReviews, totalStars=totalStars)
 
     # Either no id was given or no psychologist was found.
     # In both cases, show a list of psychologists.
@@ -890,7 +1057,7 @@ def write_blog_post():
         return redirect(url_for('psikolog_dashboard'))
 
 
-@app.route('/submit_review', methods=['GET', 'POST'])
+@app.route('/submit_review/', methods=['GET', 'POST'])
 def write_review():
     if request.method == 'GET':
         return render_template('reviews.html')
@@ -898,7 +1065,7 @@ def write_review():
         reviewAmount = request.form['reviewAmount']
         text = request.form['text']
         user_id = current_user.id
-        consult_id= "1" #purely for testing
+        consult_id = request.args.get('consult_id')
         print(text)
         print(user_id)
         print(reviewAmount)
