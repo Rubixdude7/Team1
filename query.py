@@ -235,7 +235,7 @@ class query(object):
 
         } for t in tuples]
     def getReviewsOfPsyc(self, psyc_id):
-        tuples = db.review.select(db.review.stars, db.review.review, db.consult_time.psyc, db.review.crea_dtm).join(db.consult_time, JOIN_INNER, db.review.cnslt == db.consult_time.cnslt).where(db.consult_time.psyc == psyc_id and db.review.approved =='y').tuples()
+        tuples = db.review.select(db.review.stars, db.review.review, db.consult_time.psyc, db.review.crea_dtm).join(db.consult_time, JOIN_INNER, db.review.cnslt == db.consult_time.cnslt).where(db.consult_time.psyc == psyc_id, db.review.approved =='y').tuples()
         totalReviews = len(tuples)
         totalStars = 0
         allReviews =[]
