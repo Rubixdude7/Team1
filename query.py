@@ -482,7 +482,11 @@ class query(object):
         u.save()
 
     def updateLengthFee(self, length, fee):
-        l = db.consultation_fee.get(db.consultation_fee.cnslt_fee_id == length)
+        try:
+            l = db.consultation_fee.get(db.consultation_fee.cnslt_fee_id == length)
+        except:
+            l = db.consultation_fee(fee=fee, void_ind="n")
+
         l.fee = fee
         l.save()
 

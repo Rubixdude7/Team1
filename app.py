@@ -558,6 +558,9 @@ def childform():
 @app.route('/childform', methods=['POST'])
 @roles_required('user')
 def addChild():
+    if len(request.form.get('dateofbirth')) > 10:
+        flash('Error with date of birth, please ensure it follows format', 'error')
+        return parent()
     born = datetime.datetime.strptime(request.form.get('dateofbirth'), "%Y-%m-%d")
     today = datetime.date.today()
     age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
@@ -567,6 +570,8 @@ def addChild():
     if age > 100:
         flash('Error with childs age', 'error')
         return parent()
+
+
     firstnamedup = request.form.get('firstname')
     lastnamedup = request.form.get('lastname')
     x = querydb.checkDupeChildName(firstnamedup, lastnamedup)
@@ -574,6 +579,8 @@ def addChild():
     if x==True: #janky fix for if user spam clicks submit button
         flash('error, child exists', 'error')
         return parent()
+    print("KI-----------------------")
+    print("SAS", request.form.get('dateofbirth'))
     querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'),
                      request.form.get('dateofbirth'))
     return parent()
@@ -681,9 +688,9 @@ class SearchBar(FlaskForm):
 
 
 class FeeAssign(FlaskForm):
-    oneHourFee = StringField('1 Hour')
-    onePointFiveFee = StringField('1.5 Hour')
-    twoHourFee = StringField('2 Hour')
+    oneHourFee = StringField('1.0 Hour Fee: ')
+    onePointFiveFee = StringField('1.5 Hour Fee: ')
+    twoHourFee = StringField('2.0 Hour Fee: ')
     submit = SubmitField('Submit')
 
 
@@ -702,6 +709,16 @@ def feeAdjust():
         feeOne = form.oneHourFee.data
         feeOneFive = form.onePointFiveFee.data
         feeTwo = form.twoHourFee.data
+        try:
+            var = int(feeOne)
+            var2 = int(feeOneFive)
+            var3 = int(feeTwo)
+        except ValueError:
+            flash('Values need to numbers')
+            return render_template('admin/feeAdjust.html', form=form)
+        if (len(feeOne) > 10 or len(feeOneFive) > 10 or len(feeTwo) > 10):
+            flash('Values need to be less than 10 digits')
+            return render_template('admin/feeAdjust.html', form=form)
         querydb.updateLengthFee(1,feeOne)
         querydb.updateLengthFee(2,feeOneFive)
         querydb.updateLengthFee(3,feeTwo)
