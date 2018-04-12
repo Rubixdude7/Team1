@@ -1,8 +1,9 @@
 {% extends 'flask_user/emails/base_message.txt' %}
 
 {% block message %}
+Dear {{ user }},
+Unfortunately your review has been denied, we apologize for any inconvenience. Feel free to re-submit the review following within our review guidelines
+Reason Review was denied: {{ reason }}
 
-The review has been denied. Sorry bud bud. You suck.
-Reason: {{ reason }}
 {%- endif %}
 {% endblock %}

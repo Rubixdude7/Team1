@@ -139,6 +139,35 @@ class query(object):
         if not liste:
             print("green")
         return questions
+    def reviewsForChildren(self, child_id):
+        current = db.consultation.select().where(db.consultation.child == child_id, db.consultation.finished == 'y')
+        check = list(current.tuples())
+        if check:
+            return current[-1].cnslt_id
+    def checkConsultId(self, consult_id):
+        print("CONSULT2", consult_id)
+        try:
+            current = db.consultation.get(db.consultation.cnslt_id == consult_id, db.consultation.finished == 'y')
+        except:
+            return False
+
+        if current:
+            return True
+        return False
+    def checkIfReviewed(self, child_id):
+        print("Ccre", child_id)
+        try:
+            x = db.consultation.get(db.consultation.child == child_id)
+            id = x.cnslt_id
+            print("id", id)
+            z = db.review.get(db.review.cnslt == id)
+            if z:
+                return True
+            else:
+                return False
+        except:
+            return False
+
 
     def getAllUnapprovedReviews(self):
         tuples = db.review.select(db.review.rev_id, db.review.cnslt, db.review.review, db.review.stars, db.review.approved, db.review.crea_dtm, db.review.void_ind, db.consultation.fee, db.consultation.finished, db.child.user, db.user.username, db.user.email).join(db.consultation, JOIN_INNER, db.review.cnslt == db.consultation.cnslt_id).where(db.review.approved == 'n').join(db.child, JOIN_INNER, db.consultation.child == db.child.child_id).join(db.user, JOIN_INNER, db.child.user == db.user.user_id).tuples()
@@ -184,7 +213,25 @@ class query(object):
             'email': t[11],
 
         } for t in tuples]
+    def getReviewsOfPsyc(self, psyc_id):
+        tuples = db.review.select(db.review.stars, db.review.review, db.consult_time.psyc, db.review.crea_dtm).join(db.consult_time, JOIN_INNER, db.review.cnslt == db.consult_time.cnslt).where(db.consult_time.psyc == psyc_id and db.review.approved =='y').tuples()
+        totalReviews = len(tuples)
+        totalStars = 0
+        allReviews =[]
+        for t in tuples:
+            totalStars += int(t[0])
+            allReviews.append(t[0])
+        print("t" + str(totalReviews))
+        print("t" + str(totalStars))
 
+        return [ {
+            'starAmount': t[0],
+            'review': Markup(t[1]),
+            'psyc_id': t[2],
+            'crea_dtm': t[3],
+        }
+
+        for t in tuples], totalReviews, totalStars, allReviews
     def approveReview(self, r_id):
         print(r_id)
         review = db.review.get(db.review.rev_id == r_id)
@@ -583,12 +630,18 @@ class query(object):
                             tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol',
                                   u'strong', u'ul', u'p'])
         now = pytz.utc.localize(datetime.datetime.utcnow()).replace(tzinfo=None)
+        check = db.review.select().where(db.review.cnslt == consult_id)
+
         review = db.review(cnslt=consult_id,
                             review=text,
                             stars=reviewAmount,
                             approved=approved,
-                            void_ind='n')
-        review.save()
+                            void_ind='n',
+                            crea_dtm = datetime.datetime.now())
+        if not check:
+            review.save()
+        else:
+            print("UNABLE TO SAVE, CONSULT ID EXISTS WITH A REVIEW")
     
     def getBlogPost(self, blog_id):
         post = db.blog.select().where((db.blog.blog_id == blog_id) & (db.blog.void_ind == 'n')).get()
