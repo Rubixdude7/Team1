@@ -343,6 +343,8 @@ def questionsUserView():
 
     for q in questions:
         print(q)
+
+
         answers.append(querydb.getAnswer(q.q_id, child_id))
     # end Brody code
     if totalQuestions is None:
@@ -565,7 +567,13 @@ def addChild():
     if age > 100:
         flash('Error with childs age', 'error')
         return parent()
+    firstnamedup = request.form.get('firstname')
+    lastnamedup = request.form.get('lastname')
+    x = querydb.checkDupeChildName(firstnamedup, lastnamedup)
 
+    if x==True: #janky fix for if user spam clicks submit button
+        flash('error, child exists', 'error')
+        return parent()
     querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'),
                      request.form.get('dateofbirth'))
     return parent()

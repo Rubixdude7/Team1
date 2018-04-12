@@ -170,6 +170,12 @@ class query(object):
         except:
             return False
 
+    def checkDupeChildName(self, first_name, last_name):
+        try:
+            x = db.child.get(db.child.child_nm_fst == first_name, db.child.child_nm_lst ==last_name)
+            return True
+        except:
+            return False
 
     def getAllUnapprovedReviews(self):
         tuples = db.review.select(db.review.rev_id, db.review.cnslt, db.review.review, db.review.stars, db.review.approved, db.review.crea_dtm, db.review.void_ind, db.consultation.fee, db.consultation.finished, db.child.user, db.user.username, db.user.email).join(db.consultation, JOIN_INNER, db.review.cnslt == db.consultation.cnslt_id).where(db.review.approved == 'n').join(db.child, JOIN_INNER, db.consultation.child == db.child.child_id).join(db.user, JOIN_INNER, db.child.user == db.user.user_id).tuples()
