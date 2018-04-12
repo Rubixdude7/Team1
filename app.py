@@ -167,15 +167,15 @@ def handle_bad_request(e):
           "THE FIX IS TO REFRESH THE PAGE AND IN THE FUTURE THAT IS WHAT WILL HAPPEND"
           "BUT FOR NOW WE NEED TO SEND YOU HOME TO SEE IF THE ERROR IS EVEN BEING CAUGHT"
           "SO TELL BRANDON!!!!!")
-    args = request.args.to_dict()
+    #args = request.args.to_dict()
 
     # Scopes will be passed as mutliple args, and to_dict() will only
     # return one. So, we use getlist() to get all of the scopes.
-    args['scopes'] = request.args.getlist('scopes')
-    return_url = args.pop('return_url', None)
-    if return_url is None:
-        return_url = request.referrer or '/'
-    return redirect(return_url)
+    #args['scopes'] = request.args.getlist('scopes')
+    #return_url = args.pop('return_url', None)
+    #if return_url is None:
+     #   return_url = request.referrer or '/'
+    return redirect(request.path)
 
 
 @app.route('/')
@@ -719,9 +719,12 @@ class SearchBar(FlaskForm):
 
 
 class FeeAssign(FlaskForm):
-    oneHourFee = StringField('1.0 Hour Fee: ')
-    onePointFiveFee = StringField('1.5 Hour Fee: ')
-    twoHourFee = StringField('2.0 Hour Fee: ')
+    aLength = StringField('Shortest Length: ')
+    bLength = StringField('Medium Length: ')
+    cLength = StringField('Longest Length: ')
+    aFee = StringField('1.0 Hour Fee: ')
+    bFee = StringField('1.5 Hour Fee: ')
+    cFee = StringField('2.0 Hour Fee: ')
     submit = SubmitField('Submit')
 
 
@@ -736,25 +739,41 @@ def adminPortal():
 @roles_required('admin')
 def feeAdjust():
     form = FeeAssign()
+    form.aLength.default = querydb.getLength(1)
+    form.bLength.default = querydb.getLength(2)
+    form.cLength.default = querydb.getLength(3)
+    form.aFee.default = querydb.getLengthFee(1)
+    form.bFee.default = querydb.getLengthFee(2)
+    form.cFee.default = querydb.getLengthFee(3)
     if form.validate_on_submit():
-        feeOne = form.oneHourFee.data
-        feeOneFive = form.onePointFiveFee.data
-        feeTwo = form.twoHourFee.data
+        aLength = form.aLength.data
+        bLength = form.bLength.data
+        cLength = form.cLength.data
+        feeA = form.aFee.data
+        feeB = form.bFee.data
+        feeC = form.cFee.data
         try:
-            var = int(feeOne)
-            var2 = int(feeOneFive)
-            var3 = int(feeTwo)
+            var = float(feeA)
+            var2 = float(feeB)
+            var3 = float(feeC)
+            var4 = float(aLength)
+            var5 = float(bLength)
+            var6 = float(cLength)
         except ValueError:
             flash('Values need to numbers')
             return render_template('admin/feeAdjust.html', form=form)
-        if (len(feeOne) > 10 or len(feeOneFive) > 10 or len(feeTwo) > 10):
+        if (len(feeA) > 10 or len(feeB) > 10 or len(feeC) > 10):
             flash('Values need to be less than 10 digits')
             return render_template('admin/feeAdjust.html', form=form)
-        querydb.updateLengthFee(1,feeOne)
-        querydb.updateLengthFee(2,feeOneFive)
-        querydb.updateLengthFee(3,feeTwo)
+        querydb.updateLengthFee(1, feeA)
+        querydb.updateLengthFee(2, feeB)
+        querydb.updateLengthFee(3, feeC)
+        querydb.updateLength(1, aLength)
+        querydb.updateLength(2, bLength)
+        querydb.updateLength(3, cLength)
         flash("Your changes have been saved")
         return redirect(url_for('adminPortal'))
+    form.process()
     return render_template('admin/feeAdjust.html', form=form)
 
 

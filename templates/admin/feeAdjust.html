@@ -7,21 +7,24 @@
         <hr>
         <form action="" method="POST">
             {{ form.hidden_tag() }}
-            <div class="form-control-1">
-            {{ form.oneHourFee.label }}
-            {{ form.oneHourFee }}
-            </div>
-            <br>
-            <div class="form-control-2">
-            {{ form.onePointFiveFee.label }}
-            {{ form.onePointFiveFee }}
-            </div>
-            <br>
-            <div class="form-control-2">
-            {{ form.twoHourFee.label }}
-            {{ form.twoHourFee }}
-            </div>
-            <br>
+            <table>
+                <tr>
+                    <th>Lengths</th>
+                    <th>Fees</th>
+                </tr>
+                <tr>
+                    <td>{{ form.aLength }}</td>
+                    <td>{{ form.aFee }}</td>
+                </tr>
+                <tr>
+                    <td>{{ form.bLength }}</td>
+                    <td>{{ form.bFee }}</td>
+                </tr>
+                <tr>
+                    <td>{{ form.cLength }}</td>
+                    <td>{{ form.cFee }}</td>
+                </tr>
+            </table>
             {{ form.submit(class="btn btn-success") }}
         </form>
     </div>

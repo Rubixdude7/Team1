@@ -87,23 +87,23 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li id="notif-wrapper">
-                                <input type="checkbox" id="notif-checkbox">
-                                <label for="notif-checkbox" id="notif-label"></label>
-                                <img id="no-notifs" src="{{ url_for('static', filename='contents/icons/bell.svg') }}">
-                                <img id="have-notifs" src="{{ url_for('static', filename='contents/icons/bell_ring.svg') }}">
-                                <ul class="subNav" id="notif-subNav">
-                                    <li id="notifs">
-
-                                    </li>
-                                </ul>
-                            </li>
                         {% else %}
                             <li>
                                 <a href="{{ url_for('user.login') }}">LOG IN</a>
                             </li>
                         {% endif %}
                     </ul>
+                    {% if current_user.is_authenticated %}
+                        <div id="notif-wrapper">
+                            <input type="checkbox" id="notif-checkbox">
+                            <label for="notif-checkbox" id="notif-label"></label>
+                            <img id="no-notifs" src="{{ url_for('static', filename='contents/icons/bell.svg') }}">
+                            <img id="have-notifs" src="{{ url_for('static', filename='contents/icons/bell_ring.svg') }}">
+                            <div id="notifs">
+
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </nav>
 
@@ -152,7 +152,6 @@
                 url : "{{ url_for('notification') }}",
                 contentType: 'application/json;charset=UTF-8',
                 success: function(result) {
-
                     for (var i = 0; i < result.notifs.length; i++){
                         no_notif++;
                         $('#notifs').append(
@@ -176,7 +175,8 @@
                     }
                 },
                 error: function(error) {
-                    alert(JSON.stringify(error));
+                    console.log("Notification Error");
+                    console.log(JSON.stringify(error));
                 }
             });
 
@@ -198,7 +198,7 @@
             });
             
             if (no_notif == 0) {
-                $('#notif-checkbox').prop('checked', false);
+                //$('#notif-checkbox').prop('checked', false);
                 $('#have-notifs').css("opacity", "0");
                 $('#no-notifs').css("opacity", "1");
             }

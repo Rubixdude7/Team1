@@ -520,6 +520,20 @@ class query(object):
         l.fee = fee
         l.save()
 
+    def getLengthFee(self, length):
+        f = db.consultation_fee.get(db.consultation_fee.cnslt_fee_id == length)
+        return f.fee
+
+    def getLength(self, index):
+        f = db.consultation_length.get(db.consultation_length.cnslt_len_id == index)
+        return f.length
+
+    def updateLength(self, index, length):
+        l = db.consultation_length.get(db.consultation_length.cnslt_len_id == index)
+
+        l.length = length
+        l.save()
+
 # End Jason's code
 
 # Begin Charlie's code
