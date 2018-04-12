@@ -672,18 +672,20 @@ class query(object):
                             tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol',
                                   u'strong', u'ul', u'p'])
         now = pytz.utc.localize(datetime.datetime.utcnow()).replace(tzinfo=None)
-        check = db.review.get(db.review.cnslt == consult_id)
+        check = None
+        try:
+             check = db.review.get(db.review.cnslt == consult_id)
+        except:
 
-        review = db.review(cnslt=consult_id,
-                            review=text,
-                            stars=reviewAmount,
-                            approved=approved,
-                            void_ind='n',
-                            crea_dtm = datetime.datetime.now())
+             review = db.review(cnslt=consult_id,
+                             review=text,
+                             stars=reviewAmount,
+                              approved=approved,
+                             void_ind='n',
+                             crea_dtm = datetime.datetime.now())
+             review.save()
 
-        if not check: #check if d so user can resubmit review
-            review.save()
-        else:
+        if check != None:
             print("B1")
             if check.approved == 'd':
                 print("T1")
