@@ -71,7 +71,7 @@
       background-color: $mainColor;
       min-width: 100%;
   }
-  nav .nav-wrapper li:hover>.subNav {
+  .navDropdown:hover>.subNav {
       opacity: 1;
       top: 5em;
       visibility: visible;

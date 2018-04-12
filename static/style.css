@@ -572,7 +572,7 @@ button:disabled {
     background-color: #ffcb05;
     min-width: 100%;
   }
-  nav .nav-wrapper li:hover > .subNav {
+  .navDropdown:hover > .subNav {
     opacity: 1;
     top: 5em;
     visibility: visible;
@@ -1217,10 +1217,90 @@ footer {
   }
 }
 
+#notif-wrapper {
+  width: 1.7em;
+}
+
+#notif-wrapper:hover {
+  background-color: #ffcb05 !important;
+}
+
+#notif-wrapper img {
+  width: 1.7em;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  -webkit-transition: ease-in-out .5s;
+  -moz-transition: ease-in-out .5s;
+  -ms-transition: ease-in-out .5s;
+  -o-transition: ease-in-out .5s;
+  transition: ease-in-out .5s;
+}
+
+#notif-wrapper #have-notifs {
+  opacity: 0;
+}
+
+#notif-wrapper > input {
+  width: 1.7em;
+  height: 1.7em;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  cursor: pointer;
+  opacity: 0;
+}
+
 #notif-subNav {
   width: 50vw;
   right: 0;
   left: initial;
+  line-height: 0;
+}
+
+#notif-subNav #notifs:hover {
+  background-color: #ffcb05 !important;
+}
+
+#notif-subNav #notifs input {
+  display: none;
+}
+
+#notif-subNav #notifs > div {
+  background-color: #ffcb05;
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 1em;
+  line-height: 1.2em;
+}
+
+#notif-subNav #notifs > div .notif-dismiss {
+  float: left;
+  width: 1.6em;
+  text-align: center;
+  transform: rotate(45deg);
+}
+
+#notif-subNav #notifs > div .notif-dismiss label {
+  font-size: 2em;
+  cursor: pointer;
+}
+
+#notif-subNav #notifs > div .notif-cont {
+  width: calc(50vw - 1.6em);
+  float: right;
+}
+
+#notif-subNav #notifs > div .notif-cont p {
+  font-size: 1.2em;
+}
+
+#notif-subNav #notifs input:checked + div {
+  animation-name: dismiss;
+  animation-duration: 2s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
 }
 
 #notif-checkbox:checked ~ #notif-subNav {
@@ -1228,6 +1308,22 @@ footer {
   top: 5em;
   visibility: visible;
   height: initial !important;
+}
+
+@keyframes dismiss {
+  20% {
+    max-height: 100vh;
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    max-height: 0;
+  }
+  100% {
+    transform: translateX(50vw);
+    opacity: 0;
+    max-height: 0;
+  }
 }
 
 /**********END GLOBAL CSS**********/

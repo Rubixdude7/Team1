@@ -1272,7 +1272,7 @@ class query(object):
 
     def getNotification(self, userID):
 
-        #update old notifications that may no longer be needed because of time
+        # update old notifications that may no longer be needed because of time
 
         notif = db.notification.select().where(db.notification.not_end_dtm < datetime.datetime.now())
 
@@ -1280,17 +1280,24 @@ class query(object):
             n.dismissed = "y"
             n.save()
 
-        notif = db.notification.select(db.notification.not_vars, db.notificaiton_type.not_typ).where((db.notification.dismissed == "n") & (db.notification.not_st_dtm <= datetime.datetime.now()) & (db.notification.not_end_dtm >= datetime.datetime.now()))\
+        notif = db.notification.select(db.notification.not_vars, db.notificaiton_type.not_typ, db.notification.not_id).where((db.notification.dismissed == "n") & (db.notification.user == userID) & (db.notification.not_st_dtm <= datetime.datetime.now()) & (db.notification.not_end_dtm >= datetime.datetime.now()))\
             .join(db.notificaiton_type, JOIN_INNER, db.notification.not_typ_cd == db.notificaiton_type.not_typ_cd).tuples()
+
+        # get current notifications
 
         notifs = []
         for n in notif:
-            notifs.append(n[1] % tuple(json.loads(n[0])))
+            notifs.append({"id": n[2], "notif": n[1] % tuple(json.loads(n[0]))})
 
         return notifs
 
+    def dismissNotification(self, id):
 
-        #get current notifications
+        notif = db.notification.get(db.notification.not_id == id)
+
+        notif.dismissed = "y"
+
+        notif.save()
 
 
 

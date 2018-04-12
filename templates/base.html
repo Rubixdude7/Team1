@@ -79,7 +79,7 @@
                             </li>
                         {% endif %}
                         {% if current_user.is_authenticated %}
-                            <li>
+                            <li class="navDropdown">
                                 <a href="{{ url_for('user.profile') }}">WELCOME: {{ current_user.first_name.upper() }}</a>
                                 <ul class="subNav">
                                     <li>
@@ -87,9 +87,11 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li>
+                            <li id="notif-wrapper">
                                 <input type="checkbox" id="notif-checkbox">
-                                <img src="{{ url_for('static', filename='contents/icons/bell.svg') }}">
+                                <label for="notif-checkbox" id="notif-label"></label>
+                                <img id="no-notifs" src="{{ url_for('static', filename='contents/icons/bell.svg') }}">
+                                <img id="have-notifs" src="{{ url_for('static', filename='contents/icons/bell_ring.svg') }}">
                                 <ul class="subNav" id="notif-subNav">
                                     <li id="notifs">
 
@@ -140,6 +142,9 @@
     </div>
 
     <script>
+        
+        var no_notif = 0;
+        
         $(document).ready(function () {
 
             $.ajax({
@@ -147,16 +152,27 @@
                 url : "{{ url_for('notification') }}",
                 contentType: 'application/json;charset=UTF-8',
                 success: function(result) {
-                    alert(JSON.stringify(result))
 
                     for (var i = 0; i < result.notifs.length; i++){
+                        no_notif++;
                         $('#notifs').append(
+                            "<input type=\"checkbox\" id=\"" + result.notifs[i].id + "\" onclick=\"dismiss(" + result.notifs[i].id + ")\">"+
                             "<div>"+
-                                "<p>"+
-                                    result.notifs[i] +
-                                "</p>"+
+                                "<div class=\"notif-dismiss\">"+
+                                    "<label for=\"" + result.notifs[i].id + "\">+</label>"+
+                                "</div>"+
+                                "<div class=\"notif-cont\">"+
+                                    "<p>"+
+                                        result.notifs[i].notif +
+                                    "</p>"+
+                                "</div>"+
                             "</div>"
                         );
+                    }
+
+                    if (no_notif > 0) {
+                        $('#have-notifs').css("opacity", "1");
+                        $('#no-notifs').css("opacity", "0");
                     }
                 },
                 error: function(error) {
@@ -164,7 +180,29 @@
                 }
             });
 
-        })
+        });
+
+        function dismiss(id) {
+            
+            no_notif--;
+
+            $.ajax({
+                type : "POST",
+                url : "{{ url_for('notification_dismiss') }}",
+                data: JSON.stringify({"id": id}, null, '\t'),
+                contentType: 'application/json;charset=UTF-8',
+                success: function(result) {
+                },
+                error: function(error) {
+                }
+            });
+            
+            if (no_notif == 0) {
+                $('#notif-checkbox').prop('checked', false);
+                $('#have-notifs').css("opacity", "0");
+                $('#no-notifs').css("opacity", "1");
+            }
+        }
     </script>
 </body>
 </html>

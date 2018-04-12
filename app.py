@@ -220,6 +220,16 @@ def notification():
 
     return jsonify({'notifs': notifs})
 
+@app.route('/notification-dismiss', methods=['POST'])
+@login_required
+def notification_dismiss():
+
+    print(request.json['id'])
+
+    querydb.dismissNotification(request.json['id'])
+
+    return jsonify({'status': 'ok'})
+
 
 #           END BRANDON         #
 
