@@ -227,6 +227,11 @@ def notification():
 @app.route('/editQuestion', methods=['GET', 'POST'])
 def editQuestion():
     q_id = request.args.get('q_id')
+    x = querydb.checkExitingEditQuestion(q_id) #ensure q_id exists
+    if x == False:
+        flash('Question doesnt exist')
+        return redirect(url_for('questions'))
+
     getQuestion = querydb.getQuestion(q_id)
     form = QuestionEdit(request.form)
     if form.validate_on_submit():
@@ -241,6 +246,10 @@ def editQuestion():
 @app.route('/questiondeactivate')
 def questiondeactivate():
     q_id = request.args.get('q_id')
+    x = querydb.checkExitingEditQuestion(q_id)  # ensure q_id exists
+    if x == False:
+        flash('Question doesnt exist')
+        return redirect(url_for('questions'))
     querydb.deactivateQuestion(q_id)
     flash('Your blog post has been deactivated!')
     return redirect(url_for('questions'))
@@ -249,6 +258,10 @@ def questiondeactivate():
 @app.route('/questionreactivate')
 def questionreactivate():
     q_id = request.args.get('q_id')
+    x = querydb.checkExitingEditQuestion(q_id)  # ensure q_id exists
+    if x == False:
+        flash('Question doesnt exist')
+        return redirect(url_for('questions'))
     querydb.reactivateQuestion(q_id)
     flash('Your blog post has been reactivated!')
     return redirect(url_for('questions'))
@@ -257,14 +270,19 @@ def questionreactivate():
 @app.route('/questionDelete')
 def questionDelete():
     q_id = request.args.get('q_id')
+    x = querydb.checkExitingEditQuestion(q_id)  # ensure q_id exists
+    if x == False:
+        flash('Question doesnt exist')
+        return redirect(url_for('questions'))
     querydb.questionDelete(q_id)
     flash('Question has been deleted!')
     return redirect(url_for('questions'))
 
 
 @app.route('/questions/')
+@roles_required('admin')
 @login_required
-def questions():  # TODO Breaks if there are no quesions in db
+def questions():
     questions = querydb.getAllQuestions()
     if not questions:
 
@@ -295,15 +313,17 @@ def reviewdeny():
 
     rev_id = request.args.get('rev_id')
     email = request.args.get('email')
+    print("EMAIL", email)
+    print("REV ID", rev_id)
     user = request.args.get('user')
     reason = Markup(request.form.get('reason'))
     print(reason)
-    if email is not None:
+    if email is not None and reason != "" and len(reason) > 3:
         emails.send_email(email, render_template('flask_user/emails/review_denied_subject.txt'),
                           render_template('flask_user/emails/review_denied_message.html',
-                                          app_name=current_app.user_manager.app_name, reason=reason, user=user),
+                                          app_name=current_app.user_manager.app_name, reason=reason, user=email),
                           render_template('flask_user/emails/review_denied_message.txt',
-                                          app_name=current_app.user_manager.app_name, reason=reason, user=user))
+                                          app_name=current_app.user_manager.app_name, reason=reason, user=email))
 
 
 
@@ -467,6 +487,7 @@ def post_questions():
 
 
 @app.route('/post_edit_questionAnswers', methods=['GET', 'POST'])
+@roles_required('admin')
 def post_editQuestions():
     questionAnswerList = request.form.getlist('fname')
     questionIdList = request.form.getlist('qField')
