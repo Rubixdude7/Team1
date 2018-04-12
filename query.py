@@ -142,12 +142,18 @@ class query(object):
     def reviewsForChildren(self, child_id):
         current = db.consultation.select().where(db.consultation.child == child_id, db.consultation.finished == 'y')
         check = list(current.tuples())
+
         if check:
-            return current[-1].cnslt_id
-    def checkConsultId(self, consult_id):
+            x = current[-1].cnslt_id
+
+
+            return x
+    def checkConsultId(self, consult_id, user_id):
         print("CONSULT2", consult_id)
         try:
             current = db.consultation.get(db.consultation.cnslt_id == consult_id, db.consultation.finished == 'y')
+            child = current.child_id
+            current2 = db.child.get(db.child.child_id == child, db.child.user == user_id) #ensure this review can be accessed by user.
         except:
             return False
 
@@ -162,12 +168,27 @@ class query(object):
             print("id", id)
             z = db.review.get(db.review.cnslt == id)
             if z:
-                return True
+                if z.approved == 'd': #user can remake review
+                    return False
+                else:
+                    return True
             else:
                 return False
         except:
             return False
 
+    def checkDupeChildName(self, first_name, last_name):
+        try:
+            x = db.child.get(db.child.child_nm_fst == first_name, db.child.child_nm_lst ==last_name)
+            return True
+        except:
+            return False
+    def checkExitingEditQuestion(self, q_id):
+        try:
+            x = db.questions.get(db.questions.q_id == q_id)
+            return True
+        except:
+            return False
 
     def getAllUnapprovedReviews(self):
         tuples = db.review.select(db.review.rev_id, db.review.cnslt, db.review.review, db.review.stars, db.review.approved, db.review.crea_dtm, db.review.void_ind, db.consultation.fee, db.consultation.finished, db.child.user, db.user.username, db.user.email).join(db.consultation, JOIN_INNER, db.review.cnslt == db.consultation.cnslt_id).where(db.review.approved == 'n').join(db.child, JOIN_INNER, db.consultation.child == db.child.child_id).join(db.user, JOIN_INNER, db.child.user == db.user.user_id).tuples()
@@ -240,6 +261,7 @@ class query(object):
     def denyReview(self, r_id):
         review = db.review.get(db.review.rev_id == r_id)
         review.approved = 'd' #denied, no code to test denied. soft del
+
         review.save()
 
 
@@ -474,7 +496,11 @@ class query(object):
         u.save()
 
     def updateLengthFee(self, length, fee):
-        l = db.consultation_fee.get(db.consultation_fee.cnslt_fee_id == length)
+        try:
+            l = db.consultation_fee.get(db.consultation_fee.cnslt_fee_id == length)
+        except:
+            l = db.consultation_fee(fee=fee, void_ind="n")
+
         l.fee = fee
         l.save()
 
@@ -630,7 +656,7 @@ class query(object):
                             tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol',
                                   u'strong', u'ul', u'p'])
         now = pytz.utc.localize(datetime.datetime.utcnow()).replace(tzinfo=None)
-        check = db.review.select().where(db.review.cnslt == consult_id)
+        check = db.review.get(db.review.cnslt == consult_id)
 
         review = db.review(cnslt=consult_id,
                             review=text,
@@ -638,10 +664,19 @@ class query(object):
                             approved=approved,
                             void_ind='n',
                             crea_dtm = datetime.datetime.now())
-        if not check:
+
+        if not check: #check if d so user can resubmit review
             review.save()
         else:
-            print("UNABLE TO SAVE, CONSULT ID EXISTS WITH A REVIEW")
+            print("B1")
+            if check.approved == 'd':
+                print("T1")
+                check.review=text
+                check.stars=reviewAmount
+                check.approved= 'n'
+                check.save()
+            else:
+                print("UNABLE TO SAVE, CONSULT ID EXISTS WITH A REVIEW")
     
     def getBlogPost(self, blog_id):
         post = db.blog.select().where((db.blog.blog_id == blog_id) & (db.blog.void_ind == 'n')).get()

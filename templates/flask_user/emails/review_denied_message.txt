@@ -5,5 +5,4 @@ Dear {{ user }},
 Unfortunately your review has been denied, we apologize for any inconvenience. Feel free to re-submit the review following within our review guidelines
 Reason Review was denied: {{ reason }}
 
-{%- endif %}
 {% endblock %}

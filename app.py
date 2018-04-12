@@ -237,6 +237,11 @@ def notification_dismiss():
 @app.route('/editQuestion', methods=['GET', 'POST'])
 def editQuestion():
     q_id = request.args.get('q_id')
+    x = querydb.checkExitingEditQuestion(q_id) #ensure q_id exists
+    if x == False:
+        flash('Question doesnt exist')
+        return redirect(url_for('questions'))
+
     getQuestion = querydb.getQuestion(q_id)
     form = QuestionEdit(request.form)
     if form.validate_on_submit():
@@ -251,6 +256,10 @@ def editQuestion():
 @app.route('/questiondeactivate')
 def questiondeactivate():
     q_id = request.args.get('q_id')
+    x = querydb.checkExitingEditQuestion(q_id)  # ensure q_id exists
+    if x == False:
+        flash('Question doesnt exist')
+        return redirect(url_for('questions'))
     querydb.deactivateQuestion(q_id)
     flash('Your blog post has been deactivated!')
     return redirect(url_for('questions'))
@@ -259,6 +268,10 @@ def questiondeactivate():
 @app.route('/questionreactivate')
 def questionreactivate():
     q_id = request.args.get('q_id')
+    x = querydb.checkExitingEditQuestion(q_id)  # ensure q_id exists
+    if x == False:
+        flash('Question doesnt exist')
+        return redirect(url_for('questions'))
     querydb.reactivateQuestion(q_id)
     flash('Your blog post has been reactivated!')
     return redirect(url_for('questions'))
@@ -267,14 +280,19 @@ def questionreactivate():
 @app.route('/questionDelete')
 def questionDelete():
     q_id = request.args.get('q_id')
+    x = querydb.checkExitingEditQuestion(q_id)  # ensure q_id exists
+    if x == False:
+        flash('Question doesnt exist')
+        return redirect(url_for('questions'))
     querydb.questionDelete(q_id)
     flash('Question has been deleted!')
     return redirect(url_for('questions'))
 
 
 @app.route('/questions/')
+@roles_required('admin')
 @login_required
-def questions():  # TODO Breaks if there are no quesions in db
+def questions():
     questions = querydb.getAllQuestions()
     if not questions:
 
@@ -288,7 +306,7 @@ def questions():  # TODO Breaks if there are no quesions in db
 @login_required
 def reviews(consult_id):
     print("CONSUKLT", consult_id)
-    if querydb.checkConsultId(consult_id): #ensure consult_id exists and user is allowed to do this review
+    if querydb.checkConsultId(consult_id, current_user.id): #ensure consult_id exists and user is allowed to do this review
         return render_template("reviews.html", consult_id=consult_id)
     else:
         return render_template('404.html'), 404
@@ -305,15 +323,17 @@ def reviewdeny():
 
     rev_id = request.args.get('rev_id')
     email = request.args.get('email')
+    print("EMAIL", email)
+    print("REV ID", rev_id)
     user = request.args.get('user')
     reason = Markup(request.form.get('reason'))
     print(reason)
-    if email is not None:
+    if email is not None and reason != "" and len(reason) > 3:
         emails.send_email(email, render_template('flask_user/emails/review_denied_subject.txt'),
                           render_template('flask_user/emails/review_denied_message.html',
-                                          app_name=current_app.user_manager.app_name, reason=reason, user=user),
+                                          app_name=current_app.user_manager.app_name, reason=reason, user=email),
                           render_template('flask_user/emails/review_denied_message.txt',
-                                          app_name=current_app.user_manager.app_name, reason=reason, user=user))
+                                          app_name=current_app.user_manager.app_name, reason=reason, user=email))
 
 
 
@@ -353,6 +373,8 @@ def questionsUserView():
 
     for q in questions:
         print(q)
+
+
         answers.append(querydb.getAnswer(q.q_id, child_id))
     # end Brody code
     if totalQuestions is None:
@@ -475,6 +497,7 @@ def post_questions():
 
 
 @app.route('/post_edit_questionAnswers', methods=['GET', 'POST'])
+@roles_required('admin')
 def post_editQuestions():
     questionAnswerList = request.form.getlist('fname')
     questionIdList = request.form.getlist('qField')
@@ -566,6 +589,9 @@ def childform():
 @app.route('/childform', methods=['POST'])
 @roles_required('user')
 def addChild():
+    if len(request.form.get('dateofbirth')) > 10:
+        flash('Error with date of birth, please ensure it follows format', 'error')
+        return parent()
     born = datetime.datetime.strptime(request.form.get('dateofbirth'), "%Y-%m-%d")
     today = datetime.date.today()
     age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
@@ -576,6 +602,16 @@ def addChild():
         flash('Error with childs age', 'error')
         return parent()
 
+
+    firstnamedup = request.form.get('firstname')
+    lastnamedup = request.form.get('lastname')
+    x = querydb.checkDupeChildName(firstnamedup, lastnamedup)
+
+    if x==True: #janky fix for if user spam clicks submit button
+        flash('error, child exists', 'error')
+        return parent()
+    print("KI-----------------------")
+    print("SAS", request.form.get('dateofbirth'))
     querydb.addChild(current_user.id, request.form.get('firstname'), request.form.get('lastname'),
                      request.form.get('dateofbirth'))
     return parent()
@@ -683,9 +719,9 @@ class SearchBar(FlaskForm):
 
 
 class FeeAssign(FlaskForm):
-    oneHourFee = StringField('1 Hour')
-    onePointFiveFee = StringField('1.5 Hour')
-    twoHourFee = StringField('2 Hour')
+    oneHourFee = StringField('1.0 Hour Fee: ')
+    onePointFiveFee = StringField('1.5 Hour Fee: ')
+    twoHourFee = StringField('2.0 Hour Fee: ')
     submit = SubmitField('Submit')
 
 
@@ -704,6 +740,16 @@ def feeAdjust():
         feeOne = form.oneHourFee.data
         feeOneFive = form.onePointFiveFee.data
         feeTwo = form.twoHourFee.data
+        try:
+            var = int(feeOne)
+            var2 = int(feeOneFive)
+            var3 = int(feeTwo)
+        except ValueError:
+            flash('Values need to numbers')
+            return render_template('admin/feeAdjust.html', form=form)
+        if (len(feeOne) > 10 or len(feeOneFive) > 10 or len(feeTwo) > 10):
+            flash('Values need to be less than 10 digits')
+            return render_template('admin/feeAdjust.html', form=form)
         querydb.updateLengthFee(1,feeOne)
         querydb.updateLengthFee(2,feeOneFive)
         querydb.updateLengthFee(3,feeTwo)
